@@ -4,6 +4,10 @@
   "private": true,
   "description": "JanLauncher - custom Hytale launcher",
   "homepage": "https://github.com/janekdeveloper/JanLauncher",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janekdeveloper/JanLauncher.git"
+  },
   "author": {
     "name": "Jan Dev",
     "email": "jandev.official@gmail.com"
@@ -96,12 +100,6 @@
           "arch": [
             "x64"
           ]
-        },
-        {
-          "target": "rpm",
-          "arch": [
-            "x64"
-          ]
         }
       ]
     },
@@ -120,9 +118,19 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
-    "publish": null,
-    "generateUpdatesFilesForAllChannels": true
+    "publish": {
+      "provider": "github",
+      "owner": "janekdeveloper",
+      "repo": "JanLauncher"
+    },
+    "generateUpdatesFilesForAllChannels": true,
+    "appImage": {
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "deb": {}
   }
 }
