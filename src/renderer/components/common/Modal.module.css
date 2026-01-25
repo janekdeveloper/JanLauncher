@@ -1,0 +1,71 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 999;
+}
+
+.modal {
+  width: min(520px, 90vw);
+  background: linear-gradient(160deg, rgba(20, 25, 40, 0.92), rgba(12, 16, 28, 0.88));
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(5, 10, 20, 0.45);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.closeButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
+}
+
+.closeButton:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--color-text);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.closeIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.body {
+  padding: 22px 20px 24px;
+}
+
+.footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
