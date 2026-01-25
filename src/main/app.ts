@@ -64,6 +64,7 @@ import { AuthManager } from "./core/auth/AuthManager";
 import { SanasolAuth, HytaleOfficialAuth } from "./core/auth/providers";
 import { registerIpcHandlers } from "./ipc";
 import { createMainWindow } from "./windows/mainWindow";
+import { UpdateService } from "./updater/UpdateService";
 
 const initializeCore = () => {
   Paths.init();
@@ -77,19 +78,28 @@ const initializeCore = () => {
   
   registerIpcHandlers();
   Logger.info("App", "JanLauncher started");
-  createMainWindow();
+  const mainWindow = createMainWindow();
+  
+  // Initialize update service after window is created
+  UpdateService.init(mainWindow);
 };
 
 app.whenReady().then(initializeCore);
 
 app.on("window-all-closed", () => {
+  UpdateService.cleanup();
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
+app.on("before-quit", () => {
+  UpdateService.cleanup();
+});
+
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
+    const mainWindow = createMainWindow();
+    UpdateService.init(mainWindow);
   }
 });
