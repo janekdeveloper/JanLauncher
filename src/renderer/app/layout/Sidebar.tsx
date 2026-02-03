@@ -5,9 +5,12 @@ import {
   LogsIcon,
   ModsIcon,
   NewsIcon,
-  SettingsIcon
+  SettingsIcon,
+  TelegramIcon,
+  DiscordIcon
 } from "../../components/icons";
 import { useI18n } from "../../i18n";
+import { api } from "../../services/api";
 import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
@@ -78,6 +81,31 @@ const Sidebar = () => {
             );
           })}
         </nav>
+
+        <div className={styles.socialButtons}>
+          <button
+            type="button"
+            onClick={() => api.news.openUrl("https://t.me/JanLauncher")}
+            className={styles.socialButton}
+            aria-label="Telegram"
+            title="Telegram"
+            onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <TelegramIcon className={styles.socialIcon} />
+          </button>
+          <button
+            type="button"
+            onClick={() => api.news.openUrl("https://discord.gg/8bnN2xRbMq")}
+            className={styles.socialButton}
+            aria-label="Discord"
+            title="Discord"
+            onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <DiscordIcon className={styles.socialIcon} />
+          </button>
+        </div>
       </aside>
       {tooltip && (
         <div

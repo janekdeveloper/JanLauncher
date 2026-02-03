@@ -135,7 +135,9 @@ export const ProfilesStoreProvider = ({
           minMemory: 1024,
           maxMemory: 4096,
           args: []
-        }
+        },
+        versionBranch: "release",
+        versionId: null
       };
       const created = await api.gameProfiles.create(profile);
       await loadGameProfiles();

@@ -11,6 +11,7 @@ type ModalProps = {
   children: React.ReactNode;
   footer?: React.ReactNode;
   closeLabel?: string;
+  blocking?: boolean;
 };
 
 const Modal = ({
@@ -19,7 +20,8 @@ const Modal = ({
   onClose,
   children,
   footer,
-  closeLabel
+  closeLabel,
+  blocking = false
 }: ModalProps) => {
   const { t } = useI18n();
 
@@ -27,8 +29,15 @@ const Modal = ({
     return null;
   }
 
+  const handleBackdropClick = blocking ? undefined : onClose;
+  const handleClose = blocking ? undefined : onClose;
+
   return createPortal(
-    <div className={styles.backdrop} onClick={onClose} role="presentation">
+    <div
+      className={`${styles.backdrop} ${blocking ? styles.blocking : ""}`}
+      onClick={handleBackdropClick}
+      role="presentation"
+    >
       <div
         className={styles.modal}
         role="dialog"
@@ -38,14 +47,16 @@ const Modal = ({
       >
         <header className={styles.header}>
           <h3 className={styles.title}>{title}</h3>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label={closeLabel ?? t("common.close")}
-          >
-            <CloseIcon className={styles.closeIcon} />
-          </button>
+          {!blocking && (
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={handleClose}
+              aria-label={closeLabel ?? t("common.close")}
+            >
+              <CloseIcon className={styles.closeIcon} />
+            </button>
+          )}
         </header>
         <div className={styles.body}>{children}</div>
         {footer ? <footer className={styles.footer}>{footer}</footer> : null}

@@ -61,6 +61,27 @@
   box-shadow: var(--shadow-glass);
 }
 
+.progressModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.errorModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.errorMessage {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
 .dropdown {
   position: relative;
   min-width: 240px;
@@ -139,6 +160,9 @@
   left: 0;
   bottom: calc(100% + 12px);
   width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: var(--color-glass-panel);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -248,6 +272,29 @@
 .actionIcon {
   width: 16px;
   height: 16px;
+}
+
+.versionActionButton {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border var(--transition-fast), box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.versionActionButton:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+}
+
+.versionActionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .dropdownCreate {

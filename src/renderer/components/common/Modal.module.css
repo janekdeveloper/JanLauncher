@@ -9,6 +9,10 @@
   z-index: 999;
 }
 
+.backdrop.blocking {
+  cursor: not-allowed;
+}
+
 .modal {
   width: min(520px, 90vw);
   background: linear-gradient(160deg, rgba(20, 25, 40, 0.92), rgba(12, 16, 28, 0.88));

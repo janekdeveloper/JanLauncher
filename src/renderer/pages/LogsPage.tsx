@@ -1,5 +1,7 @@
 import { useLogsViewModel } from "../viewmodels/useLogsViewModel";
 import { useI18n } from "../i18n";
+import { api } from "../services/api";
+import { FolderIcon } from "../components/icons";
 import styles from "./LogsPage.module.css";
 
 const LogsPage = () => {
@@ -13,6 +15,16 @@ const LogsPage = () => {
           <h2 className={styles.title}>{t("logs.title")}</h2>
           <p className={styles.subtitle}>{t("logs.subtitle")}</p>
         </div>
+        <button
+          type="button"
+          className={styles.openLogsButton}
+          onClick={() => api.paths.openLogsDir()}
+          title={t("logs.openLogsFolder")}
+          aria-label={t("logs.openLogsFolder")}
+        >
+          <FolderIcon className={styles.openLogsIcon} />
+          <span className={styles.openLogsText}>{t("logs.openLogsFolder")}</span>
+        </button>
       </div>
 
       {error && (

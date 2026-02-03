@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../services/api";
 import { useLauncherStore } from "../store/launcherStore";
-import type { AuthDomain, PlayerProfile } from "../../shared/types";
+import type {
+  AuthDomain,
+  PlayerProfile,
+  GameVersionBranch,
+  GameVersionInfo
+} from "../../shared/types";
 import type {
   AuthProviderInfo,
   AuthSession,
@@ -46,17 +51,33 @@ export const useHomeViewModel = () => {
   const [isAccountValid, setIsAccountValid] = useState<boolean | null>(null);
   const [isValidatingAccount, setIsValidatingAccount] = useState(false);
   const [authProviders, setAuthProviders] = useState<AuthProviderInfo[]>([]);
+  const [versionBranch, setVersionBranch] = useState<GameVersionBranch>("release");
+  const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
+  const [availableVersions, setAvailableVersions] = useState<GameVersionInfo[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [versionsLoadingAvailable, setVersionsLoadingAvailable] = useState(false);
+  const [versionsError, setVersionsError] = useState<string | null>(null);
+  const [versionInstallProgress, setVersionInstallProgress] = useState<{
+    message: string;
+    percent?: number;
+  } | null>(null);
+  const [isVersionInstalling, setIsVersionInstalling] = useState(false);
   const isValidatingRef = useRef(false);
   const isEditingPlayer = Boolean(editingPlayerId);
 
-  const canLaunch = Boolean(selectedPlayerId && selectedGameId && isAccountValid === true);
+  const canLaunch = Boolean(
+    selectedPlayerId &&
+      selectedGameId &&
+      isAccountValid === true &&
+      activeVersionId
+  );
 
   const getDefaultAuthDomain = (): AuthDomain => {
     const availableProvider = authProviders.find((p) => p.isAvailable);
     if (availableProvider) {
       return availableProvider.id as AuthDomain;
     }
-    return (authProviders[0]?.id as AuthDomain) || "sanasol.ws";
+    return (authProviders[0]?.id as AuthDomain) || "auth.sanasol.ws";
   };
 
   useEffect(() => {
@@ -111,6 +132,132 @@ export const useHomeViewModel = () => {
   }, []);
 
   useEffect(() => {
+    const cleanupProgress = api.versions.onProgress((progress) => {
+      setVersionInstallProgress(progress);
+      setIsVersionInstalling(true);
+      if (progress.percent !== undefined && progress.percent >= 100) {
+        setIsVersionInstalling(false);
+      }
+    });
+
+    const cleanupError = api.versions.onError((message) => {
+      setVersionsError(message);
+      setIsVersionInstalling(false);
+      setVersionInstallProgress(null);
+    });
+
+    return () => {
+      cleanupProgress();
+      cleanupError();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedGameId) {
+      setActiveVersionId(null);
+      return;
+    }
+    api.versions
+      .getActive(selectedGameId)
+      .then((active) => {
+        setVersionBranch(active.branch);
+        setActiveVersionId(active.versionId ?? null);
+      })
+      .catch((error) => {
+        setVersionsError(error instanceof Error ? error.message : "Failed to load active version");
+      });
+  }, [selectedGameId]);
+
+  useEffect(() => {
+    if (!versionBranch) return;
+    
+    let isMounted = true;
+    setVersionsError(null);
+    
+    const mergeVersions = (installed: GameVersionInfo[], available: GameVersionInfo[]): GameVersionInfo[] => {
+      const merged = new Map<string, GameVersionInfo>();
+      
+      installed.forEach((version) => {
+        merged.set(version.id, { ...version, installed: true, localOnly: true });
+      });
+      
+      available.forEach((version) => {
+        const existing = merged.get(version.id);
+        if (existing) {
+          merged.set(version.id, {
+            ...version,
+            installed: true,
+            localOnly: false
+          });
+        } else {
+          merged.set(version.id, {
+            ...version,
+            installed: false,
+            localOnly: false
+          });
+        }
+      });
+      
+      const result = Array.from(merged.values());
+      
+      const latest = available.find((v) => v.isLatest);
+      if (latest) {
+        result.forEach((v) => {
+          if (v.id === latest.id) {
+            v.isLatest = true;
+          } else {
+            v.isLatest = false;
+          }
+        });
+      }
+      
+      return result.sort((a, b) => b.version - a.version);
+    };
+    
+    const loadInstalledFirst = async () => {
+      try {
+        const installed = await api.versions.getInstalledAsInfo(versionBranch);
+        if (!isMounted) return;
+        
+        setAvailableVersions(installed);
+      } catch (error) {
+        if (!isMounted) return;
+        console.warn("[HomeViewModel] Failed to load installed versions", error);
+        setAvailableVersions([]);
+      }
+    };
+    
+    const loadAvailableInBackground = async () => {
+      setVersionsLoadingAvailable(true);
+      try {
+        const available = await api.versions.getAvailable(versionBranch);
+        if (!isMounted) return;
+        
+        setAvailableVersions((current) => {
+          const installed = current.filter((v) => v.installed);
+          return mergeVersions(installed, available);
+        });
+      } catch (error) {
+        if (!isMounted) return;
+        console.warn("[HomeViewModel] Failed to load available versions", error);
+        setVersionsError(error instanceof Error ? error.message : "Failed to load available versions");
+      } finally {
+        if (isMounted) {
+          setVersionsLoadingAvailable(false);
+        }
+      }
+    };
+    
+    loadInstalledFirst().then(() => {
+      loadAvailableInBackground();
+    });
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [versionBranch]);
+
+  useEffect(() => {
     let isMounted = true;
     api.auth
       .getProviders()
@@ -120,12 +267,12 @@ export const useHomeViewModel = () => {
         setAuthDomainDraft((prev) => {
           if (prev !== null) return prev;
           const defaultProvider = providers.find((p) => p.isAvailable) || providers[0];
-          return defaultProvider ? (defaultProvider.id as AuthDomain) : "sanasol.ws";
+          return defaultProvider ? (defaultProvider.id as AuthDomain) : "auth.sanasol.ws";
         });
       })
       .catch(() => {
         if (!isMounted) return;
-        setAuthDomainDraft((prev) => prev ?? "sanasol.ws");
+        setAuthDomainDraft((prev) => prev ?? "auth.sanasol.ws");
       });
     
     return () => {
@@ -308,6 +455,114 @@ export const useHomeViewModel = () => {
 
   const isGameNotInstalled = errorMessage === "Game is not installed";
 
+  const refreshVersions = async (branchOverride?: GameVersionBranch) => {
+    const targetBranch = branchOverride ?? versionBranch;
+    if (!targetBranch) return;
+    
+    setVersionsError(null);
+    
+    const mergeVersions = (installed: GameVersionInfo[], available: GameVersionInfo[]): GameVersionInfo[] => {
+      const merged = new Map<string, GameVersionInfo>();
+      
+      installed.forEach((version) => {
+        merged.set(version.id, { ...version, installed: true, localOnly: true });
+      });
+      
+      available.forEach((version) => {
+        const existing = merged.get(version.id);
+        if (existing) {
+          merged.set(version.id, {
+            ...version,
+            installed: true,
+            localOnly: false
+          });
+        } else {
+          merged.set(version.id, {
+            ...version,
+            installed: false,
+            localOnly: false
+          });
+        }
+      });
+      
+      const result = Array.from(merged.values());
+      
+      const latest = available.find((v) => v.isLatest);
+      if (latest) {
+        result.forEach((v) => {
+          if (v.id === latest.id) {
+            v.isLatest = true;
+          } else {
+            v.isLatest = false;
+          }
+        });
+      }
+      
+      return result.sort((a, b) => b.version - a.version);
+    };
+    
+    try {
+      const [installed, available] = await Promise.all([
+        api.versions.getInstalledAsInfo(targetBranch),
+        api.versions.getAvailable(targetBranch)
+      ]);
+      setAvailableVersions(mergeVersions(installed, available));
+    } catch (error) {
+      setVersionsError(error instanceof Error ? error.message : "Failed to load versions");
+      try {
+        const installed = await api.versions.getInstalledAsInfo(targetBranch);
+        setAvailableVersions(installed);
+      } catch (installedError) {
+        setAvailableVersions([]);
+      }
+    }
+  };
+
+  const setActiveBranch = async (branch: GameVersionBranch) => {
+    if (!selectedGameId) return;
+    setVersionsError(null);
+    setVersionBranch(branch);
+    setActiveVersionId(null);
+    await api.versions.setActive({
+      profileId: selectedGameId,
+      branch,
+      versionId: null
+    });
+  };
+
+  const setActiveVersion = async (versionId: string) => {
+    if (!selectedGameId) return;
+    setVersionsError(null);
+    await api.versions.setActive({
+      profileId: selectedGameId,
+      branch: versionBranch,
+      versionId
+    });
+    setActiveVersionId(versionId);
+  };
+
+  const installVersion = async (versionId: string) => {
+    setVersionsError(null);
+    setIsVersionInstalling(true);
+    setVersionInstallProgress({ message: "Starting installation...", percent: 0 });
+    try {
+      await api.versions.install({ branch: versionBranch, versionId });
+      await refreshVersions();
+    } finally {
+      setIsVersionInstalling(false);
+    }
+  };
+
+  const removeVersion = async (versionId: string) => {
+    setVersionsError(null);
+    try {
+      await api.versions.remove({ branch: versionBranch, versionId });
+      await refreshVersions();
+    } catch (error) {
+      setVersionsError(error instanceof Error ? error.message : "Failed to remove version");
+    }
+  };
+
   return {
     playerProfiles,
     gameProfiles,
@@ -352,6 +607,19 @@ export const useHomeViewModel = () => {
     isAccountValid,
     isValidatingAccount,
     refreshPlayerProfiles,
-    authProviders
+    authProviders,
+    versionBranch,
+    activeVersionId,
+    availableVersions,
+    versionsLoading,
+    versionsLoadingAvailable,
+    versionsError,
+    setVersionsError,
+    versionInstallProgress,
+    isVersionInstalling,
+    setActiveBranch,
+    setActiveVersion,
+    installVersion,
+    removeVersion
   };
 };

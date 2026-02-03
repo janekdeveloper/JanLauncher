@@ -11,6 +11,7 @@
   box-shadow: var(--shadow-glass);
   position: relative;
   z-index: 100;
+  justify-content: space-between;
 }
 
 .brand {
@@ -159,4 +160,45 @@
     opacity: 1;
     transform: translateY(-50%) translateX(0);
   }
+}
+
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.socialButton {
+  height: 48px;
+  border-radius: 14px;
+  background: var(--color-glass-panel);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-glass);
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border var(--transition-fast), box-shadow var(--transition-fast),
+    transform var(--transition-fast), color var(--transition-fast),
+    background var(--transition-fast);
+  position: relative;
+}
+
+.socialButton:hover {
+  background: var(--color-glass-gradient);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow),
+    0 4px 12px rgba(5 10 20 / 0.25);
+  transform: translateY(-1px);
+  color: var(--color-primary);
+}
+
+.socialIcon {
+  width: 22px;
+  height: 22px;
 }

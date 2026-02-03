@@ -6,7 +6,11 @@ import type {
   Mod,
   NewsArticle,
   PlayerProfile,
-  Settings
+  Settings,
+  GameVersionBranch,
+  GameVersionInfo,
+  ActiveGameVersion,
+  InstalledGameVersion
 } from "../../shared/types";
 import type {
   AuthProviderInfo,
@@ -107,6 +111,30 @@ export const api = {
     }): Promise<void> => apiInstance.mods.uninstall(options),
     openUrl: (url: string): Promise<void> => apiInstance.mods.openUrl(url)
   },
+  versions: {
+    getAvailable: (branch: GameVersionBranch): Promise<GameVersionInfo[]> =>
+      apiInstance.versions.getAvailable(branch),
+    getInstalled: (branch?: GameVersionBranch): Promise<InstalledGameVersion[]> =>
+      apiInstance.versions.getInstalled(branch),
+    getInstalledAsInfo: (branch?: GameVersionBranch): Promise<GameVersionInfo[]> =>
+      apiInstance.versions.getInstalledAsInfo(branch),
+    getActive: (profileId: string): Promise<ActiveGameVersion> =>
+      apiInstance.versions.getActive(profileId),
+    setActive: (options: {
+      profileId: string;
+      branch: GameVersionBranch;
+      versionId: string | null;
+    }): Promise<void> => apiInstance.versions.setActive(options),
+    install: (options: { branch: GameVersionBranch; versionId: string }): Promise<void> =>
+      apiInstance.versions.install(options),
+    remove: (options: { branch: GameVersionBranch; versionId: string }): Promise<void> =>
+      apiInstance.versions.remove(options),
+    onProgress: (
+      callback: (progress: { message: string; percent?: number }) => void
+    ): (() => void) => apiInstance.versions.onProgress(callback),
+    onError: (callback: (message: string) => void): (() => void) =>
+      apiInstance.versions.onError(callback)
+  },
   news: {
     loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null> =>
       apiInstance.news.loadCached(language),
@@ -138,6 +166,13 @@ export const api = {
   translation: {
     clearCache: (): Promise<void> => apiInstance.translation.clearCache()
   },
+  paths: {
+    openGameDir: (): Promise<void> => apiInstance.paths.openGameDir(),
+    openConfigDir: (): Promise<void> => apiInstance.paths.openConfigDir(),
+    openUserDataDir: (gameProfileId: string): Promise<void> =>
+      apiInstance.paths.openUserDataDir(gameProfileId),
+    openLogsDir: (): Promise<void> => apiInstance.paths.openLogsDir()
+  },
   updater: {
     check: (): Promise<void> => apiInstance.updater.check(),
     status: (): Promise<{
@@ -162,5 +197,9 @@ export const api = {
     ): (() => void) => apiInstance.updater.onUpdateDownloaded(callback),
     onError: (callback: (data: { error: string }) => void): (() => void) =>
       apiInstance.updater.onError(callback)
+  },
+  system: {
+    getTotalMemoryMB: (): Promise<number> =>
+      (apiInstance as any).system.getTotalMemoryMB()
   }
 };

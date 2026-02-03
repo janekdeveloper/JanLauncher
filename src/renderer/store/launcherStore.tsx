@@ -161,7 +161,9 @@ export const LauncherStoreProvider = ({
           minMemory: 1024,
           maxMemory: 4096,
           args: []
-        }
+        },
+        versionBranch: "release",
+        versionId: null
       };
       const created = await api.gameProfiles.create(profile);
       setGameProfiles((prev) => [created, ...prev]);

@@ -3,6 +3,9 @@ import { api } from "../services/api";
 import type { Settings } from "../../shared/types";
 import { useLauncherStore } from "../store/launcherStore";
 
+const MIN_MEMORY_MB = 2048;
+const DEFAULT_MAX_MEMORY_MB = 16384;
+
 export const useSettingsViewModel = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const { selectedGameId, gameProfiles, updateGameProfile } = useLauncherStore();
@@ -11,13 +14,46 @@ export const useSettingsViewModel = () => {
     ? gameProfiles.find((item) => item.id === selectedGameId)
     : null;
   
+  const [memoryLimit, setMemoryLimit] = useState<number>(DEFAULT_MAX_MEMORY_MB);
   const [memory, setMemory] = useState(
     selectedGame?.gameOptions?.maxMemory ?? 4096
   );
 
   useEffect(() => {
-    setMemory(selectedGame?.gameOptions?.maxMemory ?? 4096);
+    setMemory(prev => {
+      const next = selectedGame?.gameOptions?.maxMemory ?? 4096;
+      return next > 0 ? next : prev;
+    });
   }, [selectedGameId, selectedGame?.gameOptions?.maxMemory]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    api.system
+      .getTotalMemoryMB()
+      .then((totalMb) => {
+        if (!isMounted) return;
+        const clampedTotal =
+          Number.isFinite(totalMb) && totalMb > 0 ? totalMb : DEFAULT_MAX_MEMORY_MB;
+        const maxFromSystem = Math.max(
+          MIN_MEMORY_MB,
+          Math.floor(clampedTotal / 512) * 512
+        );
+        setMemoryLimit(maxFromSystem);
+        setMemory((prev) => {
+          const next = prev || MIN_MEMORY_MB;
+          return Math.min(Math.max(next, MIN_MEMORY_MB), maxFromSystem);
+        });
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setMemoryLimit(DEFAULT_MAX_MEMORY_MB);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -35,12 +71,18 @@ export const useSettingsViewModel = () => {
   };
 
   const updateMemory = (nextMemory: number) => {
+    const clamped = Math.min(
+      Math.max(nextMemory, MIN_MEMORY_MB),
+      memoryLimit || DEFAULT_MAX_MEMORY_MB
+    );
+    setMemory(clamped);
+
     if (selectedGameId) {
       const selectedGame = gameProfiles.find((item) => item.id === selectedGameId);
       if (selectedGame) {
         const nextGameOptions = {
           ...selectedGame.gameOptions,
-          maxMemory: nextMemory
+          maxMemory: clamped
         };
         void updateGameProfile(selectedGameId, { gameOptions: nextGameOptions });
       }
@@ -52,20 +94,34 @@ export const useSettingsViewModel = () => {
     setSettings((prev) => (prev ? { ...prev, jvmArgs: argsArray } : prev));
   };
 
+  const updateRussianLocalization = (enabled: boolean) => {
+    setSettings((prev) => (prev ? { ...prev, enableRussianLocalization: enabled } : prev));
+  };
+
+  const updateLauncherLanguage = (language: string) => {
+    setSettings((prev) => (prev ? { ...prev, launcherLanguage: language } : prev));
+  };
+
   const jvmArgsString = settings?.jvmArgs.join(" ") || "";
 
-  const save = async () => {
+  const save = async (currentLanguage?: string) => {
     if (!settings) return;
-    await api.settings.update(settings);
+    const settingsToSave = currentLanguage
+      ? { ...settings, launcherLanguage: currentLanguage }
+      : settings;
+    await api.settings.update(settingsToSave);
   };
 
   return {
     settings,
     memory,
+    memoryLimit,
     jvmArgsString,
     updateJavaPath,
     updateMemory,
     updateJvmArgs,
+    updateRussianLocalization,
+    updateLauncherLanguage,
     save
   };
 };

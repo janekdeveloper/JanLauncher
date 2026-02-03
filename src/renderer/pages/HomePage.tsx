@@ -4,20 +4,19 @@ import type { ReactNode } from "react";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Modal from "../components/common/Modal";
+import { ProgressBar } from "../components/common/ProgressBar";
 import {
   ChevronDownIcon,
   EditIcon,
   GameProfileIcon,
   TrashIcon,
-  UserIcon,
-  TelegramIcon,
-  DiscordIcon
+  UserIcon
 } from "../components/icons";
 import { useDropdown } from "../hooks/useDropdown";
 import { useI18n } from "../i18n";
 import { useHomeViewModel } from "../viewmodels/useHomeViewModel";
 import { api } from "../services/api";
-import type { AuthDomain } from "../../shared/types";
+import type { AuthDomain, GameVersionBranch } from "../../shared/types";
 import type { AuthProviderInfo } from "../../main/core/auth/auth.types";
 import styles from "./HomePage.module.css";
 
@@ -34,9 +33,9 @@ type DockSelectProps = {
   icon: ReactNode;
   options: DockOption[];
   onSelect: (id: string) => void;
-  onCreate: () => void;
+  onCreate?: () => void;
   renderActions?: (id: string) => ReactNode;
-  createLabel: string;
+  createLabel?: string;
   emptyLabel: string;
 };
 
@@ -104,6 +103,7 @@ const DockSelect = ({
           ) : (
             <div className={styles.dropdownEmpty}>{emptyLabel}</div>
           )}
+          {onCreate && createLabel ? (
           <button
             type="button"
             className={styles.dropdownCreate}
@@ -114,6 +114,7 @@ const DockSelect = ({
           >
             {createLabel}
           </button>
+          ) : null}
         </div>
       ) : null}
     </div>
@@ -166,7 +167,20 @@ const HomePage = () => {
     isAccountValid,
     isValidatingAccount,
     refreshPlayerProfiles,
-    authProviders
+    authProviders,
+    versionBranch,
+    activeVersionId,
+    availableVersions,
+    versionsLoading,
+    versionsLoadingAvailable,
+    versionsError,
+    setVersionsError,
+    versionInstallProgress,
+    isVersionInstalling,
+    setActiveBranch,
+    setActiveVersion,
+    installVersion,
+    removeVersion
   } = useHomeViewModel();
 
   useEffect(() => {
@@ -183,7 +197,7 @@ const HomePage = () => {
     if (provider) {
       if (provider.id === "hytale.com") {
         meta = t("home.authSystemHytale");
-      } else if (provider.id === "sanasol.ws") {
+      } else if (provider.id === "auth.sanasol.ws") {
         meta = t("home.authSystemSanasol");
       } else {
         meta = provider.displayName;
@@ -191,7 +205,7 @@ const HomePage = () => {
     } else if (profile.authDomain) {
       if (profile.authDomain === "hytale.com") {
         meta = t("home.authSystemHytale");
-      } else if (profile.authDomain === "sanasol.ws") {
+      } else if (profile.authDomain === "auth.sanasol.ws") {
         meta = t("home.authSystemSanasol");
       } else {
         meta = profile.authDomain;
@@ -201,7 +215,7 @@ const HomePage = () => {
       if (defaultProvider) {
         if (defaultProvider.id === "hytale.com") {
           meta = t("home.authSystemHytale");
-        } else if (defaultProvider.id === "sanasol.ws") {
+        } else if (defaultProvider.id === "auth.sanasol.ws") {
           meta = t("home.authSystemSanasol");
         } else {
           meta = defaultProvider.displayName;
@@ -230,6 +244,38 @@ const HomePage = () => {
     label: profile.name,
     meta: t("home.modCount", { count: profile.mods.length })
   }));
+
+  const branchOptions: DockOption[] = [
+    { id: "release", label: t("home.branchRelease") },
+    { id: "pre-release", label: t("home.branchPreRelease") },
+    { id: "beta", label: t("home.branchBeta") },
+    { id: "alpha", label: t("home.branchAlpha") }
+  ];
+
+  const versionOptions: DockOption[] = availableVersions.map((version) => {
+    const isActive = version.id === activeVersionId;
+    return {
+      id: `${version.branch}:${version.id}`,
+      label: version.isLatest ? `${version.label} (${t("home.versionLatest")})` : version.label,
+      meta: isActive
+        ? t("home.versionActive")
+        : version.installed
+          ? t("home.versionInstalled")
+          : t("home.versionNotInstalled")
+    };
+  });
+
+  const activeVersion = availableVersions.find((version) => version.id === activeVersionId);
+  const branchValue =
+    branchOptions.find((option) => option.id === versionBranch)?.label ??
+    versionBranch;
+  const versionValue = versionsLoadingAvailable
+    ? t("home.versionLoading")
+    : activeVersion
+      ? activeVersion.isLatest
+        ? `${activeVersion.label} (${t("home.versionLatest")})`
+        : activeVersion.label
+      : t("home.versionPlaceholder");
 
   return (
     <section className={styles.page}>
@@ -299,26 +345,90 @@ const HomePage = () => {
           createLabel={t("home.createGameProfile")}
           emptyLabel={t("home.emptyGameProfiles")}
         />
+        <DockSelect
+          label={t("home.branchLabel")}
+          value={branchValue}
+          icon={<GameProfileIcon className={styles.iconSvg} />}
+          options={branchOptions}
+          onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
+          emptyLabel={t("home.branchEmpty")}
+        />
+        <DockSelect
+          label={t("home.versionLabel")}
+          value={versionValue}
+          icon={<GameProfileIcon className={styles.iconSvg} />}
+          options={versionOptions}
+          onSelect={(compositeId) => {
+            const [, versionId] = compositeId.split(":", 2);
+            setActiveVersion(versionId);
+          }}
+          renderActions={(compositeId) => {
+            const [, versionId] = compositeId.split(":", 2);
+            const version = availableVersions.find((item) => item.id === versionId);
+            if (!version) return null;
+            if (version.installed) {
+              const isActive = version.id === activeVersionId;
+              return (
+                <button
+                  type="button"
+                  className={styles.versionActionButton}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeVersion(versionId);
+                  }}
+                  disabled={isActive}
+                  aria-label={t("home.versionRemove")}
+                >
+                  {t("home.versionRemove")}
+                </button>
+              );
+            }
+            return (
+              <button
+                type="button"
+                className={styles.versionActionButton}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  installVersion(versionId);
+                }}
+                disabled={isVersionInstalling}
+                aria-label={t("home.versionInstall")}
+              >
+                {t("home.versionInstall")}
+              </button>
+            );
+          }}
+          emptyLabel={versionsLoadingAvailable ? t("home.versionLoading") : t("home.versionEmpty")}
+        />
       </div>
 
-      <div className={styles.socialButtons}>
-        <button
-          type="button"
-          onClick={() => api.news.openUrl("https://t.me/JanLauncher")}
-          className={styles.socialButton}
-          aria-label="Telegram"
+      <Modal
+        isOpen={isVersionInstalling}
+        title={t("home.versionInstallingTitle")}
+        onClose={() => {}}
+        blocking={true}
+      >
+        <div className={styles.progressModalContent}>
+          <ProgressBar
+            percent={versionInstallProgress?.percent}
+            label={versionInstallProgress?.message ?? t("home.versionInstalling")}
+          />
+        </div>
+      </Modal>
+
+      {versionsError && (
+        <Modal
+          isOpen={Boolean(versionsError)}
+          title={t("home.versionErrorTitle")}
+          onClose={() => {
+            setVersionsError(null);
+          }}
         >
-          <TelegramIcon className={styles.socialIcon} />
-        </button>
-        <button
-          type="button"
-          onClick={() => api.news.openUrl("https://discord.gg/8bnN2xRbMq")}
-          className={styles.socialButton}
-          aria-label="Discord"
-        >
-          <DiscordIcon className={styles.socialIcon} />
-        </button>
-      </div>
+          <div className={styles.errorModalContent}>
+            <p className={styles.errorMessage}>{versionsError}</p>
+          </div>
+        </Modal>
+      )}
 
       <Modal
         isOpen={isPlayerModalOpen}
@@ -398,12 +508,12 @@ const HomePage = () => {
                   <span className={styles.authSystemOptionName}>
                     {provider.id === "hytale.com"
                       ? t("home.authSystemHytale")
-                      : provider.id === "sanasol.ws"
+                      : provider.id === "auth.sanasol.ws"
                       ? t("home.authSystemSanasol")
                       : provider.displayName}
                   </span>
                   <span className={styles.authSystemOptionDomain}>{provider.id}</span>
-                  {provider.id === "sanasol.ws" && !isDisabled && (
+                  {provider.id === "auth.sanasol.ws" && !isDisabled && (
                     <span className={styles.authSystemOptionHint}>
                       {t("home.authSystemSanasolHint")}
                     </span>

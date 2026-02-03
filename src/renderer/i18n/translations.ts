@@ -43,7 +43,7 @@ export const translations = {
       nicknamePlaceholder: "Введите никнейм",
       authSystemLabel: "Система аккаунта",
       authSystemHytale: "Официальная (hytale.com)",
-      authSystemSanasol: "Сторонняя (sanasol.ws)",
+      authSystemSanasol: "Сторонняя (auth.sanasol.ws)",
       authSystemSanasolHint: "Без пароля",
       authSystemUnavailable: "Недоступна",
       validatingAccount: "Проверка...",
@@ -59,7 +59,26 @@ export const translations = {
       installCompletedTitle: "Установка завершена",
       installCompletedMessage: "Игра установлена и готова к запуску.",
       installButton: "Установить",
-      installing: "Установка..."
+      installing: "Установка...",
+      branchLabel: "Ветка",
+      branchRelease: "Release",
+      branchPreRelease: "Pre-release",
+      branchBeta: "Beta",
+      branchAlpha: "Alpha",
+      branchEmpty: "Нет веток",
+      versionLabel: "Версия",
+      versionPlaceholder: "Выберите версию",
+      versionLatest: "Последняя",
+      versionInstalled: "Установлена",
+      versionActive: "Активная",
+      versionNotInstalled: "Не установлена",
+      versionInstall: "Установить",
+      versionRemove: "Удалить",
+      versionEmpty: "Версии не найдены",
+      versionLoading: "Загрузка версий...",
+      versionInstalling: "Установка версии...",
+      versionInstallingTitle: "Установка версии",
+      versionErrorTitle: "Ошибка установки версии"
     },
     mods: {
       title: "Моды",
@@ -135,11 +154,17 @@ export const translations = {
       loading: "Загрузка настроек...",
       languageLabel: "Язык интерфейса",
       languageHint: "Изменение языка применяется сразу.",
-      clearCache: "Очистить кеш переводов"
+      enableRussianLocalization: "Включить русскую локализацию игры",
+      clearCache: "Очистить кеш переводов",
+      foldersTitle: "Папки",
+      openGameDir: "Папка игры",
+      openConfigDir: "Папка конфигурации",
+      openUserDataDir: "Папка профиля"
     },
     logs: {
       title: "Логи",
-      subtitle: "Отслеживайте состояние лаунчера и запусков."
+      subtitle: "Отслеживайте состояние лаунчера и запусков.",
+      openLogsFolder: "Открыть папку логов"
     },
     logMessages: {
       init: "Лаунчер запущен и готов к работе.",
@@ -193,7 +218,7 @@ export const translations = {
       nicknamePlaceholder: "Enter nickname",
       authSystemLabel: "Account system",
       authSystemHytale: "Official (hytale.com)",
-      authSystemSanasol: "Third-party (sanasol.ws)",
+      authSystemSanasol: "Third-party (auth.sanasol.ws)",
       authSystemSanasolHint: "No password",
       authSystemUnavailable: "Unavailable",
       validatingAccount: "Validating...",
@@ -209,7 +234,26 @@ export const translations = {
       installCompletedTitle: "Installation Complete",
       installCompletedMessage: "The game is installed and ready to launch.",
       installButton: "Install",
-      installing: "Installing..."
+      installing: "Installing...",
+      branchLabel: "Branch",
+      branchRelease: "Release",
+      branchPreRelease: "Pre-release",
+      branchBeta: "Beta",
+      branchAlpha: "Alpha",
+      branchEmpty: "No branches",
+      versionLabel: "Version",
+      versionPlaceholder: "Select version",
+      versionLatest: "Latest",
+      versionInstalled: "Installed",
+      versionActive: "Active",
+      versionNotInstalled: "Not installed",
+      versionInstall: "Install",
+      versionRemove: "Remove",
+      versionEmpty: "No versions found",
+      versionLoading: "Loading versions...",
+      versionInstalling: "Installing version...",
+      versionInstallingTitle: "Installing Version",
+      versionErrorTitle: "Version Installation Error"
     },
     mods: {
       title: "Mods",
@@ -285,11 +329,17 @@ export const translations = {
       loading: "Loading settings...",
       languageLabel: "Language",
       languageHint: "Language changes apply instantly.",
-      clearCache: "Clear translation cache"
+      enableRussianLocalization: "Enable Russian fan localization",
+      clearCache: "Clear translation cache",
+      foldersTitle: "Folders",
+      openGameDir: "Game folder",
+      openConfigDir: "Config folder",
+      openUserDataDir: "Profile folder"
     },
     logs: {
       title: "Logs",
-      subtitle: "Track launcher state and launches."
+      subtitle: "Track launcher state and launches.",
+      openLogsFolder: "Open logs folder"
     },
     logMessages: {
       init: "Launcher initialized and ready.",
@@ -343,7 +393,7 @@ export const translations = {
       nicknamePlaceholder: "Введіть нікнейм",
       authSystemLabel: "Система акаунта",
       authSystemHytale: "Офіційна (hytale.com)",
-      authSystemSanasol: "Стороння (sanasol.ws)",
+      authSystemSanasol: "Стороння (auth.sanasol.ws)",
       authSystemSanasolHint: "Без пароля",
       authSystemUnavailable: "Недоступна",
       validatingAccount: "Перевірка...",
@@ -359,7 +409,26 @@ export const translations = {
       installCompletedTitle: "Встановлення завершено",
       installCompletedMessage: "Гру встановлено та готово до запуску.",
       installButton: "Встановити",
-      installing: "Встановлення..."
+      installing: "Встановлення...",
+      branchLabel: "Гілка",
+      branchRelease: "Release",
+      branchPreRelease: "Pre-release",
+      branchBeta: "Beta",
+      branchAlpha: "Alpha",
+      branchEmpty: "Немає гілок",
+      versionLabel: "Версія",
+      versionPlaceholder: "Оберіть версію",
+      versionLatest: "Остання",
+      versionInstalled: "Встановлено",
+      versionActive: "Активна",
+      versionNotInstalled: "Не встановлено",
+      versionInstall: "Встановити",
+      versionRemove: "Видалити",
+      versionEmpty: "Версії не знайдено",
+      versionLoading: "Завантаження версій...",
+      versionInstalling: "Встановлення версії...",
+      versionInstallingTitle: "Встановлення версії",
+      versionErrorTitle: "Помилка встановлення версії"
     },
       mods: {
       title: "Моди",
@@ -435,11 +504,17 @@ export const translations = {
       loading: "Завантаження налаштувань...",
       languageLabel: "Мова інтерфейсу",
       languageHint: "Зміна мови застосовується одразу.",
-      clearCache: "Очистити кеш перекладів"
+      enableRussianLocalization: "Увімкнути російську локалізацію гри",
+      clearCache: "Очистити кеш перекладів",
+      foldersTitle: "Папки",
+      openGameDir: "Папка гри",
+      openConfigDir: "Папка конфігурації",
+      openUserDataDir: "Папка профілю"
     },
     logs: {
       title: "Логи",
-      subtitle: "Відстежуйте стан лаунчера та запусків."
+      subtitle: "Відстежуйте стан лаунчера та запусків.",
+      openLogsFolder: "Відкрити папку логів"
     },
     logMessages: {
       init: "Лаунчер запущено та готово.",
@@ -493,7 +568,7 @@ export const translations = {
       nicknamePlaceholder: "Wpisz nick",
       authSystemLabel: "System konta",
       authSystemHytale: "Oficjalny (hytale.com)",
-      authSystemSanasol: "Zewnętrzny (sanasol.ws)",
+      authSystemSanasol: "Zewnętrzny (auth.sanasol.ws)",
       authSystemSanasolHint: "Bez hasła",
       authSystemUnavailable: "Niedostępny",
       validatingAccount: "Weryfikacja...",
@@ -509,7 +584,26 @@ export const translations = {
       installCompletedTitle: "Instalacja zakończona",
       installCompletedMessage: "Gra jest zainstalowana i gotowa do uruchomienia.",
       installButton: "Zainstaluj",
-      installing: "Instalowanie..."
+      installing: "Instalowanie...",
+      branchLabel: "Gałąź",
+      branchRelease: "Release",
+      branchPreRelease: "Pre-release",
+      branchBeta: "Beta",
+      branchAlpha: "Alpha",
+      branchEmpty: "Brak gałęzi",
+      versionLabel: "Wersja",
+      versionPlaceholder: "Wybierz wersję",
+      versionLatest: "Najnowsza",
+      versionInstalled: "Zainstalowana",
+      versionActive: "Aktywna",
+      versionNotInstalled: "Nie zainstalowana",
+      versionInstall: "Zainstaluj",
+      versionRemove: "Usuń",
+      versionEmpty: "Nie znaleziono wersji",
+      versionLoading: "Ładowanie wersji...",
+      versionInstalling: "Instalowanie wersji...",
+      versionInstallingTitle: "Instalowanie wersji",
+      versionErrorTitle: "Błąd instalacji wersji"
     },
     mods: {
       title: "Mody",
@@ -585,11 +679,17 @@ export const translations = {
       loading: "Ładowanie ustawień...",
       languageLabel: "Język interfejsu",
       languageHint: "Zmiana języka jest natychmiastowa.",
-      clearCache: "Wyczyść cache tłumaczeń"
+      enableRussianLocalization: "Włącz rosyjską lokalizację gry",
+      clearCache: "Wyczyść cache tłumaczeń",
+      foldersTitle: "Foldery",
+      openGameDir: "Folder gry",
+      openConfigDir: "Folder konfiguracji",
+      openUserDataDir: "Folder profilu"
     },
     logs: {
       title: "Logi",
-      subtitle: "Śledź stan launchera i uruchomień."
+      subtitle: "Śledź stan launchera i uruchomień.",
+      openLogsFolder: "Otwórz folder logów"
     },
     logMessages: {
       init: "Launcher uruchomiony i gotowy.",
@@ -643,7 +743,7 @@ export const translations = {
       nicknamePlaceholder: "Увядзіце нікнэйм",
       authSystemLabel: "Сістэма акаўнта",
       authSystemHytale: "Афіцыйная (hytale.com)",
-      authSystemSanasol: "Сторонняя (sanasol.ws)",
+      authSystemSanasol: "Сторонняя (auth.sanasol.ws)",
       authSystemSanasolHint: "Без пароля",
       authSystemUnavailable: "Недаступная",
       validatingAccount: "Праверка...",
@@ -659,7 +759,26 @@ export const translations = {
       installCompletedTitle: "Усталёўка завершана",
       installCompletedMessage: "Гульня ўсталявана і гатовая да запуску.",
       installButton: "Усталяваць",
-      installing: "Усталёўка..."
+      installing: "Усталёўка...",
+      branchLabel: "Галіна",
+      branchRelease: "Release",
+      branchPreRelease: "Pre-release",
+      branchBeta: "Beta",
+      branchAlpha: "Alpha",
+      branchEmpty: "Няма галінаў",
+      versionLabel: "Версія",
+      versionPlaceholder: "Абярыце версію",
+      versionLatest: "Апошняя",
+      versionInstalled: "Усталявана",
+      versionActive: "Актыўная",
+      versionNotInstalled: "Не ўсталявана",
+      versionInstall: "Усталяваць",
+      versionRemove: "Выдаліць",
+      versionEmpty: "Версіі не знойдзены",
+      versionLoading: "Загрузка версій...",
+      versionInstalling: "Усталёўка версіі...",
+      versionInstallingTitle: "Усталёўка версіі",
+      versionErrorTitle: "Памылка ўсталёўкі версіі"
     },
     mods: {
       title: "Моды",
@@ -735,11 +854,17 @@ export const translations = {
       loading: "Загрузка налад...",
       languageLabel: "Мова інтэрфейсу",
       languageHint: "Змена мовы ўжываецца адразу.",
-      clearCache: "Ачысціць кеш перакладаў"
+      enableRussianLocalization: "Уключыць расійскую лакалізацыю гульні",
+      clearCache: "Ачысціць кеш перакладаў",
+      foldersTitle: "Папкі",
+      openGameDir: "Папка гульні",
+      openConfigDir: "Папка канфігурацыі",
+      openUserDataDir: "Папка профілю"
     },
     logs: {
       title: "Логі",
-      subtitle: "Адсочвайце стан лаўнчара і запускаў."
+      subtitle: "Адсочвайце стан лаўнчара і запускаў.",
+      openLogsFolder: "Адкрыць папку логаў"
     },
     logMessages: {
       init: "Лаўнчар запушчаны і гатовы да працы.",
