@@ -15,7 +15,7 @@ import type {
 
 export interface IAuthProvider {
   /**
-   * Unique identifier for this provider (e.g., "hytale.com", "sanasol.ws")
+   * Unique identifier for this provider (e.g., "hytale.com", "auth.sanasol.ws")
    */
   readonly id: string;
 

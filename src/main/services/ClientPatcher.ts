@@ -4,7 +4,7 @@ import AdmZip from "adm-zip";
 import { Logger } from "../core/Logger";
 
 const ORIGINAL_DOMAIN = "hytale.com";
-const DEFAULT_AUTH_DOMAIN = "sanasol.ws";
+const DEFAULT_AUTH_DOMAIN = "auth.sanasol.ws";
 
 type PatchResult = {
   success: boolean;

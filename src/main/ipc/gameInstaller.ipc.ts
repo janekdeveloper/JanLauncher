@@ -2,6 +2,7 @@ import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { Logger } from "../core/Logger";
 import { GameInstaller } from "../services/GameInstaller";
 import type { InstallProgress } from "../services/GameInstaller";
+import { VersionManager } from "../versioning/VersionManager";
 
 /**
  * Registers IPC handlers for game installation.
@@ -16,6 +17,10 @@ export const registerGameInstallerHandlers = (): void => {
       Logger.info("IPC", `game:install - game: ${options.gameProfileId}`);
 
       try {
+        const activeVersion = VersionManager.getActiveVersion(options.gameProfileId);
+        if (!activeVersion.versionId) {
+          throw new Error("No active game version selected for this profile");
+        }
         await GameInstaller.installGame({
           profileId: options.gameProfileId,
           onProgress: (progress: InstallProgress) => {

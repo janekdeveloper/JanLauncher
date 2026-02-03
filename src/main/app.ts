@@ -64,12 +64,15 @@ import { AuthManager } from "./core/auth/AuthManager";
 import { SanasolAuth, HytaleOfficialAuth } from "./core/auth/providers";
 import { registerIpcHandlers } from "./ipc";
 import { createMainWindow } from "./windows/mainWindow";
+import { WindowManager } from "./windows/windowManager";
 import { UpdateService } from "./updater/UpdateService";
+import { VersionManager } from "./versioning/VersionManager";
 
 const initializeCore = () => {
   Paths.init();
   Logger.init("main");
   ConfigStore.init();
+  VersionManager.migrateLegacyInstall();
   
   AuthManager.init([
     new SanasolAuth(),
@@ -79,6 +82,9 @@ const initializeCore = () => {
   registerIpcHandlers();
   Logger.info("App", "JanLauncher started");
   const mainWindow = createMainWindow();
+  
+  // Initialize window manager
+  WindowManager.init(mainWindow);
   
   // Initialize update service after window is created
   UpdateService.init(mainWindow);
@@ -100,6 +106,7 @@ app.on("before-quit", () => {
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     const mainWindow = createMainWindow();
+    WindowManager.init(mainWindow);
     UpdateService.init(mainWindow);
   }
 });

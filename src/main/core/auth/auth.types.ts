@@ -11,7 +11,7 @@ export type AuthSession = {
   providerId: string;
 };
 
-export type AuthProviderId = "hytale.com" | "sanasol.ws";
+export type AuthProviderId = "hytale.com" | "auth.sanasol.ws";
 
 export type LoginParams = {
   uuid: string;

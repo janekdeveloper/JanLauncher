@@ -8,7 +8,10 @@ import { registerModsHandlers } from "./mods.ipc";
 import { registerNewsHandlers } from "./news.ipc";
 import { registerAuthHandlers } from "./auth.ipc";
 import { registerTranslationHandlers } from "./translation.ipc";
+import { registerPathsHandlers } from "./paths.ipc";
 import { registerUpdateHandlers } from "../updater/updateIpc";
+import { registerVersionsHandlers } from "./versions.ipc";
+import { registerSystemHandlers } from "./system.ipc";
 import { Logger } from "../core/Logger";
 
 /**
@@ -26,6 +29,9 @@ export const registerIpcHandlers = (): void => {
   registerNewsHandlers();
   registerAuthHandlers();
   registerTranslationHandlers();
+  registerPathsHandlers();
+  registerVersionsHandlers();
+  registerSystemHandlers();
   registerUpdateHandlers();
   Logger.info("IPC", "IPC handlers registered");
 };

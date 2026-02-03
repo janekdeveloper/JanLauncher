@@ -7,7 +7,11 @@ import type {
   Mod,
   NewsArticle,
   PlayerProfile,
-  Settings
+  Settings,
+  GameVersionBranch,
+  GameVersionInfo,
+  ActiveGameVersion,
+  InstalledGameVersion
 } from "../shared/types";
 import type {
   AuthProviderInfo,
@@ -66,6 +70,17 @@ export interface PreloadApi {
     uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
     openUrl(url: string): Promise<void>;
   };
+  versions: {
+    getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
+    getInstalled(branch?: GameVersionBranch): Promise<InstalledGameVersion[]>;
+    getInstalledAsInfo(branch?: GameVersionBranch): Promise<GameVersionInfo[]>;
+    getActive(profileId: string): Promise<ActiveGameVersion>;
+    setActive(options: { profileId: string; branch: GameVersionBranch; versionId: string | null }): Promise<void>;
+    install(options: { branch: GameVersionBranch; versionId: string }): Promise<void>;
+    remove(options: { branch: GameVersionBranch; versionId: string }): Promise<void>;
+    onProgress(callback: (progress: { message: string; percent?: number }) => void): () => void;
+    onError(callback: (message: string) => void): () => void;
+  };
   news: {
     loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
     refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
@@ -85,6 +100,12 @@ export interface PreloadApi {
   translation: {
     clearCache(): Promise<void>;
   };
+  paths: {
+    openGameDir(): Promise<void>;
+    openConfigDir(): Promise<void>;
+    openUserDataDir(gameProfileId: string): Promise<void>;
+    openLogsDir(): Promise<void>;
+  };
   updater: {
     check(): Promise<void>;
     status(): Promise<{
@@ -101,6 +122,12 @@ export interface PreloadApi {
     onDownloadProgress(callback: (data: { percent: number; transferred: number; total: number }) => void): () => void;
     onUpdateDownloaded(callback: (data: { version: string; releaseDate?: string; releaseNotes?: string }) => void): () => void;
     onError(callback: (data: { error: string }) => void): () => void;
+  };
+  system: {
+    /**
+     * Returns total physical memory in megabytes.
+     */
+    getTotalMemoryMB(): Promise<number>;
   };
 }
 
@@ -198,6 +225,33 @@ const api: PreloadApi = {
     uninstall: (options) => ipcRenderer.invoke("mods:uninstall", options),
     openUrl: (url) => ipcRenderer.invoke("mods:openUrl", url)
   },
+  versions: {
+    getAvailable: (branch) => ipcRenderer.invoke("versions:getAvailable", branch),
+    getInstalled: (branch?: GameVersionBranch) => ipcRenderer.invoke("versions:getInstalled", branch),
+    getInstalledAsInfo: (branch?: GameVersionBranch) => ipcRenderer.invoke("versions:getInstalledAsInfo", branch),
+    getActive: (profileId: string) => ipcRenderer.invoke("versions:getActive", profileId),
+    setActive: (options) => ipcRenderer.invoke("versions:setActive", options),
+    install: (options) => ipcRenderer.invoke("versions:install", options),
+    remove: (options) => ipcRenderer.invoke("versions:remove", options),
+    onProgress: (callback) => {
+      const handler = (_event: unknown, progress: { message: string; percent?: number }) => {
+        callback(progress);
+      };
+      ipcRenderer.on("versions:install:progress", handler);
+      return () => {
+        ipcRenderer.removeListener("versions:install:progress", handler);
+      };
+    },
+    onError: (callback) => {
+      const handler = (_event: unknown, message: string) => {
+        callback(message);
+      };
+      ipcRenderer.on("versions:install:error", handler);
+      return () => {
+        ipcRenderer.removeListener("versions:install:error", handler);
+      };
+    }
+  },
   news: {
     loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
       ipcRenderer.invoke("news:loadCached", language),
@@ -221,6 +275,13 @@ const api: PreloadApi = {
   },
   translation: {
     clearCache: () => ipcRenderer.invoke("translation:clearCache")
+  },
+  paths: {
+    openGameDir: () => ipcRenderer.invoke("paths:openGameDir"),
+    openConfigDir: () => ipcRenderer.invoke("paths:openConfigDir"),
+    openUserDataDir: (gameProfileId: string) =>
+      ipcRenderer.invoke("paths:openUserDataDir", gameProfileId),
+    openLogsDir: () => ipcRenderer.invoke("paths:openLogsDir")
   },
   updater: {
     check: () => ipcRenderer.invoke("updater:check"),
@@ -273,6 +334,9 @@ const api: PreloadApi = {
         ipcRenderer.removeListener("updater:error", handler);
       };
     }
+  },
+  system: {
+    getTotalMemoryMB: () => ipcRenderer.invoke("system:getTotalMemory")
   }
 };
 

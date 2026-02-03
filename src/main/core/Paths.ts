@@ -24,6 +24,8 @@ export class Paths {
   private static _logsGameDir = "";
   private static _gameInstallDir = "";
   private static _gameStagingDir = "";
+  private static _gameVersionsDir = "";
+  private static _gameCacheDir = "";
   private static _gameProfilesDir = "";
   private static _javaDir = "";
   private static _newsCacheFile = "";
@@ -75,6 +77,8 @@ export class Paths {
 
     this._gameInstallDir = path.join(this._dataRoot, "game", "current");
     this._gameStagingDir = path.join(this._dataRoot, "game", "staging");
+    this._gameVersionsDir = path.join(this._dataRoot, "game", "versions");
+    this._gameCacheDir = path.join(this._dataRoot, "game", "cache");
     this._gameProfilesDir = path.join(this._dataRoot, "game-profiles");
     this._javaDir = path.join(this._dataRoot, "java");
 
@@ -88,6 +92,8 @@ export class Paths {
       this._dataRoot,
       this._gameInstallDir,
       this._gameStagingDir,
+      this._gameVersionsDir,
+      this._gameCacheDir,
       this._gameProfilesDir,
       this._javaDir
     ];
@@ -175,6 +181,16 @@ export class Paths {
     return this._gameStagingDir;
   }
 
+  static get gameVersionsDir(): string {
+    this.ensureInitialized();
+    return this._gameVersionsDir;
+  }
+
+  static get gameCacheDir(): string {
+    this.ensureInitialized();
+    return this._gameCacheDir;
+  }
+
   static get gameProfilesDir(): string {
     this.ensureInitialized();
     return this._gameProfilesDir;
@@ -206,7 +222,12 @@ export class Paths {
    */
   static getGameDir(): string {
     this.ensureInitialized();
-    return this._gameInstallDir;
+    return this._gameVersionsDir;
+  }
+
+  static getGameVersionDir(branch: string, versionId: string): string {
+    this.ensureInitialized();
+    return path.join(this._gameVersionsDir, branch, versionId);
   }
 
   /**

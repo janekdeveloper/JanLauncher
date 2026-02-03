@@ -2,17 +2,20 @@ import { spawn, ChildProcess } from "node:child_process";
 import fs from "node:fs";
 import { Logger } from "../core/Logger";
 import { Paths } from "../core/Paths";
+import { ConfigStore } from "../core/ConfigStore";
 import { GameInstaller } from "./GameInstaller";
 import { JavaManager } from "./JavaManager";
 import { ModManager } from "./ModManager";
 import { GameProfileManager } from "./GameProfileManager";
 import { PlayerProfileManager } from "./PlayerProfileManager";
-import { AuthManager } from "../core/auth/AuthManager";
 import { AccountValidator } from "../core/auth/AccountValidator";
 import { AccountState } from "../core/auth/auth.types";
 import { ClientPatcher } from "./ClientPatcher";
-import { VersionManager } from "./VersionManager";
+import { VersionManager } from "../versioning/VersionManager";
+import { VersionStorage } from "../versioning/VersionStorage";
 import { UpdateService } from "../updater/UpdateService";
+import { WindowManager } from "../windows/windowManager";
+import { RussianLocalizationManager } from "../localization/RussianLocalizationManager";
 
 export type LaunchOptions = {
   playerProfileId: string;
@@ -36,13 +39,11 @@ export class GameLauncher {
 
     Logger.info("GameLauncher", `Starting game launch (player: ${playerProfileId}, game: ${gameProfileId})`);
 
-    if (!GameInstaller.isGameInstalled()) {
+    if (!GameInstaller.isGameInstalled(gameProfileId)) {
       const error = new Error("Game is not installed");
       Logger.error("GameLauncher", "Game installation check failed", error);
       throw error;
     }
-
-    await this.checkAndUpdateGame(gameProfileId);
 
     const playerProfileManager = new PlayerProfileManager();
     const gameProfileManager = new GameProfileManager();
@@ -76,7 +77,8 @@ export class GameLauncher {
       Logger.error("GameLauncher", "Failed to sync mods (continuing anyway)", error);
     }
 
-    const gameDir = Paths.getGameDir();
+    const activeVersion = VersionManager.resolveActiveVersion(gameProfileId);
+    const gameDir = VersionStorage.getVersionDir(activeVersion.branch, activeVersion.versionId);
     const clientPath = Paths.findClientExecutable(gameDir);
     const userDataDir = Paths.getUserDataDir(gameProfileId);
 
@@ -84,6 +86,37 @@ export class GameLauncher {
       const error = new Error(`Client executable not found in game directory: ${gameDir}`);
       Logger.error("GameLauncher", "Client executable check failed", error);
       throw error;
+    }
+
+    const settings = ConfigStore.getSettings();
+    const shouldApplyLocalization =
+      settings.launcherLanguage === "ru" && settings.enableRussianLocalization === true;
+
+    if (shouldApplyLocalization) {
+      Logger.info(
+        "GameLauncher",
+        "Applying Russian localization before launch..."
+      );
+      try {
+        await RussianLocalizationManager.applyRussianLocalization(
+          activeVersion.branch,
+          activeVersion.versionId
+        );
+        Logger.info(
+          "GameLauncher",
+          "Russian localization applied successfully, proceeding with launch"
+        );
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        Logger.error(
+          "GameLauncher",
+          `Failed to apply Russian localization: ${errorMessage}`,
+          error
+        );
+        throw new Error(
+          `Не удалось применить русскую локализацию: ${errorMessage}. Запуск игры отменен.`
+        );
+      }
     }
 
     try {
@@ -159,14 +192,31 @@ export class GameLauncher {
       clientPath,
       jvmArgs,
       userDataDir,
-      launchArgs
+      launchArgs,
+      gameDir
     });
+
+    if (!child.pid) {
+      const error = new Error("Game process failed to start: no PID assigned");
+      Logger.error("GameLauncher", "Game process spawn failed", error);
+      throw error;
+    }
+
+    Logger.info("GameLauncher", `Game process spawned successfully with PID: ${child.pid}`);
 
     this.setupProcessLogging(child, onStdout, onStderr, playerProfileId);
 
     UpdateService.setGameRunning(true);
 
     child.unref();
+
+    setTimeout(() => {
+      if (child.killed || child.exitCode !== null) {
+        Logger.warn("GameLauncher", "Game process exited immediately, skipping window minimization");
+        return;
+      }
+      WindowManager.minimizeMainWindow();
+    }, 500);
 
     Logger.info("GameLauncher", "Game process launched successfully");
   }
@@ -176,34 +226,6 @@ export class GameLauncher {
    * 
    * @param gameProfileId - The game profile ID to use for update
    */
-  private static async checkAndUpdateGame(gameProfileId: string): Promise<void> {
-    try {
-      Logger.info("GameLauncher", "Checking for game updates...");
-      const updateInfo = await VersionManager.checkForUpdate();
-
-      if (updateInfo.needsUpdate) {
-        Logger.info(
-          "GameLauncher",
-          `Update available: ${updateInfo.installedVersion} -> ${updateInfo.latestVersion}, starting update...`
-        );
-
-        await GameInstaller.updateGame({
-          profileId: gameProfileId,
-          onProgress: (progress) => {
-            Logger.info("GameLauncher", `Update progress: ${progress.message}${progress.percent ? ` (${progress.percent}%)` : ""}`);
-          }
-        });
-
-        Logger.info("GameLauncher", "Game update completed successfully");
-      } else {
-        Logger.info("GameLauncher", "Game is up to date");
-      }
-    } catch (error) {
-      Logger.error("GameLauncher", "Failed to check/update game", error);
-      Logger.warn("GameLauncher", "Continuing with launch despite update check failure");
-    }
-  }
-
   private static buildJvmArgs(gameOptions: { minMemory: number; maxMemory: number; args: string[] }): string[] {
     const args: string[] = [];
 
@@ -227,11 +249,12 @@ export class GameLauncher {
     jvmArgs: string[];
     userDataDir: string;
     launchArgs: string[];
+    gameDir: string;
   }): ChildProcess {
-    const { javaPath, clientPath, jvmArgs, launchArgs } = options;
+    const { javaPath, clientPath, jvmArgs, launchArgs, gameDir } = options;
 
     const spawnOptions: Parameters<typeof spawn>[2] = {
-      cwd: Paths.getGameDir(),
+      cwd: gameDir,
       detached: true,
       stdio: "pipe",
       env: {
@@ -316,6 +339,7 @@ export class GameLauncher {
 
     child.on("error", (error) => {
       Logger.error("GameLauncher", "Game process error", error);
+      UpdateService.setGameRunning(false);
     });
 
     child.on("exit", (code, signal) => {
@@ -326,6 +350,8 @@ export class GameLauncher {
       } else if (signal) {
         Logger.gameInfo("Game", `Game process exited with signal: ${signal}`);
       }
+
+      WindowManager.restoreMainWindow();
     });
   }
 }

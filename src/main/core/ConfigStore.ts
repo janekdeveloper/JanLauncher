@@ -10,7 +10,8 @@ import type {
   PlayerProfile,
   GameProfile,
   GameOptions,
-  Mod
+  Mod,
+  GameVersionBranch
 } from "../../shared/types";
 
 const getDefaultJavaPath = (): string => {
@@ -43,7 +44,9 @@ const getDefaultJavaPath = (): string => {
 const DEFAULT_SETTINGS: Settings = {
   javaPath: getDefaultJavaPath(),
   jvmArgs: [],
-  installedGameVersion: null
+  installedGameVersion: null,
+  launcherLanguage: undefined,
+  enableRussianLocalization: false
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -59,15 +62,19 @@ const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every(isString);
 const isNullableString = (value: unknown): value is string | null =>
   value === null || isString(value);
+const isGameVersionBranch = (value: unknown): value is GameVersionBranch =>
+  value === "release" || value === "pre-release" || value === "beta" || value === "alpha";
 
 const isSettings = (value: unknown): value is Settings =>
   isRecord(value) &&
   isNullableString(value.javaPath) &&
   isStringArray(value.jvmArgs) &&
-  (value.installedGameVersion === undefined || isNullableString(value.installedGameVersion));
+  (value.installedGameVersion === undefined || isNullableString(value.installedGameVersion)) &&
+  (value.launcherLanguage === undefined || isString(value.launcherLanguage)) &&
+  (value.enableRussianLocalization === undefined || isBoolean(value.enableRussianLocalization));
 
-const isAuthDomain = (value: unknown): value is "hytale.com" | "sanasol.ws" =>
-  value === "hytale.com" || value === "sanasol.ws";
+const isAuthDomain = (value: unknown): value is "hytale.com" | "auth.sanasol.ws" =>
+  value === "hytale.com" || value === "auth.sanasol.ws";
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
   isRecord(value) &&
@@ -112,7 +119,9 @@ const isGameProfile = (value: unknown): value is GameProfile =>
   Array.isArray(value.mods) &&
   value.mods.every(isMod) &&
   isNullableString(value.javaPath) &&
-  isGameOptions(value.gameOptions);
+  isGameOptions(value.gameOptions) &&
+  (value.versionBranch === undefined || isGameVersionBranch(value.versionBranch)) &&
+  (value.versionId === undefined || isNullableString(value.versionId));
 
 /**
  * Manages application configuration storage.
@@ -291,7 +300,9 @@ export class ConfigStore {
     return {
       javaPath: isNullableString(next.javaPath) ? next.javaPath : fallback.javaPath,
       jvmArgs: isStringArray(next.jvmArgs) ? [...next.jvmArgs] : [...fallback.jvmArgs],
-      installedGameVersion: isNullableString(next.installedGameVersion) ? next.installedGameVersion : (fallback.installedGameVersion ?? null)
+      installedGameVersion: isNullableString(next.installedGameVersion) ? next.installedGameVersion : (fallback.installedGameVersion ?? null),
+      launcherLanguage: isString(next.launcherLanguage) ? next.launcherLanguage : (fallback.launcherLanguage ?? undefined),
+      enableRussianLocalization: isBoolean(next.enableRussianLocalization) ? next.enableRussianLocalization : (fallback.enableRussianLocalization ?? false)
     };
   }
 

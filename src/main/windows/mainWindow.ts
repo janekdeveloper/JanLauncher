@@ -27,7 +27,7 @@ const getIconPath = (): string | undefined => {
       const appImagePath = path.dirname(process.env.APPIMAGE);
       possiblePaths.push(path.join(appImagePath, "build", iconName));
       possiblePaths.push(path.join(appImagePath, iconName));
-    }
+  }
   } else {
     possiblePaths.push(path.join(__dirname, "../../../build", iconName));
     possiblePaths.push(path.join(__dirname, "../../../../build", iconName));
@@ -97,7 +97,7 @@ export const createMainWindow = (): BrowserWindow => {
   const devServerUrl = process.env.VITE_DEV_SERVER_URL;
   if (devServerUrl && typeof devServerUrl === "string" && devServerUrl.trim().length > 0) {
     try {
-      win.loadURL(devServerUrl);
+    win.loadURL(devServerUrl);
     } catch (error) {
       Logger.error("MainWindow", `Failed to load dev server URL: ${devServerUrl}`, error);
       win.loadFile(getHtmlPath());

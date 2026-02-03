@@ -8,7 +8,11 @@ import type {
   Mod,
   NewsArticle,
   PlayerProfile,
-  Settings
+  Settings,
+  GameVersionBranch,
+  GameVersionInfo,
+  ActiveGameVersion,
+  InstalledGameVersion
 } from "./shared/types";
 import type {
   AuthProviderInfo,
@@ -68,6 +72,17 @@ declare global {
         uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
         openUrl(url: string): Promise<void>;
       };
+      versions: {
+        getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
+        getInstalled(branch?: GameVersionBranch): Promise<InstalledGameVersion[]>;
+        getInstalledAsInfo(branch?: GameVersionBranch): Promise<GameVersionInfo[]>;
+        getActive(profileId: string): Promise<ActiveGameVersion>;
+        setActive(options: { profileId: string; branch: GameVersionBranch; versionId: string | null }): Promise<void>;
+        install(options: { branch: GameVersionBranch; versionId: string }): Promise<void>;
+        remove(options: { branch: GameVersionBranch; versionId: string }): Promise<void>;
+        onProgress(callback: (progress: { message: string; percent?: number }) => void): () => void;
+        onError(callback: (message: string) => void): () => void;
+      };
       news: {
         loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
         refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
@@ -87,6 +102,12 @@ declare global {
       translation: {
         clearCache(): Promise<void>;
       };
+      paths: {
+        openGameDir(): Promise<void>;
+        openConfigDir(): Promise<void>;
+        openUserDataDir(gameProfileId: string): Promise<void>;
+        openLogsDir(): Promise<void>;
+      };
       updater: {
         check(): Promise<void>;
         status(): Promise<{
@@ -103,6 +124,12 @@ declare global {
         onDownloadProgress(callback: (data: { percent: number; transferred: number; total: number }) => void): () => void;
         onUpdateDownloaded(callback: (data: { version: string; releaseDate?: string; releaseNotes?: string }) => void): () => void;
         onError(callback: (data: { error: string }) => void): () => void;
+      };
+      system: {
+        /**
+         * Returns total physical memory in megabytes.
+         */
+        getTotalMemoryMB(): Promise<number>;
       };
     };
   }

@@ -120,7 +120,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "sanasol.ws") as AuthProviderId;
+    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
 
     if (!profile.authTokens) {
       return null;
@@ -142,7 +142,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "sanasol.ws") as AuthProviderId;
+    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
     const provider = this.getProvider(providerId);
 
     if (!profile.authTokens) {
@@ -182,7 +182,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "sanasol.ws") as AuthProviderId;
+    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
     const provider = this.getProvider(providerId);
 
     if (!profile.authTokens) {
@@ -237,7 +237,7 @@ export class AuthManager {
     }
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "sanasol.ws") as AuthProviderId;
+    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
 
     Logger.info(
       "AuthManager",

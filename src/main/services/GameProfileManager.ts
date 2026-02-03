@@ -73,7 +73,9 @@ export class GameProfileManager {
         lastUsed: null,
         mods: [],
         javaPath: bundledJavaPath,
-        gameOptions
+        gameOptions,
+        versionBranch: "release",
+        versionId: null
       };
 
       const profileDir = Paths.gameProfileDir(id);

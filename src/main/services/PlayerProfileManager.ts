@@ -4,9 +4,9 @@ import { Logger } from "../core/Logger";
 import { AuthManager } from "../core/auth/AuthManager";
 import type { PlayerProfile, AuthDomain } from "../../shared/types";
 
-const DEFAULT_AUTH_DOMAIN: AuthDomain = "sanasol.ws";
+const DEFAULT_AUTH_DOMAIN: AuthDomain = "auth.sanasol.ws";
 const isAuthDomain = (value: string): value is AuthDomain =>
-  value === "hytale.com" || value === "sanasol.ws";
+  value === "hytale.com" || value === "auth.sanasol.ws";
 
 /**
  * Manages player profiles (user accounts).
@@ -57,7 +57,7 @@ export class PlayerProfileManager {
       ConfigStore.addPlayerProfile(profile);
       
       try {
-        const providerId = resolvedAuthDomain as "hytale.com" | "sanasol.ws";
+        const providerId = resolvedAuthDomain as "hytale.com" | "auth.sanasol.ws";
         await AuthManager.login(profile.id, providerId, {
           uuid: profile.id,
           username: profile.nickname
@@ -138,7 +138,7 @@ export class PlayerProfileManager {
       
       if (nicknameChanged || authDomainChanged) {
         try {
-          const providerId = (nextPatch.authDomain || DEFAULT_AUTH_DOMAIN) as "hytale.com" | "sanasol.ws";
+          const providerId = (nextPatch.authDomain || DEFAULT_AUTH_DOMAIN) as "hytale.com" | "auth.sanasol.ws";
           await AuthManager.login(id, providerId, {
             uuid: id,
             username: trimmed || profile.nickname

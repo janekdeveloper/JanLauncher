@@ -11,12 +11,37 @@ export type PlayerProfile = {
   authInvalid?: boolean;
 };
 
-export type AuthDomain = "hytale.com" | "sanasol.ws";
+export type AuthDomain = "hytale.com" | "auth.sanasol.ws";
 
 export type GameOptions = {
   minMemory: number;
   maxMemory: number;
   args: string[];
+};
+
+export type GameVersionBranch = "release" | "pre-release" | "beta" | "alpha";
+
+export type ActiveGameVersion = {
+  branch: GameVersionBranch;
+  versionId: string | null;
+};
+
+export type GameVersionInfo = {
+  id: string;
+  branch: GameVersionBranch;
+  version: number;
+  label: string;
+  isLatest: boolean;
+  installed: boolean;
+  localOnly?: boolean;
+};
+
+export type InstalledGameVersion = {
+  id: string;
+  branch: GameVersionBranch;
+  version: number;
+  installedAt: string;
+  sizeBytes?: number;
 };
 
 export type Mod = {
@@ -42,12 +67,16 @@ export type GameProfile = {
   mods: Mod[];
   javaPath: string | null;
   gameOptions: GameOptions;
+  versionBranch?: GameVersionBranch;
+  versionId?: string | null;
 };
 
 export type Settings = {
   javaPath: string | null;
   jvmArgs: string[];
   installedGameVersion?: string | null;
+  launcherLanguage?: string;
+  enableRussianLocalization?: boolean;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";
