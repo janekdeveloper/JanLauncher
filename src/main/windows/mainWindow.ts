@@ -94,15 +94,22 @@ export const createMainWindow = (): BrowserWindow => {
     }
   };
 
-  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
-  if (devServerUrl && typeof devServerUrl === "string" && devServerUrl.trim().length > 0) {
-    try {
-    win.loadURL(devServerUrl);
-    } catch (error) {
-      Logger.error("MainWindow", `Failed to load dev server URL: ${devServerUrl}`, error);
+  // Only use dev server in development mode, never in packaged app
+  if (!app.isPackaged) {
+    const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+    if (devServerUrl && typeof devServerUrl === "string" && devServerUrl.trim().length > 0) {
+      try {
+        win.loadURL(devServerUrl);
+        Logger.info("MainWindow", `Loading from dev server: ${devServerUrl}`);
+      } catch (error) {
+        Logger.error("MainWindow", `Failed to load dev server URL: ${devServerUrl}`, error);
+        win.loadFile(getHtmlPath());
+      }
+    } else {
       win.loadFile(getHtmlPath());
     }
   } else {
+    // Always use local HTML file in packaged app
     win.loadFile(getHtmlPath());
   }
 
