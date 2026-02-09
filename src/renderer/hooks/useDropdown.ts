@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 
-export const useDropdown = () => {
+export const useDropdown = (
+  extraRefs: Array<RefObject<HTMLElement | null>> = []
+) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -9,7 +12,11 @@ export const useDropdown = () => {
 
     const handleClick = (event: MouseEvent) => {
       if (!ref.current) return;
-      if (!ref.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isInside = [ref, ...extraRefs].some((item) =>
+        item.current?.contains(target)
+      );
+      if (!isInside) {
         setIsOpen(false);
       }
     };

@@ -18,6 +18,7 @@ import { useHomeViewModel } from "../viewmodels/useHomeViewModel";
 import { api } from "../services/api";
 import type { AuthDomain, GameVersionBranch } from "../../shared/types";
 import type { AuthProviderInfo } from "../../main/core/auth/auth.types";
+import { DISCORD_INVITE_URL } from "../constants/links";
 import styles from "./HomePage.module.css";
 
 type DockOption = {
@@ -177,6 +178,7 @@ const HomePage = () => {
     setVersionsError,
     versionInstallProgress,
     isVersionInstalling,
+    showVersionBranchSelector,
     setActiveBranch,
     setActiveVersion,
     installVersion,
@@ -187,6 +189,14 @@ const HomePage = () => {
     refreshPlayerProfiles();
   }, [location.pathname, location.hash, refreshPlayerProfiles]);
 
+  const getProviderLabel = (provider?: AuthProviderInfo | null): string => {
+    if (!provider) return "";
+    if (provider.labelKey) {
+      return t(provider.labelKey);
+    }
+    return provider.displayName;
+  };
+
   const playerOptions: DockOption[] = playerProfiles.map((profile) => {
     const isSelected = profile.id === selectedPlayerId;
     const isValidating = isSelected ? isValidatingAccount : false;
@@ -195,31 +205,13 @@ const HomePage = () => {
     let meta = "";
     const provider = authProviders.find((p) => p.id === profile.authDomain);
     if (provider) {
-      if (provider.id === "hytale.com") {
-        meta = t("home.authSystemHytale");
-      } else if (provider.id === "auth.sanasol.ws") {
-        meta = t("home.authSystemSanasol");
-      } else {
-        meta = provider.displayName;
-      }
+      meta = getProviderLabel(provider);
     } else if (profile.authDomain) {
-      if (profile.authDomain === "hytale.com") {
-        meta = t("home.authSystemHytale");
-      } else if (profile.authDomain === "auth.sanasol.ws") {
-        meta = t("home.authSystemSanasol");
-      } else {
-        meta = profile.authDomain;
-      }
+      meta = profile.authDomain;
     } else {
       const defaultProvider = authProviders.find((p) => p.isAvailable);
       if (defaultProvider) {
-        if (defaultProvider.id === "hytale.com") {
-          meta = t("home.authSystemHytale");
-        } else if (defaultProvider.id === "auth.sanasol.ws") {
-          meta = t("home.authSystemSanasol");
-        } else {
-          meta = defaultProvider.displayName;
-        }
+        meta = getProviderLabel(defaultProvider);
       }
     }
 
@@ -276,6 +268,11 @@ const HomePage = () => {
         ? `${activeVersion.label} (${t("home.versionLatest")})`
         : activeVersion.label
       : t("home.versionPlaceholder");
+
+  const isAgentError = Boolean(errorMessage?.startsWith("DUALAUTH_AGENT_DOWNLOAD_FAILED"));
+  const agentErrorDetails = isAgentError
+    ? errorMessage?.split(":").slice(1).join(":").trim()
+    : "";
 
   return (
     <section className={styles.page}>
@@ -345,14 +342,16 @@ const HomePage = () => {
           createLabel={t("home.createGameProfile")}
           emptyLabel={t("home.emptyGameProfiles")}
         />
-        <DockSelect
-          label={t("home.branchLabel")}
-          value={branchValue}
-          icon={<GameProfileIcon className={styles.iconSvg} />}
-          options={branchOptions}
-          onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
-          emptyLabel={t("home.branchEmpty")}
-        />
+        {showVersionBranchSelector && (
+          <DockSelect
+            label={t("home.branchLabel")}
+            value={branchValue}
+            icon={<GameProfileIcon className={styles.iconSvg} />}
+            options={branchOptions}
+            onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
+            emptyLabel={t("home.branchEmpty")}
+          />
+        )}
         <DockSelect
           label={t("home.versionLabel")}
           value={versionValue}
@@ -461,7 +460,7 @@ const HomePage = () => {
                 const isSelected = authDomainDraft === provider.id;
                 const isDisabled = !provider.isAvailable;
                 
-                const isOfficialProvider = provider.id.includes("hytale.com") || provider.id === "hytale.com";
+                const isOfficialProvider = provider.kind === "official";
                 
                 return (
             <button
@@ -506,16 +505,12 @@ const HomePage = () => {
                 </div>
                 <div className={styles.authSystemOptionText}>
                   <span className={styles.authSystemOptionName}>
-                    {provider.id === "hytale.com"
-                      ? t("home.authSystemHytale")
-                      : provider.id === "auth.sanasol.ws"
-                      ? t("home.authSystemSanasol")
-                      : provider.displayName}
+                    {getProviderLabel(provider)}
                   </span>
-                  <span className={styles.authSystemOptionDomain}>{provider.id}</span>
-                  {provider.id === "auth.sanasol.ws" && !isDisabled && (
+                  <span className={styles.authSystemOptionDomain}>{provider.authDomain}</span>
+                  {provider.hintKey && !isDisabled && (
                     <span className={styles.authSystemOptionHint}>
-                      {t("home.authSystemSanasolHint")}
+                      {t(provider.hintKey)}
                     </span>
                   )}
                   {isDisabled && (
@@ -563,16 +558,30 @@ const HomePage = () => {
       <Modal
         isOpen={errorModalOpen}
         title={
-          isGameNotInstalled
-            ? installCompleted
-              ? t("home.installCompletedTitle")
-              : t("home.installTitle")
-            : t("home.errorTitle")
+          isAgentError
+            ? t("home.dualauthAgentErrorTitle")
+            : isGameNotInstalled
+              ? installCompleted
+                ? t("home.installCompletedTitle")
+                : t("home.installTitle")
+              : t("home.errorTitle")
         }
         onClose={isInstalling ? () => {} : closeErrorModal}
         footer={
           <div className={styles.modalFooter}>
-            {isGameNotInstalled ? (
+            {isAgentError ? (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
+                >
+                  {t("home.dualauthAgentErrorDiscordButton")}
+                </Button>
+                <Button variant="primary" onClick={closeErrorModal}>
+                  {t("common.close")}
+                </Button>
+              </>
+            ) : isGameNotInstalled ? (
               <>
                 {installCompleted ? (
                   <Button variant="primary" onClick={closeErrorModal}>
@@ -607,7 +616,11 @@ const HomePage = () => {
           </div>
         }
       >
-        {isGameNotInstalled ? (
+        {isAgentError ? (
+          <p className={styles.errorMessage}>
+            {t("home.dualauthAgentErrorBody", { details: agentErrorDetails || "" })}
+          </p>
+        ) : isGameNotInstalled ? (
           <div>
             <p className={styles.installMessage}>
               {installCompleted

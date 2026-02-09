@@ -11,7 +11,7 @@ export type PlayerProfile = {
   authInvalid?: boolean;
 };
 
-export type AuthDomain = "hytale.com" | "auth.sanasol.ws";
+export type AuthDomain = string;
 
 export type GameOptions = {
   minMemory: number;
@@ -77,6 +77,7 @@ export type Settings = {
   installedGameVersion?: string | null;
   launcherLanguage?: string;
   enableRussianLocalization?: boolean;
+  showVersionBranchSelector?: boolean;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";

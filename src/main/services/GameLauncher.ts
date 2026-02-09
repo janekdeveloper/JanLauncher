@@ -10,7 +10,10 @@ import { GameProfileManager } from "./GameProfileManager";
 import { PlayerProfileManager } from "./PlayerProfileManager";
 import { AccountValidator } from "../core/auth/AccountValidator";
 import { AccountState } from "../core/auth/auth.types";
+import { AuthManager } from "../core/auth/AuthManager";
 import { ClientPatcher } from "./ClientPatcher";
+import { DualAuthAgentManager } from "./DualAuthAgentManager";
+import { buildDualAuthEnv } from "./DualAuthEnv";
 import { VersionManager } from "../versioning/VersionManager";
 import { VersionStorage } from "../versioning/VersionStorage";
 import { UpdateService } from "../updater/UpdateService";
@@ -152,18 +155,25 @@ export class GameLauncher {
       );
     }
 
-    const authDomain = authSession.providerId;
+    const authProvider = AuthManager.getProvider(authSession.providerId);
+    const authDomain = authProvider.authDomain;
     const patchResult = await ClientPatcher.ensureClientPatched(
       clientPath,
       authDomain,
-      gameDir
+      gameDir,
+      activeVersion.branch
     );
     if (!patchResult.success) {
-      Logger.warn(
-        "GameLauncher",
-        `Client patching failed: ${patchResult.error ?? "unknown error"}`
-      );
+      const errorMessage = patchResult.error ?? "Client patching failed";
+      Logger.error("GameLauncher", errorMessage);
+      throw new Error(errorMessage);
     }
+
+    const dualauthEnv = buildDualAuthEnv(authProvider);
+    const baseEnv = { ...process.env, ...dualauthEnv };
+    const launchEnv = patchResult.agentPath
+      ? DualAuthAgentManager.applyJavaAgentEnv(baseEnv, patchResult.agentPath)
+      : baseEnv;
 
     const jvmArgs = this.buildJvmArgs(gameProfile.gameOptions);
     const launchArgs = [
@@ -193,7 +203,8 @@ export class GameLauncher {
       jvmArgs,
       userDataDir,
       launchArgs,
-      gameDir
+      gameDir,
+      envOverrides: launchEnv
     });
 
     if (!child.pid) {
@@ -250,15 +261,17 @@ export class GameLauncher {
     userDataDir: string;
     launchArgs: string[];
     gameDir: string;
+    envOverrides?: NodeJS.ProcessEnv;
   }): ChildProcess {
-    const { javaPath, clientPath, jvmArgs, launchArgs, gameDir } = options;
+    const { javaPath, clientPath, jvmArgs, launchArgs, gameDir, envOverrides } = options;
 
     const spawnOptions: Parameters<typeof spawn>[2] = {
       cwd: gameDir,
       detached: true,
       stdio: "pipe",
       env: {
-        ...process.env
+        ...process.env,
+        ...envOverrides
       }
     };
 

@@ -11,7 +11,9 @@ export type AuthSession = {
   providerId: string;
 };
 
-export type AuthProviderId = "hytale.com" | "auth.sanasol.ws";
+export type AuthProviderId = string;
+
+export type AuthProviderKind = "official" | "third-party";
 
 export type LoginParams = {
   uuid: string;
@@ -23,6 +25,10 @@ export type AuthProviderInfo = {
   id: AuthProviderId;
   displayName: string;
   isAvailable: boolean;
+  authDomain: string;
+  kind: AuthProviderKind;
+  labelKey?: string;
+  hintKey?: string;
 };
 
 /**

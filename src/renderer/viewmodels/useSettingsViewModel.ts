@@ -104,6 +104,22 @@ export const useSettingsViewModel = () => {
 
   const jvmArgsString = settings?.jvmArgs.join(" ") || "";
 
+  const updateShowVersionBranchSelector = (enabled: boolean) => {
+    setSettings((prev) =>
+      prev ? { ...prev, showVersionBranchSelector: enabled } : prev
+    );
+    void api.settings.update({ showVersionBranchSelector: enabled });
+    try {
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", {
+          detail: { showVersionBranchSelector: enabled }
+        })
+      );
+    } catch {
+      // No-op in non-browser environments
+    }
+  };
+
   const save = async (currentLanguage?: string) => {
     if (!settings) return;
     const settingsToSave = currentLanguage
@@ -122,6 +138,7 @@ export const useSettingsViewModel = () => {
     updateJvmArgs,
     updateRussianLocalization,
     updateLauncherLanguage,
+    updateShowVersionBranchSelector,
     save
   };
 };

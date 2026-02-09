@@ -46,7 +46,8 @@ const DEFAULT_SETTINGS: Settings = {
   jvmArgs: [],
   installedGameVersion: null,
   launcherLanguage: undefined,
-  enableRussianLocalization: false
+  enableRussianLocalization: false,
+  showVersionBranchSelector: false
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -71,10 +72,9 @@ const isSettings = (value: unknown): value is Settings =>
   isStringArray(value.jvmArgs) &&
   (value.installedGameVersion === undefined || isNullableString(value.installedGameVersion)) &&
   (value.launcherLanguage === undefined || isString(value.launcherLanguage)) &&
-  (value.enableRussianLocalization === undefined || isBoolean(value.enableRussianLocalization));
+  (value.enableRussianLocalization === undefined || isBoolean(value.enableRussianLocalization)) &&
+  (value.showVersionBranchSelector === undefined || isBoolean(value.showVersionBranchSelector));
 
-const isAuthDomain = (value: unknown): value is "hytale.com" | "auth.sanasol.ws" =>
-  value === "hytale.com" || value === "auth.sanasol.ws";
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
   isRecord(value) &&
@@ -85,7 +85,7 @@ const isPlayerProfile = (value: unknown): value is PlayerProfile =>
   isRecord(value) &&
   isString(value.id) &&
   isString(value.nickname) &&
-  (value.authDomain === undefined || isAuthDomain(value.authDomain)) &&
+  (value.authDomain === undefined || isString(value.authDomain)) &&
   (value.authTokens === undefined || isAuthTokens(value.authTokens)) &&
   (value.authInvalid === undefined || isBoolean(value.authInvalid));
 
@@ -154,6 +154,13 @@ export class ConfigStore {
       isSettings,
       "settings.json"
     );
+
+    // Ensure new settings fields are present without resetting user configuration.
+    if (!("showVersionBranchSelector" in this.settings)) {
+      (this.settings as Settings & { showVersionBranchSelector?: boolean }).showVersionBranchSelector =
+        false;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
 
     this.playerProfiles = this.readJsonFile(
       Paths.playerProfilesFile,
@@ -300,9 +307,18 @@ export class ConfigStore {
     return {
       javaPath: isNullableString(next.javaPath) ? next.javaPath : fallback.javaPath,
       jvmArgs: isStringArray(next.jvmArgs) ? [...next.jvmArgs] : [...fallback.jvmArgs],
-      installedGameVersion: isNullableString(next.installedGameVersion) ? next.installedGameVersion : (fallback.installedGameVersion ?? null),
-      launcherLanguage: isString(next.launcherLanguage) ? next.launcherLanguage : (fallback.launcherLanguage ?? undefined),
-      enableRussianLocalization: isBoolean(next.enableRussianLocalization) ? next.enableRussianLocalization : (fallback.enableRussianLocalization ?? false)
+      installedGameVersion: isNullableString(next.installedGameVersion)
+        ? next.installedGameVersion
+        : fallback.installedGameVersion ?? null,
+      launcherLanguage: isString(next.launcherLanguage)
+        ? next.launcherLanguage
+        : fallback.launcherLanguage ?? undefined,
+      enableRussianLocalization: isBoolean(next.enableRussianLocalization)
+        ? next.enableRussianLocalization
+        : fallback.enableRussianLocalization ?? false,
+      showVersionBranchSelector: isBoolean(next.showVersionBranchSelector)
+        ? next.showVersionBranchSelector
+        : fallback.showVersionBranchSelector ?? false
     };
   }
 

@@ -25,6 +25,27 @@ export interface IAuthProvider {
   readonly displayName: string;
 
   /**
+   * Auth domain used by this provider (used for client patching)
+   */
+  readonly authDomain: string;
+
+  /**
+   * Provider category for UI presentation
+   */
+  readonly kind: "official" | "third-party";
+
+  /**
+   * Optional i18n keys for renderer labels/hints
+   */
+  readonly labelKey?: string;
+  readonly hintKey?: string;
+
+  /**
+   * DualAuth agent environment configuration for this provider
+   */
+  readonly dualauthEnv?: Record<string, string>;
+
+  /**
    * Check if this provider is available (server reachable, configured, etc.)
    */
   isAvailable(): Promise<boolean>;

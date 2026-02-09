@@ -16,6 +16,14 @@ import {
 export class HytaleOfficialAuth implements IAuthProvider {
   readonly id = "hytale.com";
   readonly displayName = "Hytale Official";
+  readonly authDomain = "hytale.com";
+  readonly kind = "official";
+  readonly labelKey = "home.authSystemOfficial";
+  readonly dualauthEnv = {
+    HYTALE_AUTH_DOMAIN: "hytale.com",
+    HYTALE_TRUST_OFFICIAL: "true",
+    HYTALE_TRUST_ALL_ISSUERS: "false"
+  };
 
   async isAvailable(): Promise<boolean> {
     return false;

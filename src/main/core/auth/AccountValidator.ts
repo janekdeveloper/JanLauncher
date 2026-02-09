@@ -35,7 +35,7 @@ export class AccountValidator {
     try {
       const profileManager = new PlayerProfileManager();
       const profile = profileManager.getProfile(profileId);
-      const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
+      const providerId = AuthManager.resolveProviderId(profile.authDomain);
       const provider = AuthManager.getProvider(providerId);
 
       if (provider.shouldAlwaysRegenerateTokens?.()) {

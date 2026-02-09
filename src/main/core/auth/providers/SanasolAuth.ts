@@ -1,7 +1,7 @@
 /**
  * Sanasol authentication provider
  * 
- * Implements passwordless authentication via sessions.sanasol.ws
+ * Implements passwordless authentication via auth.sanasol.ws
  */
 import axios from "axios";
 import { Logger } from "../../Logger";
@@ -16,8 +16,17 @@ import {
 export class SanasolAuth implements IAuthProvider {
   readonly id = "auth.sanasol.ws";
   readonly displayName = "Sanasol";
+  readonly authDomain = "auth.sanasol.ws";
+  readonly kind = "third-party";
+  readonly labelKey = "home.authSystemThirdParty";
+  readonly hintKey = "home.authSystemThirdPartyHint";
+  readonly dualauthEnv = {
+    HYTALE_AUTH_DOMAIN: "auth.sanasol.ws",
+    HYTALE_TRUST_OFFICIAL: "true",
+    HYTALE_TRUST_ALL_ISSUERS: "false"
+  };
 
-  private readonly baseUrl = "https://sessions.sanasol.ws";
+  private readonly baseUrl = "https://auth.sanasol.ws";
   private readonly timeout = 30_000;
 
   async isAvailable(): Promise<boolean> {

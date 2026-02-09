@@ -2,11 +2,10 @@ import { randomUUID } from "node:crypto";
 import { ConfigStore } from "../core/ConfigStore";
 import { Logger } from "../core/Logger";
 import { AuthManager } from "../core/auth/AuthManager";
-import type { PlayerProfile, AuthDomain } from "../../shared/types";
+import type { PlayerProfile } from "../../shared/types";
 
-const DEFAULT_AUTH_DOMAIN: AuthDomain = "auth.sanasol.ws";
-const isAuthDomain = (value: string): value is AuthDomain =>
-  value === "hytale.com" || value === "auth.sanasol.ws";
+const resolveAuthProviderId = (authDomain?: string): string =>
+  AuthManager.resolveProviderId(authDomain?.trim());
 
 /**
  * Manages player profiles (user accounts).
@@ -44,9 +43,7 @@ export class PlayerProfileManager {
         throw error;
       }
 
-      const resolvedAuthDomain = isAuthDomain(authDomain ?? "")
-        ? (authDomain as AuthDomain)
-        : DEFAULT_AUTH_DOMAIN;
+      const resolvedAuthDomain = resolveAuthProviderId(authDomain);
 
       const profile: PlayerProfile = {
         id: randomUUID(),
@@ -57,8 +54,7 @@ export class PlayerProfileManager {
       ConfigStore.addPlayerProfile(profile);
       
       try {
-        const providerId = resolvedAuthDomain as "hytale.com" | "auth.sanasol.ws";
-        await AuthManager.login(profile.id, providerId, {
+        await AuthManager.login(profile.id, resolvedAuthDomain, {
           uuid: profile.id,
           username: profile.nickname
         });
@@ -126,9 +122,7 @@ export class PlayerProfileManager {
         nextPatch.nickname = trimmed;
       }
       if (patch.authDomain !== undefined) {
-        nextPatch.authDomain = isAuthDomain(patch.authDomain)
-          ? patch.authDomain
-          : DEFAULT_AUTH_DOMAIN;
+        nextPatch.authDomain = resolveAuthProviderId(patch.authDomain);
       }
       if (patch.authTokens !== undefined) {
         nextPatch.authTokens = patch.authTokens;
@@ -138,7 +132,7 @@ export class PlayerProfileManager {
       
       if (nicknameChanged || authDomainChanged) {
         try {
-          const providerId = (nextPatch.authDomain || DEFAULT_AUTH_DOMAIN) as "hytale.com" | "auth.sanasol.ws";
+          const providerId = nextPatch.authDomain || AuthManager.getDefaultProviderId();
           await AuthManager.login(id, providerId, {
             uuid: id,
             username: trimmed || profile.nickname

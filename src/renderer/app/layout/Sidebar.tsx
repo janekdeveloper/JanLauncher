@@ -11,6 +11,7 @@ import {
 } from "../../components/icons";
 import { useI18n } from "../../i18n";
 import { api } from "../../services/api";
+import { DISCORD_INVITE_URL, TELEGRAM_URL } from "../../constants/links";
 import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
@@ -85,7 +86,7 @@ const Sidebar = () => {
         <div className={styles.socialButtons}>
           <button
             type="button"
-            onClick={() => api.news.openUrl("https://t.me/JanLauncher")}
+            onClick={() => api.news.openUrl(TELEGRAM_URL)}
             className={styles.socialButton}
             aria-label="Telegram"
             title="Telegram"
@@ -96,7 +97,7 @@ const Sidebar = () => {
           </button>
           <button
             type="button"
-            onClick={() => api.news.openUrl("https://discord.gg/8bnN2xRbMq")}
+            onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
             className={styles.socialButton}
             aria-label="Discord"
             title="Discord"

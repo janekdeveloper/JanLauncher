@@ -5,7 +5,8 @@ import type {
   AuthDomain,
   PlayerProfile,
   GameVersionBranch,
-  GameVersionInfo
+  GameVersionInfo,
+  Settings
 } from "../../shared/types";
 import type {
   AuthProviderInfo,
@@ -62,6 +63,7 @@ export const useHomeViewModel = () => {
     percent?: number;
   } | null>(null);
   const [isVersionInstalling, setIsVersionInstalling] = useState(false);
+  const [showVersionBranchSelector, setShowVersionBranchSelector] = useState(false);
   const isValidatingRef = useRef(false);
   const isEditingPlayer = Boolean(editingPlayerId);
 
@@ -77,8 +79,49 @@ export const useHomeViewModel = () => {
     if (availableProvider) {
       return availableProvider.id as AuthDomain;
     }
-    return (authProviders[0]?.id as AuthDomain) || "auth.sanasol.ws";
+    return (authProviders[0]?.id as AuthDomain) || "";
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    api.settings
+      .get()
+      .then((data) => {
+        if (!isMounted) return;
+        setShowVersionBranchSelector(
+          data.showVersionBranchSelector ?? false
+        );
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setShowVersionBranchSelector(false);
+      });
+
+    const handleSettingsUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<Partial<Settings>>;
+      if (
+        Object.prototype.hasOwnProperty.call(
+          customEvent.detail ?? {},
+          "showVersionBranchSelector"
+        )
+      ) {
+        setShowVersionBranchSelector(
+          Boolean(customEvent.detail?.showVersionBranchSelector)
+        );
+      }
+    };
+
+    window.addEventListener("janlauncher:settings-updated", handleSettingsUpdated);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener(
+        "janlauncher:settings-updated",
+        handleSettingsUpdated
+      );
+    };
+  }, []);
 
   useEffect(() => {
     const cleanupStdout = api.gameLauncher.onStdout((line) => {
@@ -160,13 +203,16 @@ export const useHomeViewModel = () => {
     api.versions
       .getActive(selectedGameId)
       .then((active) => {
-        setVersionBranch(active.branch);
+        const branchToUse: GameVersionBranch = showVersionBranchSelector
+          ? active.branch
+          : "release";
+        setVersionBranch(branchToUse);
         setActiveVersionId(active.versionId ?? null);
       })
       .catch((error) => {
         setVersionsError(error instanceof Error ? error.message : "Failed to load active version");
       });
-  }, [selectedGameId]);
+  }, [selectedGameId, showVersionBranchSelector]);
 
   useEffect(() => {
     if (!versionBranch) return;
@@ -267,12 +313,12 @@ export const useHomeViewModel = () => {
         setAuthDomainDraft((prev) => {
           if (prev !== null) return prev;
           const defaultProvider = providers.find((p) => p.isAvailable) || providers[0];
-          return defaultProvider ? (defaultProvider.id as AuthDomain) : "auth.sanasol.ws";
+          return defaultProvider ? (defaultProvider.id as AuthDomain) : null;
         });
       })
       .catch(() => {
         if (!isMounted) return;
-        setAuthDomainDraft((prev) => prev ?? "auth.sanasol.ws");
+        setAuthDomainDraft((prev) => prev ?? null);
       });
     
     return () => {
@@ -617,6 +663,7 @@ export const useHomeViewModel = () => {
     setVersionsError,
     versionInstallProgress,
     isVersionInstalling,
+    showVersionBranchSelector,
     setActiveBranch,
     setActiveVersion,
     installVersion,

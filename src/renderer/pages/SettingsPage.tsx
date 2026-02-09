@@ -1,3 +1,6 @@
+import { useLayoutEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import { useI18n, type Language } from "../i18n";
@@ -10,12 +13,15 @@ import styles from "./SettingsPage.module.css";
 
 const SettingsPage = () => {
   const { t, language, setLanguage } = useI18n();
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
   const {
     ref: languageRef,
     isOpen: isLanguageOpen,
     toggle: toggleLanguage,
     close: closeLanguage
-  } = useDropdown();
+  } = useDropdown([languageMenuRef]);
+  const [languageMenuStyle, setLanguageMenuStyle] =
+    useState<CSSProperties | null>(null);
   const {
     settings,
     memory,
@@ -26,6 +32,7 @@ const SettingsPage = () => {
     updateJvmArgs,
     updateRussianLocalization,
     updateLauncherLanguage,
+    updateShowVersionBranchSelector,
     save
   } = useSettingsViewModel();
   const { selectedGameId } = useLauncherStore();
@@ -36,6 +43,35 @@ const SettingsPage = () => {
     { value: "pl", label: "Polski" },
     { value: "be", label: "Беларуская" }
   ] as const;
+
+  useLayoutEffect(() => {
+    if (!isLanguageOpen) {
+      setLanguageMenuStyle(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!languageRef.current) return;
+      const rect = languageRef.current.getBoundingClientRect();
+      setLanguageMenuStyle({
+        position: "fixed",
+        top: rect.bottom + 10,
+        left: rect.left,
+        width: rect.width,
+        right: "auto",
+        zIndex: 1000
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isLanguageOpen, languageRef]);
 
   if (!settings) {
     return (
@@ -58,7 +94,11 @@ const SettingsPage = () => {
       </div>
 
       <div className={styles.grid}>
-        <div className={styles.card}>
+        <div
+          className={`${styles.card} ${
+            isLanguageOpen ? styles.cardRaised : ""
+          }`}
+        >
           <Input
             label={t("settings.javaPathLabel")}
             value={settings.javaPath || ""}
@@ -186,39 +226,47 @@ const SettingsPage = () => {
                   aria-hidden="true"
                 />
               </button>
-              {isLanguageOpen ? (
-                <div className={styles.languageMenu} role="listbox">
-                  {languageOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={`${styles.languageOption} ${
-                        option.value === language
-                          ? styles.languageOptionActive
-                          : ""
-                      }`}
-                      onClick={() => {
-                        const newLanguage = option.value as Language;
-                        setLanguage(newLanguage);
-                        updateLauncherLanguage(newLanguage);
-                        if (newLanguage === "ru") {
-                          updateRussianLocalization(true);
-                        } else {
-                          updateRussianLocalization(false);
-                        }
-                        closeLanguage();
-                      }}
+              {isLanguageOpen && languageMenuStyle
+                ? createPortal(
+                    <div
+                      className={styles.languageMenu}
+                      role="listbox"
+                      ref={languageMenuRef}
+                      style={languageMenuStyle}
                     >
-                      <span className={styles.languageOptionLabel}>
-                        {option.label}
-                      </span>
-                      <span className={styles.languageOptionCode}>
-                        {option.value.toUpperCase()}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              ) : null}
+                      {languageOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`${styles.languageOption} ${
+                            option.value === language
+                              ? styles.languageOptionActive
+                              : ""
+                          }`}
+                          onClick={() => {
+                            const newLanguage = option.value as Language;
+                            setLanguage(newLanguage);
+                            updateLauncherLanguage(newLanguage);
+                            if (newLanguage === "ru") {
+                              updateRussianLocalization(true);
+                            } else {
+                              updateRussianLocalization(false);
+                            }
+                            closeLanguage();
+                          }}
+                        >
+                          <span className={styles.languageOptionLabel}>
+                            {option.label}
+                          </span>
+                          <span className={styles.languageOptionCode}>
+                            {option.value.toUpperCase()}
+                          </span>
+                        </button>
+                      ))}
+                    </div>,
+                    document.body
+                  )
+                : null}
             </div>
           </div>
           {language === "ru" && (
@@ -230,12 +278,30 @@ const SettingsPage = () => {
                   onChange={(e) => {
                     updateRussianLocalization(e.target.checked);
                   }}
-                  className={styles.checkbox}
+                  className={styles.checkboxInput}
                 />
+                <span className={styles.checkboxControl} aria-hidden="true" />
                 <span>{t("settings.enableRussianLocalization")}</span>
               </label>
             </div>
           )}
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={settings.showVersionBranchSelector ?? false}
+                onChange={(event) =>
+                  updateShowVersionBranchSelector(event.target.checked)
+                }
+                className={styles.checkboxInput}
+              />
+              <span className={styles.checkboxControl} aria-hidden="true" />
+              <span>{t("settings.showVersionBranchSelector")}</span>
+            </label>
+          </div>
         </div>
 
         <div className={styles.card}>

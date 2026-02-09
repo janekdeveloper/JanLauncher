@@ -45,7 +45,11 @@ export class AuthManager {
       providers.push({
         id: provider.id as AuthProviderId,
         displayName: provider.displayName,
-        isAvailable
+        isAvailable,
+        authDomain: provider.authDomain,
+        kind: provider.kind,
+        labelKey: provider.labelKey,
+        hintKey: provider.hintKey
       });
     }
 
@@ -120,7 +124,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
+    const providerId = this.resolveProviderId(profile.authDomain);
 
     if (!profile.authTokens) {
       return null;
@@ -142,7 +146,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
+    const providerId = this.resolveProviderId(profile.authDomain);
     const provider = this.getProvider(providerId);
 
     if (!profile.authTokens) {
@@ -182,7 +186,7 @@ export class AuthManager {
     this.ensureInitialized();
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
+    const providerId = this.resolveProviderId(profile.authDomain);
     const provider = this.getProvider(providerId);
 
     if (!profile.authTokens) {
@@ -237,7 +241,7 @@ export class AuthManager {
     }
 
     const profile = this.getProfile(profileId);
-    const providerId = (profile.authDomain || "auth.sanasol.ws") as AuthProviderId;
+    const providerId = this.resolveProviderId(profile.authDomain);
 
     Logger.info(
       "AuthManager",
@@ -287,5 +291,23 @@ export class AuthManager {
     if (!this.initialized) {
       throw new Error("AuthManager not initialized. Call AuthManager.init() first.");
     }
+  }
+
+  static getDefaultProviderId(): AuthProviderId {
+    this.ensureInitialized();
+    const first = this.providers.values().next().value as IAuthProvider | undefined;
+    if (!first) {
+      throw new Error("No auth providers registered");
+    }
+    return first.id as AuthProviderId;
+  }
+
+  static resolveProviderId(authDomain?: string): AuthProviderId {
+    this.ensureInitialized();
+    const trimmed = authDomain?.trim();
+    if (trimmed && this.providers.has(trimmed as AuthProviderId)) {
+      return trimmed as AuthProviderId;
+    }
+    return this.getDefaultProviderId();
   }
 }
