@@ -625,12 +625,17 @@ const HomePage = () => {
             <p className={styles.installMessage}>
               {installCompleted
                 ? t("home.installCompletedMessage")
-                : t("home.installMessage")}
+                : isInstalling
+                  ? t("home.installInProgressMessage")
+                  : t("home.installMessage")}
             </p>
             {!installCompleted && isInstalling && installProgress && (
               <div className={styles.installProgress}>
                 <p className={styles.progressMessage}>
                   {installProgress.message}
+                  {installProgress.percent !== undefined
+                    ? ` (${Math.round(installProgress.percent)}%)`
+                    : ""}
                 </p>
                 {installProgress.percent !== undefined && (
                   <div className={styles.progressBar}>
