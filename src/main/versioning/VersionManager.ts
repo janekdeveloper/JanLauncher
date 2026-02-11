@@ -13,11 +13,21 @@ import {
   type GameVersionInfo,
   type InstalledVersionRecord
 } from "./VersionManifest";
+import { getApiBaseUrl, getPatchBaseUrl } from "../core/ApiConfig";
 
-const PATCH_BASE_URL = "https://game-patches.hytale.com/patches";
 const CONSECUTIVE_MISSES_TO_STOP = 5;
 
 type PatchPair = { prev: number; target: number };
+
+type VersionsResponseItem = {
+  version: number;
+  label: string;
+  is_latest: boolean;
+};
+
+type VersionsResponse = {
+  items: VersionsResponseItem[];
+};
 
 export type VersionInstallProgress = {
   message: string;
@@ -31,76 +41,91 @@ export class VersionManager {
     this.ensureBranch(branch);
     VersionStorage.ensureLayout();
 
-    const pwrSet = new Set<string>();
-    let maxVersion = 0;
-    let consecutiveMisses = 0;
-    let version = 1;
+    Logger.info("VersionManager", `Fetching available versions for branch ${branch} from JanNet API`);
 
-    Logger.info("VersionManager", `Discovering versions for branch ${branch}`);
+    const os = this.mapOs();
+    const arch = this.mapArch();
+    const apiBaseUrl = getApiBaseUrl();
+    const url = `${apiBaseUrl}/launcher/patches/${branch}/versions`;
 
-    while (consecutiveMisses < CONSECUTIVE_MISSES_TO_STOP) {
-      const url = this.buildPatchUrl(branch, 0, version);
-      const exists = await this.headPatch(url);
-      if (exists) {
-        maxVersion = version;
-        pwrSet.add(this.patchKey(0, version));
-        consecutiveMisses = 0;
-      } else {
-        consecutiveMisses += 1;
-      }
-      version += 1;
-    }
-
-    for (let prev = 1; prev < maxVersion; prev += 1) {
-      consecutiveMisses = 0;
-      let target = prev + 1;
-      while (
-        consecutiveMisses < CONSECUTIVE_MISSES_TO_STOP &&
-        target <= maxVersion + CONSECUTIVE_MISSES_TO_STOP
-      ) {
-        const url = this.buildPatchUrl(branch, prev, target);
-        const exists = await this.headPatch(url);
-        if (exists) {
-          pwrSet.add(this.patchKey(prev, target));
-          consecutiveMisses = 0;
-        } else {
-          consecutiveMisses += 1;
+    let items: VersionsResponseItem[] = [];
+    try {
+      const response = await axios.get<VersionsResponse>(url, {
+        timeout: 5000,
+        params: {
+          os_name: os,
+          arch
+        },
+        headers: {
+          "User-Agent": "JanLauncher-VersionManager",
+          Accept: "application/json, text/plain, */*"
         }
-        target += 1;
-      }
+      });
+      items = response.data?.items ?? [];
+    } catch (error) {
+      Logger.error(
+        "VersionManager",
+        `Failed to fetch versions from JanNet API for branch ${branch}`,
+        error
+      );
+      items = [];
     }
 
-    this.pwrCache.set(branch, pwrSet);
-
-    const targets = Array.from(
-      new Set(
-        Array.from(pwrSet)
-          .map((key) => this.parsePatchKey(key).target)
-          .filter((value) => value > 0)
-      )
-    ).sort((a, b) => b - a);
-
-    Logger.info(
-      "VersionManager",
-      `Found ${pwrSet.size} patch files for branch ${branch}: ${Array.from(pwrSet).join(", ")}`
-    );
-    console.log(
-      `[VersionManager] Found ${pwrSet.size} patch files for branch ${branch}:`,
-      Array.from(pwrSet)
-    );
-
-    if (!targets.length) {
-      Logger.warn("VersionManager", `No versions found for branch ${branch}`);
-      console.warn(`[VersionManager] No versions found for branch ${branch}`);
+    if (!items.length) {
+      Logger.warn("VersionManager", `No versions found for branch ${branch} from JanNet API`);
+      console.warn(
+        `[VersionManager] No versions found for branch ${branch} from JanNet API (os=${os}, arch=${arch})`
+      );
+      this.pwrCache.set(branch, new Set<string>());
       return [];
     }
 
+    const allTargets = items
+      .map((item) => item.version)
+      .filter((value) => Number.isFinite(value) && value > 0)
+      .sort((a, b) => b - a);
+
+    if (!allTargets.length) {
+      Logger.warn("VersionManager", `No valid numeric versions in JanNet response for branch ${branch}`);
+      this.pwrCache.set(branch, new Set<string>());
+      return [];
+    }
+
+    // Filter out versions that do NOT have a full patch from 0 on the mirror.
+    const targets: number[] = [];
+    for (const candidate of allTargets) {
+      const url = this.buildPatchUrl(branch, 0, candidate);
+      // Only consider versions that have a 0 -> candidate patch file present.
+      const exists = await this.headPatch(url);
+      if (exists) {
+        targets.push(candidate);
+      }
+    }
+
+    if (!targets.length) {
+      Logger.warn(
+        "VersionManager",
+        `No versions with full 0->N patches found for branch ${branch} (filtered from JanNet response)`
+      );
+      this.pwrCache.set(branch, new Set<string>());
+      return [];
+    }
+
+    // Cache only full patches from 0 -> target for now.
+    const pwrSet = new Set<string>();
+    for (const target of targets) {
+      pwrSet.add(this.patchKey(0, target));
+    }
+    this.pwrCache.set(branch, pwrSet);
+
     Logger.info(
       "VersionManager",
-      `Discovered ${targets.length} unique versions for branch ${branch}: ${targets.join(", ")}`
+      `Discovered ${targets.length} versions for branch ${branch} from JanNet API: ${targets.join(
+        ", "
+      )}`
     );
     console.log(
-      `[VersionManager] Discovered ${targets.length} unique versions for branch ${branch}:`,
+      `[VersionManager] Versions for branch ${branch} from JanNet API:`,
       targets
     );
 
@@ -491,7 +516,8 @@ export class VersionManager {
   private static buildPatchUrl(branch: GameVersionBranch, prev: number, target: number): string {
     const os = this.mapOs();
     const arch = this.mapArch();
-    return `${PATCH_BASE_URL}/${os}/${arch}/${branch}/${prev}/${target}.pwr`;
+    const base = getPatchBaseUrl();
+    return `${base}/${os}/${arch}/${branch}/${prev}/${target}.pwr`;
   }
 
   private static mapOs(): "windows" | "linux" | "darwin" {

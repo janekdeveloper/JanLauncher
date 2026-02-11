@@ -12,7 +12,7 @@
 
 ---
 
-[![Version](https://img.shields.io/badge/Version-0.3.1-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
 [![Downloads](https://img.shields.io/badge/Downloads-2k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
 <!-- [![Downloads](https://img.shields.io/github/downloads/janekdeveloper/janlauncher/total?style=for-the-badge&logo=github&label=Downloads&color=207e5c)](https://github.com/janekdeveloper/janlauncher/releases) -->
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)]()
