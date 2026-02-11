@@ -263,7 +263,15 @@ export class VersionManager {
             : `Downloading patch ${pair.prev}→${pair.target}`;
         this.reportProgress(onProgress, label, 20);
 
-        const patchPath = await this.downloadPatch(branch, pair.prev, pair.target);
+        const patchPath = await this.downloadPatch(
+          branch,
+          pair.prev,
+          pair.target,
+          onProgress,
+          label,
+          20,
+          60
+        );
         this.reportProgress(onProgress, "Applying patch", 60);
 
         try {
@@ -578,7 +586,11 @@ export class VersionManager {
   private static async downloadPatch(
     branch: GameVersionBranch,
     prev: number,
-    target: number
+    target: number,
+    onProgress?: (progress: VersionInstallProgress) => void,
+    label?: string,
+    startPercent = 20,
+    endPercent = 60
   ): Promise<string> {
     const cacheDir = VersionStorage.getCacheDir();
     const fileName = `${branch}_${prev}_${target}.pwr`;
@@ -612,6 +624,23 @@ export class VersionManager {
 
     fs.mkdirSync(cacheDir, { recursive: true });
     const writer = fs.createWriteStream(tempPath);
+    const contentLengthHeader = response.headers["content-length"];
+    const totalSize =
+      expectedSize ??
+      (contentLengthHeader ? Number.parseInt(contentLengthHeader, 10) : null);
+
+    if (onProgress && totalSize && label) {
+      let downloaded = 0;
+      response.data.on("data", (chunk: Buffer) => {
+        downloaded += chunk.length;
+        const fraction = Math.min(downloaded / totalSize, 1);
+        const percent =
+          startPercent +
+          Math.round((endPercent - startPercent) * fraction);
+        this.reportProgress(onProgress, label, percent);
+      });
+    }
+
     await new Promise<void>((resolve, reject) => {
       response.data.pipe(writer);
       writer.on("finish", resolve);
