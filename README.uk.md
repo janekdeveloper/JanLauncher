@@ -9,6 +9,7 @@
 [![UA](https://img.shields.io/badge/README-Українська-yellow)](README.uk.md)
 [![BE](https://img.shields.io/badge/README-Беларуская-green)](README.be.md)
 [![PL](https://img.shields.io/badge/README-Polski-purple)](README.pl.md)
+[![ES](https://img.shields.io/badge/README-Español-orange)](README.es.md)
 
 ---
 
