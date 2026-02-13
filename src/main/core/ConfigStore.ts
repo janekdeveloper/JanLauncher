@@ -49,7 +49,8 @@ const DEFAULT_SETTINGS: Settings = {
   showVersionBranchSelector: false,
   sidebarPosition: "left",
   showLogsNav: false,
-  themeId: "classic"
+  themeId: "classic",
+  hasCompletedOnboarding: false
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -81,7 +82,8 @@ const isSettings = (value: unknown): value is Settings =>
     value.sidebarPosition === "left" ||
     value.sidebarPosition === "top") &&
   (value.showLogsNav === undefined || isBoolean(value.showLogsNav)) &&
-  (value.themeId === undefined || (typeof value.themeId === "string" && value.themeId.length > 0));
+  (value.themeId === undefined || (typeof value.themeId === "string" && value.themeId.length > 0)) &&
+  (value.hasCompletedOnboarding === undefined || isBoolean(value.hasCompletedOnboarding));
 
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
@@ -186,6 +188,11 @@ export class ConfigStore {
 
     if (!("showLogsNav" in this.settings)) {
       (this.settings as Settings & { showLogsNav?: boolean }).showLogsNav = false;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("hasCompletedOnboarding" in this.settings)) {
+      (this.settings as Settings).hasCompletedOnboarding = false;
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -372,7 +379,10 @@ export class ConfigStore {
       showLogsNav: isBoolean(next.showLogsNav)
         ? next.showLogsNav
         : fallback.showLogsNav ?? false,
-      themeId: isThemeId(next.themeId) ? next.themeId : fallback.themeId ?? "classic"
+      themeId: isThemeId(next.themeId) ? next.themeId : fallback.themeId ?? "classic",
+      hasCompletedOnboarding: isBoolean(next.hasCompletedOnboarding)
+        ? next.hasCompletedOnboarding
+        : fallback.hasCompletedOnboarding ?? false
     };
   }
 

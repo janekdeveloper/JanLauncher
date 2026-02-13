@@ -89,6 +89,8 @@ export type Settings = {
   sidebarPosition?: "left" | "top";
   showLogsNav?: boolean;
   themeId?: ThemeId;
+  /** Set to true after user completes first-run onboarding. Never reset. */
+  hasCompletedOnboarding?: boolean;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";

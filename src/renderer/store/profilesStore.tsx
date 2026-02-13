@@ -7,7 +7,7 @@ type ProfilesStore = {
   playerProfilesLoading: boolean;
   playerProfilesError: string | null;
   loadPlayerProfiles: () => Promise<void>;
-  createPlayerProfile: (nickname: string) => Promise<PlayerProfile>;
+  createPlayerProfile: (nickname: string, authDomain?: string) => Promise<PlayerProfile>;
   updatePlayerProfile: (id: string, nickname: string) => Promise<void>;
   removePlayerProfile: (id: string) => Promise<void>;
 
@@ -50,7 +50,7 @@ export const ProfilesStoreProvider = ({
     }
   }, []);
 
-  const createPlayerProfile = useCallback(async (nickname: string) => {
+  const createPlayerProfile = useCallback(async (nickname: string, authDomain?: string) => {
     const trimmed = nickname.trim();
     if (!trimmed) {
       throw new Error("Nickname cannot be empty");
@@ -60,7 +60,8 @@ export const ProfilesStoreProvider = ({
     try {
       const profile: PlayerProfile = {
         id: "",
-        nickname: trimmed
+        nickname: trimmed,
+        ...(authDomain && { authDomain })
       };
       const created = await api.playerProfiles.create(profile);
       await loadPlayerProfiles();

@@ -23,7 +23,6 @@
 .logContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   padding: 16px;
   border-radius: var(--radius-md);
   background: var(--color-glass-panel);
@@ -31,14 +30,21 @@
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--color-glass-border);
   box-shadow: var(--shadow-glass);
-  max-height: 520px;
-  overflow-y: auto;
+  height: 520px;
   font-family: "Consolas", "Monaco", "Courier New", monospace;
   font-size: 0.875rem;
 }
 
+.virtuoso {
+  flex: 1;
+  min-height: 0;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
 .logRow {
   padding: 12px 14px;
+  margin-bottom: 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-glass-border);
   border-left: 4px solid var(--color-log-info);

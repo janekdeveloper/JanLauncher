@@ -26,8 +26,8 @@ export const useLogsViewModel = () => {
   const [logLines, setLogLines] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const shouldAutoScrollRef = useRef(true);
+  const atBottomRef = useRef(true);
+  const scrollToEndRef = useRef<(() => void) | null>(null);
 
   const logs = useMemo<LogEntry[]>(() => {
     return logLines
@@ -71,7 +71,7 @@ export const useLogsViewModel = () => {
       try {
         unsubscribe = api.logs.onNewLine((line: string) => {
           setLogLines((prev) => [...prev, line]);
-          shouldAutoScrollRef.current = true;
+          atBottomRef.current = true;
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to subscribe to logs");
@@ -88,26 +88,16 @@ export const useLogsViewModel = () => {
   }, []);
 
   useEffect(() => {
-    if (shouldAutoScrollRef.current && containerRef.current) {
-      const container = containerRef.current;
-      container.scrollTop = container.scrollHeight;
+    if (atBottomRef.current) {
+      scrollToEndRef.current?.();
     }
   }, [logs]);
-
-  const handleScroll = () => {
-    if (!containerRef.current) return;
-
-    const container = containerRef.current;
-    const isAtBottom =
-      container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
-    shouldAutoScrollRef.current = isAtBottom;
-  };
 
   return {
     logs,
     loading,
     error,
-    containerRef,
-    handleScroll
+    atBottomRef,
+    scrollToEndRef
   };
 };
