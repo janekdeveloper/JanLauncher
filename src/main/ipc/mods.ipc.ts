@@ -48,7 +48,7 @@ export const registerModsHandlers = (): void => {
       if (options.gameVersion !== undefined && options.gameVersion !== null && typeof options.gameVersion !== "string") {
         throw new Error("Invalid gameVersion");
       }
-      if (options.language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(options.language)) {
+      if (options.language !== undefined && !["ru", "en", "uk", "pl", "be", "es"].includes(options.language)) {
         throw new Error("Invalid language");
       }
 
@@ -90,7 +90,7 @@ export const registerModsHandlers = (): void => {
       if (typeof modId !== "number" || !Number.isInteger(modId) || modId <= 0) {
         throw new Error("Invalid modId");
       }
-      if (language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(language)) {
+      if (language !== undefined && !["ru", "en", "uk", "pl", "be", "es"].includes(language)) {
         throw new Error("Invalid language");
       }
 
@@ -117,7 +117,7 @@ export const registerModsHandlers = (): void => {
       if (!gameProfileId || typeof gameProfileId !== "string") {
         throw new Error("Invalid gameProfileId");
       }
-      if (language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(language)) {
+      if (language !== undefined && !["ru", "en", "uk", "pl", "be", "es"].includes(language)) {
         throw new Error("Invalid language");
       }
 
@@ -244,7 +244,7 @@ export const registerModsHandlers = (): void => {
   );
 
   ipcMain.handle("mods:getCategories", async (_event, language?: Language): Promise<CurseForgeCategory[]> => {
-    if (language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(language)) {
+    if (language !== undefined && !["ru", "en", "uk", "pl", "be", "es"].includes(language)) {
       throw new Error("Invalid language");
     }
 

@@ -66,7 +66,7 @@ export const registerTranslationHandlers = (): void => {
       if (typeof options.text !== "string") {
         throw new Error("Invalid text");
       }
-      if (!["ru", "en", "uk", "pl", "be"].includes(options.targetLanguage)) {
+      if (!["ru", "en", "uk", "pl", "be", "es"].includes(options.targetLanguage)) {
         throw new Error("Invalid target language");
       }
 

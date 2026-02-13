@@ -93,14 +93,14 @@ export const api = {
       sortOrder?: "asc" | "desc";
       categoryId?: number | null;
       gameVersion?: string | null;
-      language?: "ru" | "en" | "uk" | "pl" | "be";
+      language?: "ru" | "en" | "uk" | "pl" | "be" | "es";
     }): Promise<CurseForgeSearchResult> => apiInstance.mods.search(options),
-    getDetails: (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeMod> =>
-      (apiInstance.mods.getDetails as (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be") => Promise<CurseForgeMod>)(modId, language),
-    loadInstalled: (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<Mod[]> =>
-      (apiInstance.mods.loadInstalled as (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be") => Promise<Mod[]>)(gameProfileId, language),
-    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeCategory[]> =>
-      (apiInstance.mods.getCategories as (language?: "ru" | "en" | "uk" | "pl" | "be") => Promise<CurseForgeCategory[]>)(language),
+    getDetails: (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeMod> =>
+      (apiInstance.mods.getDetails as (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<CurseForgeMod>)(modId, language),
+    loadInstalled: (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<Mod[]> =>
+      (apiInstance.mods.loadInstalled as (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<Mod[]>)(gameProfileId, language),
+    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]> =>
+      (apiInstance.mods.getCategories as (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<CurseForgeCategory[]>)(language),
     getGameVersions: (): Promise<string[]> =>
       (apiInstance.mods.getGameVersions as () => Promise<string[]>)(),
     install: (options: {
@@ -143,11 +143,11 @@ export const api = {
       apiInstance.versions.onError(callback)
   },
   news: {
-    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null> =>
+    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null> =>
       apiInstance.news.loadCached(language),
-    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]> =>
+    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]> =>
       apiInstance.news.refresh(language),
-    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]> =>
+    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]> =>
       apiInstance.news.fetch(language),
     openUrl: (url: string): Promise<void> => apiInstance.news.openUrl(url)
   },

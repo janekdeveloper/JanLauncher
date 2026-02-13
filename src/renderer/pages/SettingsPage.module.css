@@ -476,6 +476,7 @@
   transition: all var(--transition-fast);
   font-size: 0.85rem;
   font-weight: 500;
+  min-width: 0;
 }
 
 .folderButton:hover:not(:disabled) {
@@ -507,9 +508,14 @@
 }
 
 .folderButtonText {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  max-height: 2.6em;
+  word-break: break-word;
 }
 
 .loading {

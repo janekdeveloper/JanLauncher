@@ -43,7 +43,8 @@ const SettingsPage = () => {
     { value: "en", label: "English" },
     { value: "uk", label: "Українська" },
     { value: "pl", label: "Polski" },
-    { value: "be", label: "Беларуская" }
+    { value: "be", label: "Беларуская" },
+    { value: "es", label: "Español" }
   ] as const;
 
   useLayoutEffect(() => {

@@ -3,7 +3,7 @@ import { Logger } from "../core/Logger";
 import { NewsManager } from "../services/NewsManager";
 import type { NewsArticle } from "../../shared/types";
 
-type Language = "ru" | "en" | "uk" | "pl" | "be";
+type Language = "ru" | "en" | "uk" | "pl" | "be" | "es";
 
 /**
  * Registers IPC handlers for news management.

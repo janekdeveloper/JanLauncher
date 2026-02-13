@@ -16,7 +16,8 @@ export class MyMemoryProvider implements TranslationProvider {
     en: "en",
     uk: "uk",
     pl: "pl",
-    be: "be"
+    be: "be",
+    es: "es"
   };
 
   /**
@@ -33,8 +34,24 @@ export class MyMemoryProvider implements TranslationProvider {
     targetLang: Language
   ): Promise<string | null> {
     try {
+      if (!sourceLang || !targetLang) {
+        Logger.warn(
+          "MyMemoryProvider",
+          `Invalid language parameters: sourceLang=${sourceLang}, targetLang=${targetLang}`
+        );
+        return null;
+      }
+
       const sourceCode = MyMemoryProvider.LANGUAGE_CODES[sourceLang];
       const targetCode = MyMemoryProvider.LANGUAGE_CODES[targetLang];
+
+      if (!sourceCode || !targetCode) {
+        Logger.warn(
+          "MyMemoryProvider",
+          `Language code not found: sourceLang=${sourceLang} (${sourceCode}), targetLang=${targetLang} (${targetCode})`
+        );
+        return null;
+      }
 
       if (sourceCode === targetCode) {
         return text;

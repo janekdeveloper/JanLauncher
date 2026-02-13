@@ -47,6 +47,14 @@ export class TranslationService {
     text: string,
     targetLang: Language
   ): Promise<string> {
+    if (!targetLang) {
+      Logger.warn(
+        "TranslationService",
+        `Invalid targetLang: ${targetLang}, returning original text`
+      );
+      return text;
+    }
+
     const normalized = normalizeTextForTranslation(text);
     if (normalized === null) {
       return text;

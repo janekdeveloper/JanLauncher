@@ -64,11 +64,11 @@ export interface PreloadApi {
       sortOrder?: "asc" | "desc";
       categoryId?: number | null;
       gameVersion?: string | null;
-      language?: "ru" | "en" | "uk" | "pl" | "be";
+      language?: "ru" | "en" | "uk" | "pl" | "be" | "es";
     }): Promise<CurseForgeSearchResult>;
-    getDetails(modId: number, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeMod>;
-    loadInstalled(gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<Mod[]>;
-    getCategories(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeCategory[]>;
+    getDetails(modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeMod>;
+    loadInstalled(gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<Mod[]>;
+    getCategories(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]>;
     getGameVersions(): Promise<string[]>;
     install(options: { gameProfileId: string; modId: number; fileId?: number }): Promise<Mod>;
     toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
@@ -87,9 +87,9 @@ export interface PreloadApi {
     onError(callback: (message: string) => void): () => void;
   };
   news: {
-    loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
-    refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
-    fetch(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
+    loadCached(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null>;
+    refresh(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
+    fetch(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
     openUrl(url: string): Promise<void>;
   };
   auth: {
@@ -225,7 +225,7 @@ const api: PreloadApi = {
     search: (options) => ipcRenderer.invoke("mods:search", options),
     getDetails: (modId, language) => ipcRenderer.invoke("mods:getDetails", modId, language),
     loadInstalled: (gameProfileId, language) => ipcRenderer.invoke("mods:loadInstalled", gameProfileId, language),
-    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be") => ipcRenderer.invoke("mods:getCategories", language),
+    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => ipcRenderer.invoke("mods:getCategories", language),
     getGameVersions: () => ipcRenderer.invoke("mods:getGameVersions"),
     install: (options) => ipcRenderer.invoke("mods:install", options),
     toggle: (options) => ipcRenderer.invoke("mods:toggle", options),
@@ -260,11 +260,11 @@ const api: PreloadApi = {
     }
   },
   news: {
-    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:loadCached", language),
-    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:refresh", language),
-    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:fetch", language),
     openUrl: (url) => ipcRenderer.invoke("news:openUrl", url)
   },

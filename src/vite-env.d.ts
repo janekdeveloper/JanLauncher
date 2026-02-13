@@ -84,9 +84,9 @@ declare global {
         onError(callback: (message: string) => void): () => void;
       };
       news: {
-        loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
-        refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
-        fetch(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
+        loadCached(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null>;
+        refresh(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
+        fetch(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
         openUrl(url: string): Promise<void>;
       };
       auth: {
