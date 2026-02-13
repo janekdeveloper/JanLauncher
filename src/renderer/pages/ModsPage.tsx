@@ -340,8 +340,7 @@ const ModsPage = () => {
                         key={mod.id}
                         className={`${styles.modCard} listItemEnter`}
                         style={{ animationDelay: `${Math.min(index, 7) * 40}ms` }}
-                      >
-                        {/* Header */}
+                        >
                         <div className={styles.modCardHeader}>
                           <div className={styles.modCardIconWrapper}>
                             {modLogo ? (
@@ -385,17 +384,14 @@ const ModsPage = () => {
                           </div>
                         </div>
 
-                        {/* Body */}
                         <div className={styles.modCardBody}>
                           <p className={styles.modCardDescription}>
                             {mod.summary || t("mods.noDescription")}
                           </p>
                         </div>
 
-                        {/* Divider */}
                         <div className={styles.modCardDivider} />
 
-                        {/* Meta */}
                         <div className={styles.modCardMeta}>
                           {mod.downloadCount > 0 && (
                             <div className={styles.modCardMetaItem}>
@@ -421,7 +417,6 @@ const ModsPage = () => {
                           )}
                         </div>
 
-                        {/* Actions */}
                         <div className={styles.modCardActions}>
                           {installed ? (
                             <Button

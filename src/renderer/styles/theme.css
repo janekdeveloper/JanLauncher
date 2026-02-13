@@ -47,7 +47,6 @@
   --ease-out-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Glass effect utility classes */
 .glass {
   background: var(--color-glass-panel);
   backdrop-filter: blur(20px) saturate(180%);

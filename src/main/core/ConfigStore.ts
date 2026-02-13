@@ -88,7 +88,11 @@ const isSettings = (value: unknown): value is Settings =>
 const isAuthTokens = (value: unknown): value is AuthTokens =>
   isRecord(value) &&
   isString(value.identityToken) &&
-  isString(value.sessionToken);
+  isString(value.sessionToken) &&
+  (value.expiresAt === undefined || isNumber(value.expiresAt)) &&
+  (value.authUuid === undefined || isString(value.authUuid)) &&
+  (value.authUsername === undefined || isString(value.authUsername)) &&
+  (value.refreshToken === undefined || isString(value.refreshToken));
 
 const isPlayerProfile = (value: unknown): value is PlayerProfile =>
   isRecord(value) &&
@@ -164,7 +168,6 @@ export class ConfigStore {
       "settings.json"
     );
 
-    // Ensure new settings fields are present without resetting user configuration.
     if (!("showVersionBranchSelector" in this.settings)) {
       (this.settings as Settings & { showVersionBranchSelector?: boolean }).showVersionBranchSelector =
         false;

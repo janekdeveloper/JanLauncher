@@ -14,7 +14,6 @@ export const registerSystemHandlers = (): void => {
       return totalMb;
     } catch (error) {
       Logger.error("IPC", "system:getTotalMemory failed", error);
-      // Fallback: 16 GB in MB
       return 16 * 1024;
     }
   });

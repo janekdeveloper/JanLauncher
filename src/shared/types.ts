@@ -1,6 +1,14 @@
 export type AuthTokens = {
   identityToken: string;
   sessionToken: string;
+  /** Unix timestamp (seconds) when the access token expires. Used for auto-refresh. */
+  expiresAt?: number;
+  /** Auth provider user id (e.g. from launcher-data). Used for game launch and display. */
+  authUuid?: string;
+  /** Auth provider display name. Used for game launch and display. */
+  authUsername?: string;
+  /** OAuth refresh token. Stored but never logged or exposed to renderer. */
+  refreshToken?: string;
 };
 
 export type PlayerProfile = {

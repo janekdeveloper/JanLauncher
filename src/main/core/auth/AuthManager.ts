@@ -49,7 +49,8 @@ export class AuthManager {
         authDomain: provider.authDomain,
         kind: provider.kind,
         labelKey: provider.labelKey,
-        hintKey: provider.hintKey
+        hintKey: provider.hintKey,
+        descriptionKey: provider.descriptionKey
       });
     }
 
@@ -130,12 +131,17 @@ export class AuthManager {
       return null;
     }
 
+    const t = profile.authTokens;
+    const authUuid = t.authUuid?.trim();
+    const authUsername = t.authUsername?.trim();
     return {
-      uuid: profile.id,
-      username: profile.nickname,
-      identityToken: profile.authTokens.identityToken,
-      sessionToken: profile.authTokens.sessionToken,
-      providerId
+      uuid: authUuid || profile.id,
+      username: authUsername && authUsername !== "Hytale Player" ? authUsername : profile.nickname,
+      identityToken: t.identityToken,
+      sessionToken: t.sessionToken,
+      expiresAt: t.expiresAt,
+      providerId,
+      refreshToken: t.refreshToken
     };
   }
 
@@ -153,12 +159,17 @@ export class AuthManager {
       return null;
     }
 
+    const t = profile.authTokens;
+    const authUuid = t.authUuid?.trim();
+    const authUsername = t.authUsername?.trim();
     const currentSession: AuthSession = {
-      uuid: profile.id,
-      username: profile.nickname,
-      identityToken: profile.authTokens.identityToken,
-      sessionToken: profile.authTokens.sessionToken,
-      providerId
+      uuid: authUuid || profile.id,
+      username: authUsername && authUsername !== "Hytale Player" ? authUsername : profile.nickname,
+      identityToken: t.identityToken,
+      sessionToken: t.sessionToken,
+      expiresAt: t.expiresAt,
+      providerId,
+      refreshToken: t.refreshToken
     };
 
     try {
@@ -193,12 +204,17 @@ export class AuthManager {
       return;
     }
 
+    const t = profile.authTokens;
+    const authUuid = t.authUuid?.trim();
+    const authUsername = t.authUsername?.trim();
     const session: AuthSession = {
-      uuid: profile.id,
-      username: profile.nickname,
-      identityToken: profile.authTokens.identityToken,
-      sessionToken: profile.authTokens.sessionToken,
-      providerId
+      uuid: authUuid || profile.id,
+      username: authUsername && authUsername !== "Hytale Player" ? authUsername : profile.nickname,
+      identityToken: t.identityToken,
+      sessionToken: t.sessionToken,
+      expiresAt: t.expiresAt,
+      providerId,
+      refreshToken: t.refreshToken
     };
 
     try {
@@ -273,7 +289,11 @@ export class AuthManager {
       authDomain: providerId,
       authTokens: {
         identityToken: session.identityToken,
-        sessionToken: session.sessionToken
+        sessionToken: session.sessionToken,
+        expiresAt: session.expiresAt,
+        authUuid: session.uuid,
+        authUsername: session.username,
+        refreshToken: session.refreshToken
       },
       authInvalid: false
     });

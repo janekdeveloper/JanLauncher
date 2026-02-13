@@ -17,15 +17,18 @@ import { useI18n } from "../i18n";
 import { useHomeViewModel } from "../viewmodels/useHomeViewModel";
 import { api } from "../services/api";
 import type { AuthDomain, GameVersionBranch } from "../../shared/types";
-import type { AuthProviderInfo } from "../../main/core/auth/auth.types";
+import type { AuthProviderInfo, AuthProviderId } from "../../main/core/auth/auth.types";
 import { DISCORD_INVITE_URL } from "../constants/links";
 import styles from "./HomePage.module.css";
+
+type AccountStatus = "valid" | "refreshing" | "invalid";
 
 type DockOption = {
   id: string;
   label: string;
   meta?: string;
   invalid?: boolean;
+  status?: AccountStatus;
 };
 
 type DockSelectProps = {
@@ -85,14 +88,22 @@ const DockSelect = ({
                     close();
                   }}
                 >
-                  <span className={`${styles.dropdownItemLabel} ${option.invalid ? styles.dropdownItemLabelInvalid : ""}`}>
-                    {option.label}
-                  </span>
-                  {option.meta ? (
-                    <span className={`${styles.dropdownItemMeta} ${option.invalid ? styles.dropdownItemMetaInvalid : ""}`}>
-                      {option.meta}
-                    </span>
+                  {option.status ? (
+                    <span
+                      className={`${styles.accountStatusIndicator} ${styles[`accountStatus${option.status.charAt(0).toUpperCase() + option.status.slice(1)}`]}`}
+                      aria-hidden
+                    />
                   ) : null}
+                  <span className={styles.dropdownItemText}>
+                    <span className={`${styles.dropdownItemLabel} ${option.invalid ? styles.dropdownItemLabelInvalid : ""}`}>
+                      {option.label}
+                    </span>
+                    {option.meta ? (
+                      <span className={`${styles.dropdownItemMeta} ${option.invalid ? styles.dropdownItemMetaInvalid : ""}`}>
+                        {option.meta}
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
                 {renderActions ? (
                   <div className={styles.dropdownItemActions}>
@@ -167,6 +178,11 @@ const HomePage = () => {
     isGameNotInstalled,
     isAccountValid,
     isValidatingAccount,
+    loginModalState,
+    loginError,
+    startLogin,
+    closeLoginModal,
+    getDefaultAuthDomain,
     refreshPlayerProfiles,
     authProviders,
     versionBranch,
@@ -201,6 +217,12 @@ const HomePage = () => {
     const isSelected = profile.id === selectedPlayerId;
     const isValidating = isSelected ? isValidatingAccount : false;
     const isInvalid = isSelected ? isAccountValid === false : false;
+    const status: AccountStatus =
+      isSelected && isValidating
+        ? "refreshing"
+        : isSelected && isInvalid
+          ? "invalid"
+          : "valid";
 
     let meta = "";
     const provider = authProviders.find((p) => p.id === profile.authDomain);
@@ -227,7 +249,8 @@ const HomePage = () => {
       id: profile.id,
       label: profile.nickname,
       meta,
-      invalid: isInvalid
+      invalid: isInvalid,
+      status
     };
   });
 
@@ -289,6 +312,30 @@ const HomePage = () => {
       {showVersionBranchSelector ? (
         <>
           <div className={styles.playButtonCenter}>
+            {selectedPlayerId && isAccountValid === false && (
+              <div className={styles.invalidAccountBlock}>
+                <p className={styles.invalidAccountWarning}>
+                  {t("home.invalidAccountWarning")}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const profile = selectedPlayer;
+                    if (profile) {
+                      startLogin(
+                        profile.id,
+                        (profile.authDomain ?? getDefaultAuthDomain()) as AuthProviderId,
+                        { uuid: profile.id, username: profile.nickname }
+                      );
+                    }
+                  }}
+                  className={styles.reloginButton}
+                >
+                  {t("home.relogin")}
+                </Button>
+              </div>
+            )}
             <Button
               variant="primary"
               size="lg"
@@ -524,6 +571,31 @@ const HomePage = () => {
             />
           </div>
 
+          {selectedPlayerId && isAccountValid === false && (
+            <div className={styles.invalidAccountBlock}>
+              <p className={styles.invalidAccountWarning}>
+                {t("home.invalidAccountWarning")}
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const profile = selectedPlayer;
+                  if (profile) {
+                    startLogin(
+                      profile.id,
+                      (profile.authDomain ?? getDefaultAuthDomain()) as AuthProviderId,
+                      { uuid: profile.id, username: profile.nickname }
+                    );
+                  }
+                }}
+                className={styles.reloginButton}
+              >
+                {t("home.relogin")}
+              </Button>
+            </div>
+          )}
+
           <Button
             variant="primary"
             size="lg"
@@ -550,6 +622,51 @@ const HomePage = () => {
           </Button>
         </div>
       )}
+
+      <Modal
+        isOpen={loginModalState !== "idle"}
+        title={
+          loginModalState === "waiting"
+            ? t("home.loginOpeningBrowser")
+            : loginModalState === "success"
+              ? t("home.loginSuccess")
+              : loginModalState === "error"
+                ? t("home.loginError")
+                : ""
+        }
+        onClose={
+          loginModalState === "waiting" || loginModalState === "error"
+            ? closeLoginModal
+            : undefined
+        }
+        footer={
+          loginModalState === "waiting" ? (
+            <div className={styles.modalFooter}>
+              <Button variant="ghost" onClick={closeLoginModal}>
+                {t("home.loginCancel")}
+              </Button>
+            </div>
+          ) : loginModalState === "error" ? (
+            <div className={styles.modalFooter}>
+              <Button variant="primary" onClick={closeLoginModal}>
+                {t("common.close")}
+              </Button>
+            </div>
+          ) : undefined
+        }
+      >
+        {loginModalState === "waiting" && (
+          <p className={styles.loginModalMessage}>
+            {t("home.loginOpeningBrowser")}
+          </p>
+        )}
+        {loginModalState === "success" && (
+          <p className={styles.loginModalMessage}>{t("home.loginSuccess")}</p>
+        )}
+        {loginModalState === "error" && loginError && (
+          <p className={styles.errorMessage}>{loginError}</p>
+        )}
+      </Modal>
 
       <Modal
         isOpen={isVersionInstalling}
@@ -610,67 +727,84 @@ const HomePage = () => {
                 const isSelected = authDomainDraft === provider.id;
                 const isDisabled = !provider.isAvailable;
                 
+                const isHytale = provider.id === "hytale.com";
                 const isOfficialProvider = provider.kind === "official";
-                
+
                 return (
-            <button
+                  <button
                     key={provider.id}
-              type="button"
-              className={`${styles.authSystemOption} ${
+                    type="button"
+                    className={`${styles.authSystemOption} ${
                       isSelected ? styles.authSystemOptionActive : ""
                     } ${isDisabled ? styles.authSystemOptionDisabled : ""}`}
                     onClick={() => setAuthDomainDraft(provider.id as AuthDomain)}
                     disabled={isDisabled}
-            >
-              <div className={styles.authSystemOptionContent}>
-                <div className={styles.authSystemOptionIcon}>
-                        {isOfficialProvider ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
                   >
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
+                    <div className={styles.authSystemOptionContent}>
+                      <div className={styles.authSystemOptionIcon}>
+                        {isHytale ? (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          </svg>
+                        ) : isOfficialProvider ? (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                          </svg>
                         ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                    <line x1="7" y1="8" x2="17" y2="8" />
-                    <line x1="7" y1="12" x2="17" y2="12" />
-                  </svg>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                            <line x1="7" y1="8" x2="17" y2="8" />
+                            <line x1="7" y1="12" x2="17" y2="12" />
+                          </svg>
                         )}
-                </div>
-                <div className={styles.authSystemOptionText}>
-                  <span className={styles.authSystemOptionName}>
-                    {getProviderLabel(provider)}
-                  </span>
-                  <span className={styles.authSystemOptionDomain}>{provider.authDomain}</span>
-                  {provider.hintKey && !isDisabled && (
-                    <span className={styles.authSystemOptionHint}>
-                      {t(provider.hintKey)}
-                    </span>
-                  )}
-                  {isDisabled && (
-                    <span className={styles.authSystemOptionHint}>
-                      {t("home.authSystemUnavailable")}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </button>
+                      </div>
+                      <div className={styles.authSystemOptionText}>
+                        <span className={styles.authSystemOptionName}>
+                          {getProviderLabel(provider)}
+                        </span>
+                        <span className={styles.authSystemOptionDomain}>{provider.authDomain}</span>
+                        {provider.descriptionKey && (
+                          <span className={styles.authSystemOptionDescription}>
+                            {t(provider.descriptionKey)}
+                          </span>
+                        )}
+                        {provider.hintKey && !isDisabled && (
+                          <span className={styles.authSystemOptionHint}>
+                            {t(provider.hintKey)}
+                          </span>
+                        )}
+                        {isDisabled && (
+                          <span className={styles.authSystemOptionHint}>
+                            {t("home.authSystemUnavailable")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
                 );
               })
             ) : (

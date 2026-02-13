@@ -91,11 +91,9 @@ export class VersionManager {
       return [];
     }
 
-    // Filter out versions that do NOT have a full patch from 0 on the mirror.
     const targets: number[] = [];
     for (const candidate of allTargets) {
       const url = this.buildPatchUrl(branch, 0, candidate);
-      // Only consider versions that have a 0 -> candidate patch file present.
       const exists = await this.headPatch(url);
       if (exists) {
         targets.push(candidate);
@@ -111,7 +109,6 @@ export class VersionManager {
       return [];
     }
 
-    // Cache only full patches from 0 -> target for now.
     const pwrSet = new Set<string>();
     for (const target of targets) {
       pwrSet.add(this.patchKey(0, target));

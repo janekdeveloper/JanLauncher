@@ -9,6 +9,8 @@ export type AuthSession = {
   sessionToken: string;
   expiresAt?: number;
   providerId: string;
+  /** OAuth refresh token. Internal use only; never expose to renderer. */
+  refreshToken?: string;
 };
 
 export type AuthProviderId = string;
@@ -29,6 +31,7 @@ export type AuthProviderInfo = {
   kind: AuthProviderKind;
   labelKey?: string;
   hintKey?: string;
+  descriptionKey?: string;
 };
 
 /**

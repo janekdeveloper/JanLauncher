@@ -94,7 +94,6 @@ export const createMainWindow = (): BrowserWindow => {
     }
   };
 
-  // Only use dev server in development mode, never in packaged app
   if (!app.isPackaged) {
     const devServerUrl = process.env.VITE_DEV_SERVER_URL;
     if (devServerUrl && typeof devServerUrl === "string" && devServerUrl.trim().length > 0) {
@@ -109,7 +108,6 @@ export const createMainWindow = (): BrowserWindow => {
       win.loadFile(getHtmlPath());
     }
   } else {
-    // Always use local HTML file in packaged app
     win.loadFile(getHtmlPath());
   }
 

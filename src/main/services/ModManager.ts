@@ -501,7 +501,6 @@ export class ModManager {
       throw new Error("CURSEFORGE_API_KEY environment variable is not set");
     }
 
-    // Try getting downloadUrl from file details endpoint (as used in other launchers)
     const url = `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}`;
     try {
       const response = await axios.get(url, {
@@ -512,12 +511,10 @@ export class ModManager {
 
       Logger.debug("ModManager", `File details response structure: ${JSON.stringify(Object.keys(response.data?.data || {}))}`);
 
-      // Try different possible locations for downloadUrl
       const fileData = response.data?.data;
       let downloadUrl = fileData?.downloadUrl;
 
       if (!downloadUrl && fileData) {
-        // Log the full response structure for debugging
         Logger.debug("ModManager", `Full file data keys: ${JSON.stringify(Object.keys(fileData))}`);
         Logger.debug("ModManager", `File data sample: ${JSON.stringify(fileData, null, 2).substring(0, 500)}`);
       }
@@ -526,13 +523,10 @@ export class ModManager {
         return downloadUrl;
       }
 
-      // If downloadUrl is not in the response, try using the download endpoint directly
       Logger.info("ModManager", "downloadUrl not found in file details, using direct download endpoint");
       return `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}/download`;
     } catch (error: any) {
       Logger.error("ModManager", `Failed to get file details: ${error.message}`);
-      
-      // Fallback: use direct download endpoint
       Logger.info("ModManager", "Falling back to direct download endpoint");
       return `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}/download`;
     }
@@ -543,8 +537,6 @@ export class ModManager {
     this.removeFileIfExists(tempPath);
     try {
       const headers: Record<string, string> = {};
-      
-      // If URL is a CurseForge API endpoint, add API key
       if (url.includes("api.curseforge.com")) {
         const apiKey = getCurseForgeApiKey();
         if (apiKey) {

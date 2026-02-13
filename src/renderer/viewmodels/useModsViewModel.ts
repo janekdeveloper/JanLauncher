@@ -77,7 +77,6 @@ export const useModsViewModel = () => {
         const mods = await api.mods.loadInstalled(selectedGame.id, language);
         if (!cancelled) setInstalledMods(mods);
       } catch {
-        // ignore
       } finally {
         if (!cancelled) setIsLoadingInstalled(false);
       }
@@ -182,15 +181,13 @@ export const useModsViewModel = () => {
     return () => {
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
     };
-    // Only react to query changes, not to runSearch function changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
     if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
     runSearch({ pageIndex: 0 });
-    // Intentionally not including runSearch to avoid running on query change (handled by debounced effect)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFilter, selectedCategoryId, selectedGameVersion]);
 
   const resetSearchState = useCallback(() => {

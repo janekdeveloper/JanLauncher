@@ -36,3 +36,31 @@ export class ReloginRequiredError extends AuthError {
     this.name = "ReloginRequiredError";
   }
 }
+
+export class AuthNetworkError extends AuthError {
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message, "NETWORK_ERROR");
+    this.name = "AuthNetworkError";
+  }
+}
+
+export class AuthExpiredError extends AuthError {
+  constructor(message = "Authentication tokens have expired") {
+    super(message, "TOKEN_EXPIRED");
+    this.name = "AuthExpiredError";
+  }
+}
+
+export class AuthInvalidCredentialsError extends AuthError {
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message, "INVALID_CREDENTIALS");
+    this.name = "AuthInvalidCredentialsError";
+  }
+}
+
+export class AuthServerError extends AuthError {
+  constructor(message: string, public readonly statusCode?: number) {
+    super(message, "SERVER_ERROR");
+    this.name = "AuthServerError";
+  }
+}

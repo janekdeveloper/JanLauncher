@@ -39,6 +39,7 @@ export interface IAuthProvider {
    */
   readonly labelKey?: string;
   readonly hintKey?: string;
+  readonly descriptionKey?: string;
 
   /**
    * DualAuth agent environment configuration for this provider

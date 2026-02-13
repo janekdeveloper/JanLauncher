@@ -116,7 +116,6 @@ export const useSettingsViewModel = () => {
         })
       );
     } catch {
-      // No-op in non-browser environments
     }
   };
 
@@ -137,7 +136,6 @@ export const useSettingsViewModel = () => {
         })
       );
     } catch {
-      // No-op in non-browser environments
     }
   };
 
@@ -158,7 +156,6 @@ export const useSettingsViewModel = () => {
         })
       );
     } catch {
-      // No-op in non-browser environments
     }
   };
 

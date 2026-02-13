@@ -239,12 +239,20 @@
   border: 1px solid transparent;
   color: var(--color-text);
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
   transition: background var(--transition-fast),
     border var(--transition-fast), transform var(--transition-fast);
   flex: 1;
+}
+
+.dropdownItemText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .dropdownItem:hover {
@@ -481,11 +489,59 @@
   font-family: monospace;
 }
 
+.authSystemOptionDescription {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
 .authSystemOptionHint {
   font-size: 0.75rem;
   color: var(--color-secondary);
   font-weight: 500;
   margin-top: 2px;
+}
+
+.accountStatusIndicator {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.accountStatusValid {
+  background: var(--color-success, #22c55e);
+}
+
+.accountStatusRefreshing {
+  background: var(--color-warning, #eab308);
+}
+
+.accountStatusInvalid {
+  background: var(--color-error, #ef4444);
+}
+
+.invalidAccountBlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.invalidAccountWarning {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.reloginButton {
+  flex-shrink: 0;
+}
+
+.loginModalMessage {
+  margin: 0;
+  color: var(--color-text);
 }
 
 .deleteConfirmMessage {

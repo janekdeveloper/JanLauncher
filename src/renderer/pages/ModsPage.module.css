@@ -206,10 +206,6 @@
   gap: 24px;
 }
 
-/* ============================================
-   MOD CARD - LAUNCHER-GRADE REDESIGN
-   ============================================ */
-
 .modCard {
   display: flex;
   flex-direction: column;
@@ -261,7 +257,6 @@
   opacity: 1;
 }
 
-/* Header Section */
 .modCardHeader {
   display: flex;
   gap: 16px;
@@ -368,7 +363,6 @@
   font-weight: 600;
 }
 
-/* Body Section */
 .modCardBody {
   padding: 0 20px 16px;
 }
@@ -384,7 +378,6 @@
   overflow: hidden;
 }
 
-/* Divider */
 .modCardDivider {
   height: 1px;
   margin: 0 20px;
@@ -396,7 +389,6 @@
   );
 }
 
-/* Meta Section */
 .modCardMeta {
   display: flex;
   flex-wrap: wrap;
@@ -426,7 +418,6 @@
   white-space: nowrap;
 }
 
-/* Actions Section */
 .modCardActions {
   display: flex;
   gap: 10px;
@@ -495,10 +486,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ============================================
-   INSTALLED MODS LIST
-   ============================================ */
 
 .modList {
   display: flex;
@@ -595,10 +582,6 @@
   flex-shrink: 0;
 }
 
-/* ============================================
-   EMPTY STATES & LOADING
-   ============================================ */
-
 .emptyState {
   padding: 48px 26px;
   border-radius: var(--radius-md);
@@ -630,10 +613,6 @@
   color: var(--color-text-muted);
 }
 
-/* ============================================
-   PAGINATION
-   ============================================ */
-
 .pagination {
   display: flex;
   align-items: center;
@@ -655,10 +634,6 @@
   min-width: 120px;
   text-align: center;
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 980px) {
   .header {

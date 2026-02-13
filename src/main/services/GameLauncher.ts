@@ -155,6 +155,21 @@ export class GameLauncher {
       );
     }
 
+    if (authSession.providerId === "hytale.com") {
+      try {
+        const refreshed = await AuthManager.refreshSession(playerProfileId);
+        if (refreshed) {
+          authSession = refreshed;
+          Logger.info("GameLauncher", "Refreshed Hytale game session for launch");
+        }
+      } catch (err) {
+        Logger.warn(
+          "GameLauncher",
+          `Failed to refresh Hytale session before launch, using existing tokens: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+    }
+
     const authProvider = AuthManager.getProvider(authSession.providerId);
     const authDomain = authProvider.authDomain;
     const patchResult = await ClientPatcher.ensureClientPatched(

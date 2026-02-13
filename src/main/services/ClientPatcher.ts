@@ -421,7 +421,6 @@ export class ClientPatcher {
       if (fs.existsSync(legacyFlag)) fs.unlinkSync(legacyFlag);
       if (fs.existsSync(dualauthFlag)) fs.unlinkSync(dualauthFlag);
     } catch {
-      // ignore cleanup failures
     }
 
     return { restored: true };
