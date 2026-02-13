@@ -29,7 +29,7 @@
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid var(--color-glass-border);
   color: var(--color-text);
-  box-shadow: 0 2px 8px rgba(5 10 20 / 0.15);
+  box-shadow: var(--shadow-subtle);
 }
 
 .profileSelector {
@@ -65,13 +65,13 @@
 
 .tab:hover {
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-surface-overlay);
 }
 
 .tabActive {
   background: var(--color-glass-gradient);
   color: var(--color-text);
-  box-shadow: 0 2px 8px rgba(5 10 20 / 0.15);
+  box-shadow: var(--shadow-subtle);
 }
 
 .toolbar {
@@ -177,15 +177,15 @@
 
 .filterButton:hover {
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-surface-overlay);
   border-color: var(--color-glass-border);
 }
 
 .filterButtonActive {
   background: var(--color-glass-gradient);
   color: var(--color-text);
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
 }
 
 .catalog {
@@ -210,16 +210,9 @@
   display: flex;
   flex-direction: column;
   border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(22, 30, 44, 0.98) 0%,
-    rgba(27, 37, 51, 0.96) 100%
-  );
-  border: 1px solid rgba(134, 212, 255, 0.15);
-  box-shadow: 
-    0 4px 16px rgba(5, 10, 20, 0.3),
-    0 0 0 1px rgba(134, 212, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: var(--color-glass-panel);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-glass);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
@@ -236,7 +229,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(134, 212, 255, 0.4),
+    var(--color-primary),
     transparent
   );
   opacity: 0;
@@ -245,12 +238,8 @@
 
 .modCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(134, 212, 255, 0.3);
-  box-shadow: 
-    0 12px 32px rgba(5, 10, 20, 0.4),
-    0 0 0 1px rgba(134, 212, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 24px rgba(134, 212, 255, 0.1);
+  border-color: var(--color-glass-border);
+  box-shadow: var(--shadow-elevated), 0 0 0 1px var(--color-primary-glow);
 }
 
 .modCard:hover::before {
@@ -273,13 +262,11 @@
   position: relative;
   background: linear-gradient(
     135deg,
-    rgba(59, 130, 246, 0.2) 0%,
-    rgba(16, 185, 129, 0.2) 100%
+    var(--color-primary-glow) 0%,
+    var(--color-secondary-glow) 100%
   );
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(134, 212, 255, 0.2);
+  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--color-glass-border);
 }
 
 .modCardIcon {
@@ -297,8 +284,8 @@
   justify-content: center;
   background: linear-gradient(
     135deg,
-    rgba(59, 130, 246, 0.25) 0%,
-    rgba(16, 185, 129, 0.25) 100%
+    var(--color-primary-glow) 0%,
+    var(--color-secondary-glow) 100%
   );
   position: relative;
 }
@@ -309,7 +296,7 @@
   inset: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(134, 212, 255, 0.1) 0%,
+    var(--color-glass-highlight) 0%,
     transparent 70%
   );
 }
@@ -317,12 +304,12 @@
 .modCardIconPlaceholderText {
   font-size: 2rem;
   font-weight: 800;
-  color: rgba(134, 212, 255, 0.8);
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: -0.02em;
   position: relative;
   z-index: 1;
-  text-shadow: 0 2px 8px rgba(134, 212, 255, 0.3);
+  text-shadow: 0 2px 8px var(--color-primary-glow);
 }
 
 .modCardHeaderContent {
@@ -384,7 +371,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(134, 212, 255, 0.15),
+    var(--color-glass-highlight),
     transparent
   );
 }
@@ -438,14 +425,14 @@
 }
 
 .modCardActionInstalled {
-  background: rgba(70, 221, 176, 0.15) !important;
+  background: var(--color-secondary-glow) !important;
   color: var(--color-secondary) !important;
-  border-color: rgba(70, 221, 176, 0.3) !important;
+  border-color: var(--color-secondary) !important;
   cursor: default;
 }
 
 .modCardActionInstalled:hover {
-  background: rgba(70, 221, 176, 0.2) !important;
+  background: var(--color-secondary-glow) !important;
   transform: none;
 }
 
@@ -462,7 +449,7 @@
 }
 
 .modCardActionExternal:hover {
-  background: rgba(134, 212, 255, 0.15);
+  background: var(--color-glass-highlight);
   transform: scale(1.05);
 }
 
@@ -475,7 +462,7 @@
 .modCardActionSpinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--color-border-overlay-strong);
   border-top-color: currentColor;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -508,7 +495,7 @@
   gap: 20px;
   padding: 20px;
   border-radius: var(--radius-md);
-  background: rgba(22, 30, 44, 0.85);
+  background: var(--color-glass-panel);
   border: 1px solid var(--color-glass-border);
   box-shadow: var(--shadow-glass);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
@@ -516,7 +503,7 @@
 
 .modItem:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(5 10 20 / 0.2);
+  box-shadow: var(--shadow-subtle);
 }
 
 .modItemContent {
@@ -546,15 +533,15 @@
 }
 
 .modStatusEnabled {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: var(--color-secondary-glow);
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
 }
 
 .modStatusDisabled {
-  background: rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: var(--color-glass-highlight);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
 }
 
 .modDescription {

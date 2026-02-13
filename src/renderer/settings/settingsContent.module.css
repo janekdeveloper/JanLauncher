@@ -142,7 +142,7 @@
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   border: 3px solid var(--color-bg);
   box-shadow: 0 0 0 2px var(--color-primary-glow),
-    0 4px 12px rgba(134 212 255 / 0.4);
+    var(--shadow-subtle);
   cursor: pointer;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -150,7 +150,7 @@
 .range::-webkit-slider-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 6px 16px rgba(134 212 255 / 0.5);
+    var(--shadow-elevated);
 }
 
 .range::-moz-range-thumb {
@@ -160,7 +160,7 @@
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   border: 3px solid var(--color-bg);
   box-shadow: 0 0 0 2px var(--color-primary-glow),
-    0 4px 12px rgba(134 212 255 / 0.4);
+    var(--shadow-subtle);
   cursor: pointer;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -168,7 +168,7 @@
 .range::-moz-range-thumb:hover {
   transform: scale(1.15);
   box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 6px 16px rgba(134 212 255 / 0.5);
+    var(--shadow-elevated);
 }
 
 .memoryLabels {
@@ -196,11 +196,7 @@
 .languagePicker {
   position: relative;
   min-width: 200px;
-  background: linear-gradient(
-      135deg,
-      rgba(134, 212, 255, 0.16),
-      rgba(58, 210, 163, 0.12)
-    ),
+  background: var(--color-glass-gradient),
     var(--color-glass-panel);
   border: 1px solid var(--color-glass-border);
   border-radius: 14px;
@@ -256,11 +252,7 @@
   right: 0;
   top: calc(100% + 10px);
   width: 100%;
-  background: linear-gradient(
-      160deg,
-      rgba(134, 212, 255, 0.12),
-      rgba(58, 210, 163, 0.08)
-    ),
+  background: var(--color-glass-gradient),
     var(--color-glass-panel);
   border-radius: 16px;
   border: 1px solid var(--color-glass-border);
@@ -299,7 +291,7 @@
   -webkit-backdrop-filter: blur(8px) saturate(180%);
   border-color: var(--color-glass-border);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(5 10 20 / 0.15);
+  box-shadow: var(--shadow-subtle);
 }
 
 .languageOptionActive {
@@ -320,7 +312,7 @@
   padding: 3px 8px;
   border-radius: 999px;
   border: 1px solid var(--color-border);
-  background: rgba(15, 20, 27, 0.45);
+  background: var(--color-bg-panel);
 }
 
 .checkboxWrapper {
@@ -341,7 +333,7 @@
 }
 
 .checkboxLabel:hover {
-  color: var(--color-text-bright);
+  color: var(--color-text);
 }
 
 .checkboxInput {
@@ -356,13 +348,11 @@
   height: 24px;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 0% 0%, rgba(134, 212, 255, 0.22), transparent),
-    radial-gradient(circle at 100% 100%, rgba(58, 210, 163, 0.18), transparent),
-    linear-gradient(135deg, rgba(9, 12, 20, 0.9), rgba(9, 14, 26, 0.96));
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.75),
-    0 8px 22px rgba(5, 10, 20, 0.9);
+    radial-gradient(circle at 0% 0%, var(--color-primary-glow), transparent),
+    radial-gradient(circle at 100% 100%, var(--color-secondary-glow), transparent),
+    var(--color-glass-panel);
+  border: 1px solid var(--color-border-overlay-strong);
+  box-shadow: var(--shadow-soft);
   flex-shrink: 0;
   transition:
     background var(--transition-fast),
@@ -379,12 +369,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 25% 20%, #ffffff, #e6f5ff),
-    linear-gradient(145deg, #e0f2ff, #c1dcff);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.9),
-    0 5px 12px rgba(0, 0, 0, 0.8);
+  background: var(--color-toggle-thumb);
+  box-shadow: var(--shadow-subtle);
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -398,7 +384,7 @@
   border-radius: inherit;
   background: radial-gradient(
     circle at 50% 0%,
-    rgba(255, 255, 255, 0.16),
+    var(--color-border-overlay-strong),
     transparent 60%
   );
   opacity: 0.8;
@@ -406,39 +392,28 @@
 }
 
 .checkboxLabel:hover .checkboxControl {
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.75),
-    0 10px 24px rgba(5, 10, 20, 0.95);
+  box-shadow: var(--shadow-elevated);
   transform: translateY(-1px);
 }
 
 .checkboxInput:focus-visible + .checkboxControl {
   outline: none;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.8),
-    0 0 0 3px var(--color-primary-glow),
-    0 10px 26px rgba(5, 10, 20, 1);
+  box-shadow: 0 0 0 3px var(--color-primary-glow), var(--shadow-elevated);
 }
 
 .checkboxInput:checked + .checkboxControl {
   background:
-    radial-gradient(circle at 0% 0%, rgba(134, 212, 255, 0.4), transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(58, 210, 163, 0.4), transparent 65%),
+    radial-gradient(circle at 0% 0%, var(--color-primary-glow), transparent 60%),
+    radial-gradient(circle at 100% 100%, var(--color-secondary-glow), transparent 65%),
     linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.7),
-    0 0 26px rgba(134, 212, 255, 1);
+  border-color: var(--color-glass-border);
+  box-shadow: 0 0 0 2px var(--color-primary-glow), var(--shadow-glass);
 }
 
 .checkboxInput:checked + .checkboxControl::after {
   transform: translateX(20px);
-  background:
-    radial-gradient(circle at 25% 20%, #ffffff, #f4feff),
-    linear-gradient(145deg, #f3fbff, #e6fdff);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 1),
-    0 5px 14px rgba(0, 0, 0, 0.85);
+  background: var(--color-toggle-thumb);
+  box-shadow: var(--shadow-subtle);
 }
 
 @keyframes languageMenuIn {
@@ -468,6 +443,70 @@
   border-top: 1px solid var(--color-glass-border);
 }
 
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.themeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.themeCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+}
+
+.themeCardActive {
+  border-color: var(--color-primary);
+  background: var(--color-glass-panel);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+}
+
+.themePreview {
+  display: flex;
+  gap: 4px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.themePreviewStrip {
+  flex: 1;
+  min-width: 0;
+}
+
+.themePreviewStrip:nth-child(1) {
+  background: var(--preview-primary, var(--color-primary));
+}
+
+.themePreviewStrip:nth-child(2) {
+  background: var(--preview-secondary, var(--color-secondary));
+}
+
+.themePreviewStrip:nth-child(3) {
+  background: var(--preview-bg, var(--color-bg));
+}
+
+.themeName {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--color-text);
+}
+
 .foldersGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -482,11 +521,7 @@
   padding: 10px 14px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-glass-border);
-  background: linear-gradient(
-    135deg,
-    rgba(134, 212, 255, 0.12),
-    rgba(58, 210, 163, 0.08)
-  );
+  background: var(--color-glass-gradient);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   color: var(--color-text);
@@ -498,14 +533,10 @@
 }
 
 .folderButton:hover:not(:disabled) {
-  background: linear-gradient(
-    135deg,
-    rgba(134, 212, 255, 0.2),
-    rgba(58, 210, 163, 0.15)
-  );
+  background: var(--color-glass-gradient);
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 4px 12px rgba(134, 212, 255, 0.2);
+    var(--shadow-subtle);
   transform: translateY(-2px);
 }
 

@@ -5,6 +5,8 @@ import Button from "../../components/common/Button";
 import { useI18n, type Language } from "../../i18n";
 import { useDropdown } from "../../hooks/useDropdown";
 import { useSettingsContext } from "../SettingsContext";
+import { useTheme } from "../../theme";
+import { THEME_IDS, themes } from "../../theme";
 import { api } from "../../services/api";
 import { FolderIcon } from "../../components/icons";
 import styles from "../settingsContent.module.css";
@@ -20,7 +22,8 @@ const LANGUAGE_OPTIONS = [
 
 const GeneralTab = () => {
   const { t, language, setLanguage } = useI18n();
-  const { settings, gameProfiles, updateSettings } = useSettingsContext();
+  const { settings, updateSettings } = useSettingsContext();
+  const { themeId, setTheme } = useTheme();
   const languageMenuRef = useRef<HTMLDivElement | null>(null);
   const { ref: languageRef, isOpen: isLanguageOpen, toggle: toggleLanguage, close: closeLanguage } = useDropdown([languageMenuRef]);
   const [languageMenuStyle, setLanguageMenuStyle] = useState<CSSProperties | null>(null);
@@ -141,6 +144,39 @@ const GeneralTab = () => {
               </label>
             </div>
           )}
+        </div>
+
+        <div className={styles.card}>
+          <p className={styles.label}>{t("settings.themeLabel")}</p>
+          <div className={styles.themeGrid}>
+            {THEME_IDS.map((id) => {
+              const theme = themes[id];
+              const isActive = themeId === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${styles.themeCard} ${isActive ? styles.themeCardActive : ""}`}
+                  onClick={() => setTheme(id)}
+                  aria-pressed={isActive}
+                  style={
+                    {
+                      "--preview-primary": theme.primary,
+                      "--preview-secondary": theme.secondary,
+                      "--preview-bg": theme.background
+                    } as React.CSSProperties
+                  }
+                >
+                  <div className={styles.themePreview}>
+                    <span className={styles.themePreviewStrip} aria-hidden />
+                    <span className={styles.themePreviewStrip} aria-hidden />
+                    <span className={styles.themePreviewStrip} aria-hidden />
+                  </div>
+                  <span className={styles.themeName}>{t(`settings.theme.${id}`)}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className={styles.card}>

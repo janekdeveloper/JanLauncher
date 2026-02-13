@@ -13,6 +13,7 @@ import type {
   Mod,
   GameVersionBranch
 } from "../../shared/types";
+import { isThemeId } from "../../shared/theme";
 
 const getDefaultJavaPath = (): string => {
   try {
@@ -47,7 +48,8 @@ const DEFAULT_SETTINGS: Settings = {
   enableRussianLocalization: false,
   showVersionBranchSelector: false,
   sidebarPosition: "left",
-  showLogsNav: false
+  showLogsNav: false,
+  themeId: "classic"
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -78,7 +80,8 @@ const isSettings = (value: unknown): value is Settings =>
   (value.sidebarPosition === undefined ||
     value.sidebarPosition === "left" ||
     value.sidebarPosition === "top") &&
-  (value.showLogsNav === undefined || isBoolean(value.showLogsNav));
+  (value.showLogsNav === undefined || isBoolean(value.showLogsNav)) &&
+  (value.themeId === undefined || (typeof value.themeId === "string" && value.themeId.length > 0));
 
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
@@ -164,6 +167,11 @@ export class ConfigStore {
       "settings.json"
     );
 
+    if (!("themeId" in this.settings) || !isThemeId(this.settings.themeId)) {
+      (this.settings as Settings).themeId = "classic";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
     if (!("showVersionBranchSelector" in this.settings)) {
       (this.settings as Settings & { showVersionBranchSelector?: boolean }).showVersionBranchSelector =
         false;
@@ -214,7 +222,7 @@ export class ConfigStore {
     }
     if (legacySettings.javaPath !== undefined || legacySettings.jvmArgs !== undefined) {
       const { javaPath: _j, jvmArgs: _a, ...rest } = legacySettings;
-      this.settings = rest as Settings;
+      this.settings = this.sanitizeSettings(rest as Settings, this.settings);
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -363,7 +371,8 @@ export class ConfigStore {
           : fallback.sidebarPosition ?? "left",
       showLogsNav: isBoolean(next.showLogsNav)
         ? next.showLogsNav
-        : fallback.showLogsNav ?? false
+        : fallback.showLogsNav ?? false,
+      themeId: isThemeId(next.themeId) ? next.themeId : fallback.themeId ?? "classic"
     };
   }
 

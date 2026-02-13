@@ -23,6 +23,7 @@ import type {
 } from "../main/core/auth/auth.types";
 
 export interface PreloadApi {
+  openExternal(url: string): Promise<void>;
   window: {
     openSettings(): Promise<void>;
   };
@@ -141,6 +142,7 @@ export interface PreloadApi {
 }
 
 const api: PreloadApi = {
+  openExternal: (url) => ipcRenderer.invoke("external:open", url),
   window: {
     openSettings: () => ipcRenderer.invoke("window:openSettings")
   },

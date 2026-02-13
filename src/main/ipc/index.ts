@@ -10,6 +10,7 @@ import { registerNewsHandlers } from "./news.ipc";
 import { registerAuthHandlers } from "./auth.ipc";
 import { registerTranslationHandlers } from "./translation.ipc";
 import { registerPathsHandlers } from "./paths.ipc";
+import { registerExternalHandlers } from "./external.ipc";
 import { registerUpdateHandlers } from "../updater/updateIpc";
 import { registerVersionsHandlers } from "./versions.ipc";
 import { registerSystemHandlers } from "./system.ipc";
@@ -32,6 +33,7 @@ export const registerIpcHandlers = (): void => {
   registerAuthHandlers();
   registerTranslationHandlers();
   registerPathsHandlers();
+  registerExternalHandlers();
   registerVersionsHandlers();
   registerSystemHandlers();
   registerUpdateHandlers();

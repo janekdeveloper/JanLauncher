@@ -56,7 +56,7 @@
   background: var(--color-glass-gradient);
   border-color: var(--color-primary);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(5 10 20 / 0.15);
+  box-shadow: var(--shadow-subtle);
 }
 
 .logRow[data-level="warn"] {
@@ -113,7 +113,7 @@
 }
 
 .errorBanner {
-  background: rgba(255, 122, 134, 0.1);
+  background: var(--color-danger-subtle);
   border: 1px solid var(--color-danger);
   border-radius: var(--radius-md);
   padding: 12px 16px;
@@ -129,11 +129,7 @@
   padding: 12px 20px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-glass-border);
-  background: linear-gradient(
-    135deg,
-    rgba(134, 212, 255, 0.16),
-    rgba(58, 210, 163, 0.12)
-  );
+  background: var(--color-glass-gradient);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   color: var(--color-text);
@@ -141,7 +137,7 @@
   transition: all var(--transition-fast);
   font-size: 0.9rem;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(5, 10, 20, 0.1);
+  box-shadow: var(--shadow-subtle);
   position: relative;
   overflow: hidden;
 }
@@ -156,7 +152,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.1),
+    var(--color-surface-overlay),
     transparent
   );
   transition: left 0.5s ease;
@@ -167,21 +163,15 @@
 }
 
 .openLogsButton:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(134, 212, 255, 0.24),
-    rgba(58, 210, 163, 0.18)
-  );
+  background: var(--color-glass-gradient);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 8px 20px rgba(134, 212, 255, 0.3);
+  box-shadow: 0 0 0 3px var(--color-primary-glow), var(--shadow-elevated);
   transform: translateY(-2px);
 }
 
 .openLogsButton:active {
   transform: translateY(0);
-  box-shadow: 0 0 0 2px var(--color-primary-glow),
-    0 4px 12px rgba(134, 212, 255, 0.2);
+  box-shadow: 0 0 0 2px var(--color-primary-glow), var(--shadow-subtle);
 }
 
 .openLogsIcon {

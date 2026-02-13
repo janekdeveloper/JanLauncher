@@ -79,6 +79,8 @@ export type GameProfile = {
   versionId?: string | null;
 };
 
+import type { ThemeId } from "./theme";
+
 export type Settings = {
   installedGameVersion?: string | null;
   launcherLanguage?: string;
@@ -86,6 +88,7 @@ export type Settings = {
   showVersionBranchSelector?: boolean;
   sidebarPosition?: "left" | "top";
   showLogsNav?: boolean;
+  themeId?: ThemeId;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";

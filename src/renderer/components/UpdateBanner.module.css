@@ -4,14 +4,14 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: linear-gradient(135deg, rgba(134, 212, 255, 0.15) 0%, rgba(106, 198, 255, 0.12) 100%);
+  background: var(--color-glass-gradient);
   color: var(--color-text);
   padding: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(134, 212, 255, 0.2) inset;
+  box-shadow: var(--shadow-soft), 0 0 0 1px var(--color-glass-border) inset;
   animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(134, 212, 255, 0.25);
+  border-bottom: 1px solid var(--color-glass-border);
 }
 
 @keyframes slideDown {
@@ -64,28 +64,28 @@
 }
 
 .banner[data-status="available"] {
-  background: linear-gradient(135deg, rgba(134, 212, 255, 0.2) 0%, rgba(106, 198, 255, 0.15) 100%);
-  box-shadow: 0 4px 20px rgba(134, 212, 255, 0.25), 0 0 0 1px rgba(134, 212, 255, 0.3) inset;
-  border-bottom-color: rgba(134, 212, 255, 0.35);
+  background: var(--color-glass-gradient);
+  box-shadow: 0 4px 20px var(--color-primary-glow), 0 0 0 1px var(--color-glass-border) inset;
+  border-bottom-color: var(--color-primary);
 }
 
 .banner[data-status="downloading"] {
-  background: linear-gradient(135deg, rgba(134, 212, 255, 0.18) 0%, rgba(70, 221, 176, 0.12) 100%);
-  box-shadow: 0 4px 20px rgba(134, 212, 255, 0.2), 0 0 0 1px rgba(134, 212, 255, 0.25) inset;
-  border-bottom-color: rgba(134, 212, 255, 0.3);
+  background: var(--color-glass-gradient);
+  box-shadow: 0 4px 20px var(--color-primary-glow), 0 0 0 1px var(--color-glass-border) inset;
+  border-bottom-color: var(--color-glass-border);
 }
 
 .banner[data-status="downloaded"] {
-  background: linear-gradient(135deg, rgba(70, 221, 176, 0.2) 0%, rgba(54, 200, 155, 0.15) 100%);
-  box-shadow: 0 4px 20px rgba(70, 221, 176, 0.25), 0 0 0 1px rgba(70, 221, 176, 0.3) inset;
-  border-bottom-color: rgba(70, 221, 176, 0.35);
+  background: linear-gradient(135deg, var(--color-secondary-glow) 0%, var(--color-secondary-glow) 100%);
+  box-shadow: 0 4px 20px var(--color-secondary-glow), 0 0 0 1px var(--color-secondary) inset;
+  border-bottom-color: var(--color-secondary);
   animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1), pulse 2s ease-in-out infinite;
 }
 
 .banner[data-status="error"] {
-  background: linear-gradient(135deg, rgba(255, 122, 134, 0.2) 0%, rgba(238, 98, 113, 0.15) 100%);
-  box-shadow: 0 4px 20px rgba(255, 122, 134, 0.25), 0 0 0 1px rgba(255, 122, 134, 0.3) inset;
-  border-bottom-color: rgba(255, 122, 134, 0.35);
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-strong) 100%);
+  box-shadow: 0 4px 20px var(--color-danger-glow), 0 0 0 1px var(--color-danger) inset;
+  border-bottom-color: var(--color-danger);
 }
 
 .bannerClosing {
@@ -108,31 +108,31 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(134, 212, 255, 0.15);
+  background: var(--color-glass-highlight);
   border-radius: 10px;
   backdrop-filter: blur(10px);
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(134, 212, 255, 0.2) inset;
-  border: 1px solid rgba(134, 212, 255, 0.2);
+  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--color-glass-border);
 }
 
 .banner[data-status="downloaded"] .iconWrapper {
-  background: rgba(70, 221, 176, 0.15);
-  border-color: rgba(70, 221, 176, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(70, 221, 176, 0.2) inset;
+  background: var(--color-secondary-glow);
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-subtle);
 }
 
 .banner[data-status="error"] .iconWrapper {
-  background: rgba(255, 122, 134, 0.15);
-  border-color: rgba(255, 122, 134, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 122, 134, 0.2) inset;
+  background: var(--color-danger);
+  border-color: var(--color-danger-strong);
+  box-shadow: var(--shadow-subtle);
 }
 
 .icon {
   width: 20px;
   height: 20px;
   color: var(--color-primary);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 1px 2px rgba(0 0 0 / 0.3));
 }
 
 .banner[data-status="downloaded"] .icon {
@@ -187,12 +187,12 @@
   position: relative;
   width: 100%;
   height: 6px;
-  background: rgba(47, 61, 85, 0.5);
+  background: var(--color-bg-panel);
   border-radius: 10px;
   overflow: hidden;
   margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-  border: 1px solid rgba(134, 212, 255, 0.1);
+  box-shadow: var(--shadow-inset);
+  border: 1px solid var(--color-glass-highlight);
 }
 
 .progressFill {
@@ -214,7 +214,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(134, 212, 255, 0.5) 50%,
+    var(--color-primary) 50%,
     transparent 100%
   );
   border-radius: 10px;
@@ -228,8 +228,8 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: rgba(47, 61, 85, 0.4);
-  border: 1px solid rgba(134, 212, 255, 0.15);
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-glass-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -239,8 +239,8 @@
 }
 
 .closeButton:hover {
-  background: rgba(134, 212, 255, 0.15);
-  border-color: rgba(134, 212, 255, 0.3);
+  background: var(--color-glass-highlight);
+  border-color: var(--color-primary);
   transform: scale(1.05);
 }
 

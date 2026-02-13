@@ -107,7 +107,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--color-on-primary);
 }
 
 .playIconOnly svg {
@@ -261,7 +261,7 @@
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border-color: var(--color-glass-border);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(5 10 20 / 0.15);
+  box-shadow: var(--shadow-subtle);
 }
 
 .dropdownItemLabel {
@@ -274,11 +274,11 @@
 }
 
 .dropdownItemLabelInvalid {
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .dropdownItemMetaInvalid {
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .dropdownEmpty {
@@ -292,12 +292,12 @@
   gap: 8px;
   border-radius: 12px;
   padding: 4px;
-  background: rgba(8, 12, 24, 0.35);
+  background: var(--color-bg-muted);
   border: 1px solid transparent;
 }
 
 .dropdownItemRow:hover {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-border-overlay);
 }
 
 .dropdownItemActions {
@@ -309,8 +309,8 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-overlay);
+  background: var(--color-surface-overlay);
   display: grid;
   place-items: center;
   color: var(--color-text-muted);
@@ -320,16 +320,16 @@
 }
 
 .actionButton:hover {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: var(--color-border-overlay-strong);
   color: var(--color-text);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
   transform: translateY(-1px);
 }
 
 .actionDanger:hover {
-  border-color: rgba(255, 100, 100, 0.35);
-  color: #ff6b6b;
-  box-shadow: 0 0 0 2px rgba(255, 99, 99, 0.25);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  box-shadow: 0 0 0 2px var(--color-danger-glow);
 }
 
 .actionIcon {
@@ -340,8 +340,8 @@
 .versionActionButton {
   padding: 6px 10px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-overlay);
+  background: var(--color-surface-overlay);
   color: var(--color-text);
   font-size: 0.75rem;
   cursor: pointer;
@@ -350,8 +350,8 @@
 }
 
 .versionActionButton:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-color: var(--color-border-overlay-strong);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
   transform: translateY(-1px);
 }
 
@@ -426,7 +426,7 @@
   border-color: var(--color-primary);
   background: var(--color-glass-gradient);
   box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 4px 12px rgba(99, 102, 241, 0.2);
+    var(--shadow-subtle);
 }
 
 .authSystemOptionDisabled {
@@ -452,7 +452,7 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(99, 102, 241, 0.15);
+  background: var(--color-glass-highlight);
   display: grid;
   place-items: center;
   color: var(--color-primary);
@@ -461,8 +461,8 @@
 }
 
 .authSystemOptionActive .authSystemOptionIcon {
-  background: rgba(99, 102, 241, 0.25);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  background: var(--color-primary-glow);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
 }
 
 .authSystemOptionIcon svg {
@@ -510,15 +510,15 @@
 }
 
 .accountStatusValid {
-  background: var(--color-success, #22c55e);
+  background: var(--color-success);
 }
 
 .accountStatusRefreshing {
-  background: var(--color-warning, #eab308);
+  background: var(--color-warning);
 }
 
 .accountStatusInvalid {
-  background: var(--color-error, #ef4444);
+  background: var(--color-danger);
 }
 
 .invalidAccountBlock {
@@ -551,7 +551,7 @@
 }
 
 .errorMessage {
-  color: var(--color-error, #ff4444);
+  color: var(--color-danger);
   margin: 0;
   line-height: 1.6;
 }
@@ -568,14 +568,14 @@
 
 .progressMessage {
   margin: 0 0 12px 0;
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--color-text-muted);
   font-size: 0.9em;
 }
 
 .progressBar {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-muted);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -584,8 +584,8 @@
   height: 100%;
   background: linear-gradient(
     90deg,
-    var(--color-primary, #6366f1),
-    var(--color-secondary, #8b5cf6)
+    var(--color-primary),
+    var(--color-secondary)
   );
   transition: width 0.3s ease;
 }

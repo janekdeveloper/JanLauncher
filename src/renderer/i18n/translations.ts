@@ -7,6 +7,12 @@ export const translations = {
       save: "Сохранить",
       notSelected: "Не выбран"
     },
+    communityModal: {
+      title: "Присоединяйтесь к сообществу JanLauncher",
+      description: "Будьте в курсе обновлений, получайте поддержку и общайтесь с другими игроками.",
+      joinDiscord: "Перейти в Discord",
+      openTelegram: "Перейти в Telegram"
+    },
     nav: {
       home: "Главная",
       mods: "Моды",
@@ -183,6 +189,14 @@ export const translations = {
       sidebarPositionLeft: "Слева",
       sidebarPositionTop: "Сверху",
       showLogsNav: "Показывать раздел логов в боковой панели",
+      themeLabel: "Тема оформления",
+      theme: {
+        classic: "Классическая",
+        green: "Зелёная",
+        purple: "Фиолетовая",
+        red: "Красная",
+        yellow: "Жёлтая"
+      },
       tabs: {
         general: "Общие",
         game: "Игра",
@@ -222,6 +236,12 @@ export const translations = {
       close: "Close",
       save: "Save",
       notSelected: "Not selected"
+    },
+    communityModal: {
+      title: "Join the JanLauncher Community",
+      description: "Stay updated, get support, and connect with other players.",
+      joinDiscord: "Join Discord",
+      openTelegram: "Open Telegram"
     },
     nav: {
       home: "Home",
@@ -399,6 +419,14 @@ export const translations = {
       sidebarPositionLeft: "Left",
       sidebarPositionTop: "Top",
       showLogsNav: "Show logs section in sidebar",
+      themeLabel: "Theme",
+      theme: {
+        classic: "Classic",
+        green: "Green",
+        purple: "Purple",
+        red: "Red",
+        yellow: "Yellow"
+      },
       tabs: {
         general: "General",
         game: "Game",
@@ -438,6 +466,12 @@ export const translations = {
       close: "Закрити",
       save: "Зберегти",
       notSelected: "Не вибрано"
+    },
+    communityModal: {
+      title: "Приєднуйтесь до спільноти JanLauncher",
+      description: "Будьте в курсі оновлень, отримуйте підтримку та спілкуйтесь з іншими гравцями.",
+      joinDiscord: "Перейти в Discord",
+      openTelegram: "Перейти в Telegram"
     },
     nav: {
       home: "Головна",
@@ -615,6 +649,14 @@ export const translations = {
       sidebarPositionLeft: "Зліва",
       sidebarPositionTop: "Зверху",
       showLogsNav: "Показувати розділ логів у боковій панелі",
+      themeLabel: "Тема оформлення",
+      theme: {
+        classic: "Класична",
+        green: "Зелена",
+        purple: "Фіолетова",
+        red: "Червона",
+        yellow: "Жовта"
+      },
       tabs: {
         general: "Загальні",
         game: "Гра",
@@ -654,6 +696,12 @@ export const translations = {
       close: "Zamknij",
       save: "Zapisz",
       notSelected: "Nie wybrano"
+    },
+    communityModal: {
+      title: "Dołącz do społeczności JanLauncher",
+      description: "Bądź na bieżąco, uzyskuj wsparcie i łącz się z innymi graczami.",
+      joinDiscord: "Dołącz do Discord",
+      openTelegram: "Otwórz Telegram"
     },
     nav: {
       home: "Start",
@@ -831,6 +879,14 @@ export const translations = {
       sidebarPositionLeft: "Po lewej",
       sidebarPositionTop: "U góry",
       showLogsNav: "Pokaż sekcję logów w pasku bocznym",
+      themeLabel: "Motyw",
+      theme: {
+        classic: "Klasyczny",
+        green: "Zielony",
+        purple: "Fioletowy",
+        red: "Czerwony",
+        yellow: "Żółty"
+      },
       tabs: {
         general: "Ogólne",
         game: "Gra",
@@ -870,6 +926,12 @@ export const translations = {
       close: "Зачыніць",
       save: "Захаваць",
       notSelected: "Не выбрана"
+    },
+    communityModal: {
+      title: "Далучайцеся да супольнасці JanLauncher",
+      description: "Будзьце ў курсе абнаўленняў, атрымлівайце падтрымку і звязвайцеся з іншымі гульцамі.",
+      joinDiscord: "Перайсці ў Discord",
+      openTelegram: "Перайсці ў Telegram"
     },
     nav: {
       home: "Галоўная",
@@ -1047,6 +1109,14 @@ export const translations = {
       sidebarPositionLeft: "Злева",
       sidebarPositionTop: "Зверху",
       showLogsNav: "Паказваць раздзел логаў у бакавой панэлі",
+      themeLabel: "Тема афармлення",
+      theme: {
+        classic: "Класічная",
+        green: "Зялёная",
+        purple: "Фіялетавая",
+        red: "Чырвоная",
+        yellow: "Жоўтая"
+      },
       tabs: {
         general: "Агульныя",
         game: "Гульня",
@@ -1086,6 +1156,12 @@ export const translations = {
       close: "Cerrar",
       save: "Guardar",
       notSelected: "No seleccionado"
+    },
+    communityModal: {
+      title: "Únete a la comunidad JanLauncher",
+      description: "Mantente al día, obtén soporte y conéctate con otros jugadores.",
+      joinDiscord: "Unirse a Discord",
+      openTelegram: "Abrir Telegram"
     },
     nav: {
       home: "Inicio",
@@ -1263,6 +1339,14 @@ export const translations = {
       sidebarPositionLeft: "Izquierda",
       sidebarPositionTop: "Arriba",
       showLogsNav: "Mostrar sección de registros en la barra lateral",
+      themeLabel: "Tema",
+      theme: {
+        classic: "Clásico",
+        green: "Verde",
+        purple: "Púrpura",
+        red: "Rojo",
+        yellow: "Amarillo"
+      },
       tabs: {
         general: "General",
         game: "Juego",

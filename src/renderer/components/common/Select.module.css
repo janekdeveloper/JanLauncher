@@ -31,7 +31,7 @@
   padding: 0 10px 0 12px;
   border-radius: 8px;
   border: 1px solid var(--color-glass-border);
-  background: rgba(22 30 44 / 0.7);
+  background: var(--color-bg-panel);
   color: var(--color-text);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -41,14 +41,14 @@
 }
 
 .trigger:hover:not(:disabled) {
-  border-color: rgba(134 212 255 / 0.35);
-  background: rgba(30 42 62 / 0.85);
+  border-color: var(--color-glass-border);
+  background: var(--color-bg-elevated);
 }
 
 .trigger:focus {
   outline: none;
-  border-color: rgba(134 212 255 / 0.5);
-  box-shadow: 0 0 0 2px rgba(134 212 255 / 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
 }
 
 .trigger:disabled {
@@ -87,7 +87,7 @@
   background: var(--color-glass-panel);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: var(--shadow-glass), 0 12px 28px rgba(5 10 20 / 0.45);
+  box-shadow: var(--shadow-glass), var(--shadow-elevated);
   padding: 4px;
   min-width: 100%;
 }
@@ -111,15 +111,15 @@
 }
 
 .option:hover {
-  background: rgba(134 212 255 / 0.12);
+  background: var(--color-glass-highlight);
   color: var(--color-text);
 }
 
 .optionSelected {
-  background: rgba(134 212 255 / 0.18);
+  background: var(--color-glass-highlight);
   color: var(--color-primary);
 }
 
 .optionSelected:hover {
-  background: rgba(134 212 255 / 0.22);
+  background: var(--color-glass-border);
 }
