@@ -182,7 +182,25 @@ export const translations = {
       sidebarPositionLabel: "Расположение боковой панели",
       sidebarPositionLeft: "Слева",
       sidebarPositionTop: "Сверху",
-      showLogsNav: "Показывать раздел логов в боковой панели"
+      showLogsNav: "Показывать раздел логов в боковой панели",
+      tabs: {
+        general: "Общие",
+        game: "Игра",
+        java: "Java",
+        interface: "Интерфейс",
+        advanced: "Дополнительно"
+      },
+      interfaceTabHint: "Расположение боковой панели и отображаемые разделы.",
+      gameTabHint: "Настройки игры задаются в главном окне.",
+      gameTabDescription: "Выберите профиль игры в главном окне лаунчера для управления версией и установкой.",
+      javaTabHint: "Путь к Java и аргументы JVM.",
+      javaAppliesToAllProfiles: "Путь и аргументы применяются ко всем профилям игры.",
+      javaPerProfileHint: "Путь и аргументы задаются отдельно для каждого профиля игры.",
+      modsTabHint: "Настройки модов.",
+      modsTabDescription: "Управление модами выполняется в главном окне в разделе «Моды».",
+      authTabHint: "Управление аккаунтами.",
+      authTabDescription: "Добавление и привязка аккаунтов выполняется в главном окне в разделе «Профили».",
+      advancedTabHint: "Дополнительные действия."
     },
     logs: {
       title: "Логи",
@@ -380,7 +398,25 @@ export const translations = {
       sidebarPositionLabel: "Sidebar position",
       sidebarPositionLeft: "Left",
       sidebarPositionTop: "Top",
-      showLogsNav: "Show logs section in sidebar"
+      showLogsNav: "Show logs section in sidebar",
+      tabs: {
+        general: "General",
+        game: "Game",
+        java: "Java",
+        interface: "Interface",
+        advanced: "Advanced"
+      },
+      interfaceTabHint: "Sidebar position and visible sections.",
+      gameTabHint: "Game settings are configured in the main window.",
+      gameTabDescription: "Select a game profile in the main launcher window to manage version and installation.",
+      javaTabHint: "Java path and JVM arguments.",
+      javaAppliesToAllProfiles: "Path and arguments apply to all game profiles.",
+      javaPerProfileHint: "Path and arguments are set per game profile.",
+      modsTabHint: "Mod settings.",
+      modsTabDescription: "Manage mods in the main window under Mods.",
+      authTabHint: "Account management.",
+      authTabDescription: "Add and link accounts in the main window under Profiles.",
+      advancedTabHint: "Additional actions."
     },
     logs: {
       title: "Logs",
@@ -578,7 +614,25 @@ export const translations = {
       sidebarPositionLabel: "Розташування бічної панелі",
       sidebarPositionLeft: "Зліва",
       sidebarPositionTop: "Зверху",
-      showLogsNav: "Показувати розділ логів у боковій панелі"
+      showLogsNav: "Показувати розділ логів у боковій панелі",
+      tabs: {
+        general: "Загальні",
+        game: "Гра",
+        java: "Java",
+        interface: "Інтерфейс",
+        advanced: "Додатково"
+      },
+      interfaceTabHint: "Розташування бічної панелі та відображані розділи.",
+      gameTabHint: "Налаштування гри задаються в головному вікні.",
+      gameTabDescription: "Виберіть профіль гри в головному вікні лаунчера для керування версією та встановленням.",
+      javaTabHint: "Шлях до Java та аргументи JVM.",
+      javaAppliesToAllProfiles: "Шлях і аргументи застосовуються до всіх профілів гри.",
+      javaPerProfileHint: "Шлях і аргументи задаються окремо для кожного профілю гри.",
+      modsTabHint: "Налаштування модів.",
+      modsTabDescription: "Керування модами виконується в головному вікні в розділі «Моди».",
+      authTabHint: "Керування обліковими записами.",
+      authTabDescription: "Додавання та прив'язка облікових записів виконується в головному вікні в розділі «Профілі».",
+      advancedTabHint: "Додаткові дії."
     },
     logs: {
       title: "Логи",
@@ -776,7 +830,25 @@ export const translations = {
       sidebarPositionLabel: "Pozycja paska bocznego",
       sidebarPositionLeft: "Po lewej",
       sidebarPositionTop: "U góry",
-      showLogsNav: "Pokaż sekcję logów w pasku bocznym"
+      showLogsNav: "Pokaż sekcję logów w pasku bocznym",
+      tabs: {
+        general: "Ogólne",
+        game: "Gra",
+        java: "Java",
+        interface: "Interfejs",
+        advanced: "Zaawansowane"
+      },
+      interfaceTabHint: "Pozycja paska bocznego i widoczne sekcje.",
+      gameTabHint: "Ustawienia gry są konfigurowane w głównym oknie.",
+      gameTabDescription: "Wybierz profil gry w głównym oknie launchera, aby zarządzać wersją i instalacją.",
+      javaTabHint: "Ścieżka do Javy i argumenty JVM.",
+      javaAppliesToAllProfiles: "Ścieżka i argumenty dotyczą wszystkich profili gry.",
+      javaPerProfileHint: "Ścieżka i argumenty są ustawiane osobno dla każdego profilu gry.",
+      modsTabHint: "Ustawienia modów.",
+      modsTabDescription: "Zarządzaj modami w głównym oknie w sekcji Mody.",
+      authTabHint: "Zarządzanie kontami.",
+      authTabDescription: "Dodawanie i powiązywanie kont w głównym oknie w sekcji Profile.",
+      advancedTabHint: "Dodatkowe działania."
     },
     logs: {
       title: "Logi",
@@ -974,7 +1046,25 @@ export const translations = {
       sidebarPositionLabel: "Размяшчэнне бакавой панэлі",
       sidebarPositionLeft: "Злева",
       sidebarPositionTop: "Зверху",
-      showLogsNav: "Паказваць раздзел логаў у бакавой панэлі"
+      showLogsNav: "Паказваць раздзел логаў у бакавой панэлі",
+      tabs: {
+        general: "Агульныя",
+        game: "Гульня",
+        java: "Java",
+        interface: "Інтэрфейс",
+        advanced: "Дадаткова"
+      },
+      interfaceTabHint: "Размяшчэнне бакавой панэлі і адлюстроўваемыя раздзелы.",
+      gameTabHint: "Налады гульні задаюцца ў галоўным акне.",
+      gameTabDescription: "Выберыце профіль гульні ў галоўным акне лаунчара для кіравання версіяй і ўстаноўкай.",
+      javaTabHint: "Шлях да Java і аргументы JVM.",
+      javaAppliesToAllProfiles: "Шлях і аргументы прымяняюцца да ўсіх профіляў гульні.",
+      javaPerProfileHint: "Шлях і аргументы задаюцца асобна для кожнага профілю гульні.",
+      modsTabHint: "Налады модаў.",
+      modsTabDescription: "Кіраванне модамі выконваецца ў галоўным акне ў раздзеле «Моды».",
+      authTabHint: "Кіраванне акаўнтамі.",
+      authTabDescription: "Даданне і прывязка акаўнтаў выконваецца ў галоўным акне ў раздзеле «Профілі».",
+      advancedTabHint: "Дадатковыя дзеянні."
     },
     logs: {
       title: "Логі",
@@ -1172,7 +1262,25 @@ export const translations = {
       sidebarPositionLabel: "Posición de la barra lateral",
       sidebarPositionLeft: "Izquierda",
       sidebarPositionTop: "Arriba",
-      showLogsNav: "Mostrar sección de registros en la barra lateral"
+      showLogsNav: "Mostrar sección de registros en la barra lateral",
+      tabs: {
+        general: "General",
+        game: "Juego",
+        java: "Java",
+        interface: "Interfaz",
+        advanced: "Avanzado"
+      },
+      interfaceTabHint: "Posición de la barra lateral y secciones visibles.",
+      gameTabHint: "La configuración del juego se realiza en la ventana principal.",
+      gameTabDescription: "Seleccione un perfil de juego en la ventana principal del lanzador para gestionar la versión e instalación.",
+      javaTabHint: "Ruta de Java y argumentos JVM.",
+      javaAppliesToAllProfiles: "La ruta y los argumentos se aplican a todos los perfiles de juego.",
+      javaPerProfileHint: "La ruta y los argumentos se configuran por perfil de juego.",
+      modsTabHint: "Configuración de mods.",
+      modsTabDescription: "Gestione los mods en la ventana principal en la sección Mods.",
+      authTabHint: "Gestión de cuentas.",
+      authTabDescription: "Añada y vincule cuentas en la ventana principal en la sección Perfiles.",
+      advancedTabHint: "Acciones adicionales."
     },
     logs: {
       title: "Registros",

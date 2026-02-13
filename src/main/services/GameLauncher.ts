@@ -65,12 +65,18 @@ export class GameLauncher {
     Logger.info("GameLauncher", `Loaded profiles: player="${playerProfile.nickname}", game="${gameProfile.name}"`);
 
     let javaPath: string;
-    try {
-      javaPath = await JavaManager.ensureJava();
-      Logger.info("GameLauncher", `Java resolved: ${javaPath}`);
-    } catch (error) {
-      Logger.error("GameLauncher", "Failed to ensure Java", error);
-      throw error;
+    const profileJavaPath = gameProfile.javaPath?.trim() || null;
+    if (profileJavaPath && fs.existsSync(profileJavaPath)) {
+      javaPath = profileJavaPath;
+      Logger.info("GameLauncher", `Using profile Java: ${javaPath}`);
+    } else {
+      try {
+        javaPath = await JavaManager.ensureJava();
+        Logger.info("GameLauncher", `Java resolved: ${javaPath}`);
+      } catch (error) {
+        Logger.error("GameLauncher", "Failed to ensure Java", error);
+        throw error;
+      }
     }
 
     try {

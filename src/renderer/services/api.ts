@@ -28,10 +28,15 @@ if (!window.api) {
 const apiInstance = window.api;
 
 export const api = {
+  window: {
+    openSettings: (): Promise<void> => apiInstance.window.openSettings()
+  },
   settings: {
     get: (): Promise<Settings> => apiInstance.settings.get(),
     update: (patch: Partial<Settings>): Promise<void> =>
-      apiInstance.settings.update(patch)
+      apiInstance.settings.update(patch),
+    onUpdated: (callback: (patch: Partial<Settings>) => void): (() => void) =>
+      apiInstance.settings.onUpdated(callback)
   },
   playerProfiles: {
     list: (): Promise<PlayerProfile[]> => apiInstance.playerProfiles.list(),
@@ -100,9 +105,9 @@ export const api = {
     loadInstalled: (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<Mod[]> =>
       (apiInstance.mods.loadInstalled as (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<Mod[]>)(gameProfileId, language),
     getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]> =>
-      (apiInstance.mods.getCategories as (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<CurseForgeCategory[]>)(language),
+      apiInstance.mods.getCategories(language),
     getGameVersions: (): Promise<string[]> =>
-      (apiInstance.mods.getGameVersions as () => Promise<string[]>)(),
+      apiInstance.mods.getGameVersions(),
     install: (options: {
       gameProfileId: string;
       modId: number;

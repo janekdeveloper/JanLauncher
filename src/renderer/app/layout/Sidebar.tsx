@@ -70,6 +70,17 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
       }
     };
 
+    const unsubscribe = api.settings.onUpdated((patch) => {
+      if (Object.prototype.hasOwnProperty.call(patch ?? {}, "showLogsNav")) {
+        setShowLogsNav(
+          (patch?.showLogsNav === undefined ? true : Boolean(patch.showLogsNav))
+        );
+      }
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", { detail: patch })
+      );
+    });
+
     window.addEventListener(
       "janlauncher:settings-updated",
       handleSettingsUpdated
@@ -77,6 +88,7 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
 
     return () => {
       isMounted = false;
+      unsubscribe();
       window.removeEventListener(
         "janlauncher:settings-updated",
         handleSettingsUpdated
@@ -84,17 +96,22 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
     };
   }, []);
 
-  const allNavItems = [
+  const allNavItems: Array<
+    | { to: string; label: string; end?: boolean; icon: typeof HomeIcon }
+    | { action: "openSettings"; label: string; icon: typeof SettingsIcon }
+  > = [
     { to: "/", label: t("nav.home"), end: true, icon: HomeIcon },
     { to: "/mods", label: t("nav.mods"), icon: ModsIcon },
     { to: "/news", label: t("nav.news"), icon: NewsIcon },
-    { to: "/settings", label: t("nav.settings"), icon: SettingsIcon },
+    { action: "openSettings", label: t("nav.settings"), icon: SettingsIcon },
     { to: "/logs", label: t("nav.logs"), icon: LogsIcon }
   ];
 
   const navItems = showLogsNav
     ? allNavItems
-    : allNavItems.filter((item) => item.to !== "/logs");
+    : allNavItems.filter((item) => !("to" in item) || item.to !== "/logs");
+
+  const navItemsWithTo = navItems.filter((item): item is typeof item & { to: string } => "to" in item);
 
   const handleMouseEnter = (
     item: { label: string },
@@ -124,7 +141,7 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
 
   useEffect(() => {
     const pathname = location.pathname;
-    const activeItem = navItems.find(
+    const activeItem = navItemsWithTo.find(
       (item) => item.to === pathname || (item.to === "/" && pathname === "/")
     );
     if (!activeItem || !navContainerRef.current) {
@@ -151,7 +168,7 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
       requestAnimationFrame(schedule);
     });
     return () => cancelAnimationFrame(id);
-  }, [location.pathname, navItems]);
+  }, [location.pathname, navItemsWithTo]);
 
   return (
     <>
@@ -203,16 +220,38 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
           )}
           {navItems.map((item) => {
             const Icon = item.icon;
+            if ("action" in item && item.action === "openSettings") {
+              return (
+                <button
+                  key="settings"
+                  type="button"
+                  ref={(el) => {
+                    if (el) navRefs.current.set("__settings", el);
+                  }}
+                  title={item.label}
+                  aria-label={item.label}
+                  onMouseEnter={(e) => handleMouseEnter(item, e.currentTarget)}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={() => api.window.openSettings()}
+                  className={[styles.navItem, position === "top" ? styles.navItemTop : undefined]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  <Icon className={styles.navIcon} />
+                </button>
+              );
+            }
+            const linkItem = item as { to: string; label: string; end?: boolean; icon: typeof HomeIcon };
             return (
               <NavLink
-                key={item.to}
+                key={linkItem.to}
                 ref={(el) => {
-                  if (el) navRefs.current.set(item.to, el);
+                  if (el) navRefs.current.set(linkItem.to, el);
                 }}
-                to={item.to}
-                end={item.end}
-                title={item.label}
-                aria-label={item.label}
+                to={linkItem.to}
+                end={linkItem.end}
+                title={linkItem.label}
+                aria-label={linkItem.label}
                 onMouseEnter={(e) => handleMouseEnter(item, e.currentTarget)}
                 onMouseLeave={handleMouseLeave}
                 className={({ isActive }) =>

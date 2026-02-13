@@ -271,6 +271,22 @@ export const FolderIcon = ({ className }: IconProps) => (
   </svg>
 );
 
+export const LayoutIcon = ({ className }: IconProps) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="3" width="7" height="18" rx="1" />
+    <rect x="14" y="3" width="7" height="18" rx="1" />
+  </svg>
+);
+
 export const CheckCircleIcon = ({ className }: IconProps) => (
   <svg
     viewBox="0 0 24 24"

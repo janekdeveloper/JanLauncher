@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, BrowserWindow } from "electron";
 import { Logger } from "../core/Logger";
 import type { Settings } from "../../shared/types";
 
@@ -22,6 +22,12 @@ export const registerSettingsHandlers = (): void => {
       Logger.debug("IPC", `settings:update ${JSON.stringify(patch)}`);
       const { ConfigStore } = await import("../core/ConfigStore");
       ConfigStore.updateSettings(patch);
+
+      BrowserWindow.getAllWindows().forEach((win) => {
+        if (!win.isDestroyed() && win.webContents) {
+          win.webContents.send("settings:updated", patch);
+        }
+      });
     }
   );
 };

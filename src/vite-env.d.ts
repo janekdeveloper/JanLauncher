@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 import type {
+  CurseForgeCategory,
   CurseForgeMod,
   CurseForgeSearchResult,
   GameProfile,
@@ -25,9 +26,13 @@ import type {
 declare global {
   interface Window {
     api?: {
+      window: {
+        openSettings(): Promise<void>;
+      };
       settings: {
         get(): Promise<Settings>;
         update(patch: Partial<Settings>): Promise<void>;
+        onUpdated(callback: (patch: Partial<Settings>) => void): () => void;
       };
       playerProfiles: {
         list(): Promise<PlayerProfile[]>;
@@ -67,6 +72,8 @@ declare global {
         }): Promise<CurseForgeSearchResult>;
         getDetails(modId: number): Promise<CurseForgeMod>;
         loadInstalled(gameProfileId: string): Promise<Mod[]>;
+        getCategories(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]>;
+        getGameVersions(): Promise<string[]>;
         install(options: { gameProfileId: string; modId: number; fileId?: number }): Promise<Mod>;
         toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
         uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;

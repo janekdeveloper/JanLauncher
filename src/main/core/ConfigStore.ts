@@ -42,8 +42,6 @@ const getDefaultJavaPath = (): string => {
 };
 
 const DEFAULT_SETTINGS: Settings = {
-  javaPath: getDefaultJavaPath(),
-  jvmArgs: [],
   installedGameVersion: null,
   launcherLanguage: undefined,
   enableRussianLocalization: false,
@@ -70,8 +68,6 @@ const isGameVersionBranch = (value: unknown): value is GameVersionBranch =>
 
 const isSettings = (value: unknown): value is Settings =>
   isRecord(value) &&
-  isNullableString(value.javaPath) &&
-  isStringArray(value.jvmArgs) &&
   (value.installedGameVersion === undefined ||
     isNullableString(value.installedGameVersion)) &&
   (value.launcherLanguage === undefined || isString(value.launcherLanguage)) &&
@@ -201,6 +197,27 @@ export class ConfigStore {
       "gameProfiles.json"
     );
 
+    const legacySettings = this.settings as Settings & { javaPath?: string | null; jvmArgs?: string[] };
+    let profilesChanged = false;
+    for (const profile of this.gameProfiles) {
+      if (!profile.javaPath || profile.javaPath.trim() === "") {
+        profile.javaPath = legacySettings.javaPath ?? getDefaultJavaPath();
+        profilesChanged = true;
+      }
+      if (!profile.gameOptions.args || profile.gameOptions.args.length === 0) {
+        profile.gameOptions.args = legacySettings.jvmArgs ?? [];
+        profilesChanged = true;
+      }
+    }
+    if (profilesChanged) {
+      this.writeJsonFile(Paths.gameProfilesFile, this.gameProfiles);
+    }
+    if (legacySettings.javaPath !== undefined || legacySettings.jvmArgs !== undefined) {
+      const { javaPath: _j, jvmArgs: _a, ...rest } = legacySettings;
+      this.settings = rest as Settings;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
     this.initialized = true;
   }
 
@@ -328,8 +345,6 @@ export class ConfigStore {
     fallback: Settings
   ): Settings {
     return {
-      javaPath: isNullableString(next.javaPath) ? next.javaPath : fallback.javaPath,
-      jvmArgs: isStringArray(next.jvmArgs) ? [...next.jvmArgs] : [...fallback.jvmArgs],
       installedGameVersion: isNullableString(next.installedGameVersion)
         ? next.installedGameVersion
         : fallback.installedGameVersion ?? null,

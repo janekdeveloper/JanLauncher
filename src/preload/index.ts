@@ -23,9 +23,13 @@ import type {
 } from "../main/core/auth/auth.types";
 
 export interface PreloadApi {
+  window: {
+    openSettings(): Promise<void>;
+  };
   settings: {
     get(): Promise<Settings>;
     update(patch: Partial<Settings>): Promise<void>;
+    onUpdated(callback: (patch: Partial<Settings>) => void): () => void;
   };
   playerProfiles: {
     list(): Promise<PlayerProfile[]>;
@@ -137,9 +141,17 @@ export interface PreloadApi {
 }
 
 const api: PreloadApi = {
+  window: {
+    openSettings: () => ipcRenderer.invoke("window:openSettings")
+  },
   settings: {
     get: () => ipcRenderer.invoke("settings:get"),
-    update: (patch) => ipcRenderer.invoke("settings:update", patch)
+    update: (patch) => ipcRenderer.invoke("settings:update", patch),
+    onUpdated: (callback) => {
+      const handler = (_: unknown, patch: Partial<Settings>) => callback(patch);
+      ipcRenderer.on("settings:updated", handler);
+      return () => ipcRenderer.removeListener("settings:updated", handler);
+    }
   },
   playerProfiles: {
     list: () => ipcRenderer.invoke("playerProfiles:list"),

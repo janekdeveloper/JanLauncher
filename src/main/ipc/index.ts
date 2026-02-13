@@ -1,4 +1,5 @@
 import { registerSettingsHandlers } from "./settings.ipc";
+import { registerWindowHandlers } from "./window.ipc";
 import { registerPlayerProfilesHandlers } from "./playerProfiles.ipc";
 import { registerGameProfilesHandlers } from "./gameProfiles.ipc";
 import { registerLogsHandlers } from "./logs.ipc";
@@ -20,6 +21,7 @@ import { Logger } from "../core/Logger";
 export const registerIpcHandlers = (): void => {
   Logger.info("IPC", "Registering IPC handlers");
   registerSettingsHandlers();
+  registerWindowHandlers();
   registerPlayerProfilesHandlers();
   registerGameProfilesHandlers();
   registerLogsHandlers();

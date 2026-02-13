@@ -80,8 +80,6 @@ export type GameProfile = {
 };
 
 export type Settings = {
-  javaPath: string | null;
-  jvmArgs: string[];
   installedGameVersion?: string | null;
   launcherLanguage?: string;
   enableRussianLocalization?: boolean;
