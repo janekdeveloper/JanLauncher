@@ -120,6 +120,48 @@ export const useSettingsViewModel = () => {
     }
   };
 
+  const updateSidebarPosition = (position: "left" | "top") => {
+    setSettings((prev) =>
+      prev
+        ? {
+            ...prev,
+            sidebarPosition: position
+          }
+        : prev
+    );
+    void api.settings.update({ sidebarPosition: position });
+    try {
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", {
+          detail: { sidebarPosition: position }
+        })
+      );
+    } catch {
+      // No-op in non-browser environments
+    }
+  };
+
+  const updateShowLogsNav = (enabled: boolean) => {
+    setSettings((prev) =>
+      prev
+        ? {
+            ...prev,
+            showLogsNav: enabled
+          }
+        : prev
+    );
+    void api.settings.update({ showLogsNav: enabled });
+    try {
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", {
+          detail: { showLogsNav: enabled }
+        })
+      );
+    } catch {
+      // No-op in non-browser environments
+    }
+  };
+
   const save = async (currentLanguage?: string) => {
     if (!settings) return;
     const settingsToSave = currentLanguage
@@ -139,6 +181,8 @@ export const useSettingsViewModel = () => {
     updateRussianLocalization,
     updateLauncherLanguage,
     updateShowVersionBranchSelector,
+    updateShowLogsNav,
+    updateSidebarPosition,
     save
   };
 };

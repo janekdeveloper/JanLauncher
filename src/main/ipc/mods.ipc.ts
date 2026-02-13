@@ -1,6 +1,6 @@
 import { ipcMain, shell } from "electron";
 import { Logger } from "../core/Logger";
-import { ModManager, type CurseForgeMod, type CurseForgeSearchResult } from "../services/ModManager";
+import { ModManager, type CurseForgeCategory, type CurseForgeMod, type CurseForgeSearchResult } from "../services/ModManager";
 import { ModDescriptionTranslator } from "../services/ModDescriptionTranslator";
 import type { Language } from "../core/translation";
 import type { Mod } from "../../shared/types";
@@ -19,6 +19,8 @@ export const registerModsHandlers = (): void => {
         pageSize?: number;
         sortField?: "downloads" | "dateCreated" | "dateModified" | "name";
         sortOrder?: "asc" | "desc";
+        categoryId?: number | null;
+        gameVersion?: string | null;
         language?: Language;
       }
     ): Promise<CurseForgeSearchResult> => {
@@ -40,6 +42,12 @@ export const registerModsHandlers = (): void => {
       if (options.sortOrder !== undefined && !["asc", "desc"].includes(options.sortOrder)) {
         throw new Error("Invalid sortOrder");
       }
+      if (options.categoryId !== undefined && options.categoryId !== null && (typeof options.categoryId !== "number" || !Number.isInteger(options.categoryId) || options.categoryId <= 0)) {
+        throw new Error("Invalid categoryId");
+      }
+      if (options.gameVersion !== undefined && options.gameVersion !== null && typeof options.gameVersion !== "string") {
+        throw new Error("Invalid gameVersion");
+      }
       if (options.language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(options.language)) {
         throw new Error("Invalid language");
       }
@@ -51,7 +59,9 @@ export const registerModsHandlers = (): void => {
           options.pageIndex ?? 0,
           options.pageSize ?? 20,
           options.sortField,
-          options.sortOrder ?? "desc"
+          options.sortOrder ?? "desc",
+          options.categoryId ?? undefined,
+          options.gameVersion ?? undefined
         );
 
         const language = options.language ?? "en";
@@ -232,6 +242,37 @@ export const registerModsHandlers = (): void => {
       }
     }
   );
+
+  ipcMain.handle("mods:getCategories", async (_event, language?: Language): Promise<CurseForgeCategory[]> => {
+    if (language !== undefined && !["ru", "en", "uk", "pl", "be"].includes(language)) {
+      throw new Error("Invalid language");
+    }
+
+    Logger.debug("IPC", `mods:getCategories language=${language ?? "en"}`);
+    try {
+      const categories = await ModManager.getCategories();
+      
+      const targetLanguage = language ?? "en";
+      if (targetLanguage !== "en") {
+        return await ModDescriptionTranslator.translateCategories(categories, targetLanguage);
+      }
+
+      return categories;
+    } catch (error) {
+      Logger.error("IPC", "mods:getCategories failed", error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle("mods:getGameVersions", async (): Promise<string[]> => {
+    Logger.debug("IPC", "mods:getGameVersions");
+    try {
+      return await ModManager.getGameVersions();
+    } catch (error) {
+      Logger.error("IPC", "mods:getGameVersions failed", error);
+      throw error;
+    }
+  });
 
   ipcMain.handle("mods:openUrl", async (_event, url: string): Promise<void> => {
     Logger.debug("IPC", `mods:openUrl ${url}`);

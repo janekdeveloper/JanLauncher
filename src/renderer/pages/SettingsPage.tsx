@@ -33,6 +33,8 @@ const SettingsPage = () => {
     updateRussianLocalization,
     updateLauncherLanguage,
     updateShowVersionBranchSelector,
+    updateShowLogsNav,
+    updateSidebarPosition,
     save
   } = useSettingsViewModel();
   const { selectedGameId } = useLauncherStore();
@@ -300,6 +302,53 @@ const SettingsPage = () => {
               />
               <span className={styles.checkboxControl} aria-hidden="true" />
               <span>{t("settings.showVersionBranchSelector")}</span>
+            </label>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={settings.showLogsNav ?? false}
+                onChange={(event) => updateShowLogsNav(event.target.checked)}
+                className={styles.checkboxInput}
+              />
+              <span className={styles.checkboxControl} aria-hidden="true" />
+              <span>{t("settings.showLogsNav")}</span>
+            </label>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <p className={styles.label}>{t("settings.sidebarPositionLabel")}</p>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="radio"
+                name="sidebar-position"
+                value="left"
+                checked={(settings.sidebarPosition ?? "left") === "left"}
+                onChange={() => updateSidebarPosition("left")}
+                className={styles.checkboxInput}
+              />
+              <span className={styles.checkboxControl} aria-hidden="true" />
+              <span>{t("settings.sidebarPositionLeft")}</span>
+            </label>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="radio"
+                name="sidebar-position"
+                value="top"
+                checked={settings.sidebarPosition === "top"}
+                onChange={() => updateSidebarPosition("top")}
+                className={styles.checkboxInput}
+              />
+              <span className={styles.checkboxControl} aria-hidden="true" />
+              <span>{t("settings.sidebarPositionTop")}</span>
             </label>
           </div>
         </div>

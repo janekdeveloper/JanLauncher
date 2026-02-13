@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type {
+  CurseForgeCategory,
   CurseForgeMod,
   CurseForgeSearchResult,
   GameProfile,
@@ -61,10 +62,14 @@ export interface PreloadApi {
       pageSize?: number;
       sortField?: "downloads" | "dateCreated" | "dateModified" | "name";
       sortOrder?: "asc" | "desc";
+      categoryId?: number | null;
+      gameVersion?: string | null;
       language?: "ru" | "en" | "uk" | "pl" | "be";
     }): Promise<CurseForgeSearchResult>;
     getDetails(modId: number, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeMod>;
     loadInstalled(gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<Mod[]>;
+    getCategories(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeCategory[]>;
+    getGameVersions(): Promise<string[]>;
     install(options: { gameProfileId: string; modId: number; fileId?: number }): Promise<Mod>;
     toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
     uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
@@ -220,6 +225,8 @@ const api: PreloadApi = {
     search: (options) => ipcRenderer.invoke("mods:search", options),
     getDetails: (modId, language) => ipcRenderer.invoke("mods:getDetails", modId, language),
     loadInstalled: (gameProfileId, language) => ipcRenderer.invoke("mods:loadInstalled", gameProfileId, language),
+    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be") => ipcRenderer.invoke("mods:getCategories", language),
+    getGameVersions: () => ipcRenderer.invoke("mods:getGameVersions"),
     install: (options) => ipcRenderer.invoke("mods:install", options),
     toggle: (options) => ipcRenderer.invoke("mods:toggle", options),
     uninstall: (options) => ipcRenderer.invoke("mods:uninstall", options),

@@ -43,6 +43,8 @@
   --radius-lg: 18px;
   --transition-fast: 160ms ease;
   --transition-medium: 220ms ease;
+  --transition-slow: 320ms ease;
+  --ease-out-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Glass effect utility classes */

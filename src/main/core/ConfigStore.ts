@@ -47,7 +47,9 @@ const DEFAULT_SETTINGS: Settings = {
   installedGameVersion: null,
   launcherLanguage: undefined,
   enableRussianLocalization: false,
-  showVersionBranchSelector: false
+  showVersionBranchSelector: false,
+  sidebarPosition: "left",
+  showLogsNav: false
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -70,10 +72,17 @@ const isSettings = (value: unknown): value is Settings =>
   isRecord(value) &&
   isNullableString(value.javaPath) &&
   isStringArray(value.jvmArgs) &&
-  (value.installedGameVersion === undefined || isNullableString(value.installedGameVersion)) &&
+  (value.installedGameVersion === undefined ||
+    isNullableString(value.installedGameVersion)) &&
   (value.launcherLanguage === undefined || isString(value.launcherLanguage)) &&
-  (value.enableRussianLocalization === undefined || isBoolean(value.enableRussianLocalization)) &&
-  (value.showVersionBranchSelector === undefined || isBoolean(value.showVersionBranchSelector));
+  (value.enableRussianLocalization === undefined ||
+    isBoolean(value.enableRussianLocalization)) &&
+  (value.showVersionBranchSelector === undefined ||
+    isBoolean(value.showVersionBranchSelector)) &&
+  (value.sidebarPosition === undefined ||
+    value.sidebarPosition === "left" ||
+    value.sidebarPosition === "top") &&
+  (value.showLogsNav === undefined || isBoolean(value.showLogsNav));
 
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
@@ -159,6 +168,17 @@ export class ConfigStore {
     if (!("showVersionBranchSelector" in this.settings)) {
       (this.settings as Settings & { showVersionBranchSelector?: boolean }).showVersionBranchSelector =
         false;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("sidebarPosition" in this.settings)) {
+      (this.settings as Settings & { sidebarPosition?: "left" | "top" }).sidebarPosition =
+        "left";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("showLogsNav" in this.settings)) {
+      (this.settings as Settings & { showLogsNav?: boolean }).showLogsNav = false;
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -318,7 +338,14 @@ export class ConfigStore {
         : fallback.enableRussianLocalization ?? false,
       showVersionBranchSelector: isBoolean(next.showVersionBranchSelector)
         ? next.showVersionBranchSelector
-        : fallback.showVersionBranchSelector ?? false
+        : fallback.showVersionBranchSelector ?? false,
+      sidebarPosition:
+        next.sidebarPosition === "left" || next.sidebarPosition === "top"
+          ? next.sidebarPosition
+          : fallback.sidebarPosition ?? "left",
+      showLogsNav: isBoolean(next.showLogsNav)
+        ? next.showLogsNav
+        : fallback.showLogsNav ?? false
     };
   }
 

@@ -78,6 +78,8 @@ export type Settings = {
   launcherLanguage?: string;
   enableRussianLocalization?: boolean;
   showVersionBranchSelector?: boolean;
+  sidebarPosition?: "left" | "top";
+  showLogsNav?: boolean;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";
@@ -120,6 +122,14 @@ export type CurseForgeSearchResult = {
     resultCount: number;
     totalCount: number;
   };
+};
+
+export type CurseForgeCategory = {
+  id: number;
+  gameId: number;
+  name: string;
+  slug: string;
+  iconUrl?: string;
 };
 
 export type NewsArticle = {

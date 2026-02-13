@@ -12,6 +12,7 @@ const UpdateBanner: React.FC = () => {
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     const loadStatus = async () => {
@@ -94,23 +95,39 @@ const UpdateBanner: React.FC = () => {
   }, []);
 
   const handleLater = useCallback(() => {
-    setIsDismissed(true);
+    if (isClosing) return;
+    setIsClosing(true);
     api.updater.installOnQuit().catch((err) => {
       console.error("Failed to schedule install on quit:", err);
     });
-  }, []);
+  }, [isClosing]);
 
   const handleDismiss = useCallback(() => {
-    setIsDismissed(true);
-  }, []);
+    if (isClosing) return;
+    setIsClosing(true);
+  }, [isClosing]);
 
-  if (isDismissed || status === "idle" || status === "checking") {
-    return null;
-  }
+  const handleBannerAnimationEnd = useCallback(
+    (e: React.AnimationEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget || !isClosing) return;
+      if (String((e as React.AnimationEvent<HTMLDivElement>).animationName || "").includes("lideUp")) {
+        setIsDismissed(true);
+        setIsClosing(false);
+      }
+    },
+    [isClosing]
+  );
+
+  if (isDismissed && !isClosing) return null;
+  if (status === "idle" || status === "checking") return null;
 
   if (status === "error") {
     return (
-      <div className={styles.banner} data-status="error">
+      <div
+        className={`${styles.banner} ${isClosing ? styles.bannerClosing : ""}`}
+        data-status="error"
+        onAnimationEnd={handleBannerAnimationEnd}
+      >
         <div className={styles.content}>
           <div className={styles.iconWrapper}>
             <AlertCircleIcon className={styles.icon} />
@@ -134,7 +151,11 @@ const UpdateBanner: React.FC = () => {
 
   if (status === "update-available") {
     return (
-      <div className={styles.banner} data-status="available">
+      <div
+        className={`${styles.banner} ${isClosing ? styles.bannerClosing : ""}`}
+        data-status="available"
+        onAnimationEnd={handleBannerAnimationEnd}
+      >
         <div className={styles.content}>
           <div className={styles.iconWrapper}>
             <UpdateIcon className={styles.icon} />
@@ -162,7 +183,11 @@ const UpdateBanner: React.FC = () => {
 
   if (status === "downloading") {
     return (
-      <div className={styles.banner} data-status="downloading">
+      <div
+        className={`${styles.banner} ${isClosing ? styles.bannerClosing : ""}`}
+        data-status="downloading"
+        onAnimationEnd={handleBannerAnimationEnd}
+      >
         <div className={styles.content}>
           <div className={styles.iconWrapper}>
             <LoaderIcon className={`${styles.icon} ${styles.spinning}`} />
@@ -185,7 +210,11 @@ const UpdateBanner: React.FC = () => {
 
   if (status === "downloaded") {
     return (
-      <div className={styles.banner} data-status="downloaded">
+      <div
+        className={`${styles.banner} ${isClosing ? styles.bannerClosing : ""}`}
+        data-status="downloaded"
+        onAnimationEnd={handleBannerAnimationEnd}
+      >
         <div className={styles.content}>
           <div className={styles.iconWrapper}>
             <CheckCircleIcon className={styles.icon} />

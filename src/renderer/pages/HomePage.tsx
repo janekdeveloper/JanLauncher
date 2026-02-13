@@ -283,123 +283,273 @@ const HomePage = () => {
           <p className={styles.playHint}>
             {t("home.playHint")}
           </p>
+        </div>
+      </div>
+
+      {showVersionBranchSelector ? (
+        <>
+          <div className={styles.playButtonCenter}>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={launch}
+              disabled={!canLaunch || isLaunching}
+              className={styles.playButton}
+            >
+              {isLaunching ? (
+                t("home.launching")
+              ) : (
+                <span
+                  className={styles.playIconOnly}
+                  aria-label={t("home.playButton")}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <polygon points="8,5 19,12 8,19" />
+                  </svg>
+                </span>
+              )}
+            </Button>
+          </div>
+          <div className={styles.dockFullWidth}>
+            <DockSelect
+              label={t("home.accountLabel")}
+              value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
+              icon={<UserIcon className={styles.iconSvg} />}
+              options={playerOptions}
+              onSelect={setSelectedPlayerId}
+              renderActions={(id) => (
+                <>
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openEditPlayerModal(id);
+                    }}
+                    aria-label={t("home.editAccount")}
+                  >
+                    <EditIcon className={styles.actionIcon} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.actionDanger}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDeleteConfirm(id);
+                    }}
+                    aria-label={t("home.deleteAccount")}
+                  >
+                    <TrashIcon className={styles.actionIcon} />
+                  </button>
+                </>
+              )}
+              onCreate={openPlayerModal}
+              createLabel={t("home.createAccount")}
+              emptyLabel={t("home.emptyAccounts")}
+            />
+            <DockSelect
+              label={t("home.gameProfileLabel")}
+              value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={gameOptions}
+              onSelect={setSelectedGameId}
+              onCreate={openGameModal}
+              createLabel={t("home.createGameProfile")}
+              emptyLabel={t("home.emptyGameProfiles")}
+            />
+            <DockSelect
+              label={t("home.branchLabel")}
+              value={branchValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={branchOptions}
+              onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
+              emptyLabel={t("home.branchEmpty")}
+            />
+            <DockSelect
+              label={t("home.versionLabel")}
+              value={versionValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={versionOptions}
+              onSelect={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                setActiveVersion(versionId);
+              }}
+              renderActions={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                const version = availableVersions.find((item) => item.id === versionId);
+                if (!version) return null;
+                if (version.installed) {
+                  const isActive = version.id === activeVersionId;
+                  return (
+                    <button
+                      type="button"
+                      className={styles.versionActionButton}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeVersion(versionId);
+                      }}
+                      disabled={isActive}
+                      aria-label={t("home.versionRemove")}
+                    >
+                      {t("home.versionRemove")}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    type="button"
+                    className={styles.versionActionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      installVersion(versionId);
+                    }}
+                    disabled={isVersionInstalling}
+                    aria-label={t("home.versionInstall")}
+                  >
+                    {t("home.versionInstall")}
+                  </button>
+                );
+              }}
+              emptyLabel={
+                versionsLoadingAvailable
+                  ? t("home.versionLoading")
+                  : t("home.versionEmpty")
+              }
+            />
+          </div>
+        </>
+      ) : (
+        <div className={styles.dockRow}>
+          <div className={styles.dock}>
+            <DockSelect
+              label={t("home.accountLabel")}
+              value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
+              icon={<UserIcon className={styles.iconSvg} />}
+              options={playerOptions}
+              onSelect={setSelectedPlayerId}
+              renderActions={(id) => (
+                <>
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openEditPlayerModal(id);
+                    }}
+                    aria-label={t("home.editAccount")}
+                  >
+                    <EditIcon className={styles.actionIcon} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.actionDanger}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDeleteConfirm(id);
+                    }}
+                    aria-label={t("home.deleteAccount")}
+                  >
+                    <TrashIcon className={styles.actionIcon} />
+                  </button>
+                </>
+              )}
+              onCreate={openPlayerModal}
+              createLabel={t("home.createAccount")}
+              emptyLabel={t("home.emptyAccounts")}
+            />
+            <DockSelect
+              label={t("home.gameProfileLabel")}
+              value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={gameOptions}
+              onSelect={setSelectedGameId}
+              onCreate={openGameModal}
+              createLabel={t("home.createGameProfile")}
+              emptyLabel={t("home.emptyGameProfiles")}
+            />
+            <DockSelect
+              label={t("home.versionLabel")}
+              value={versionValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={versionOptions}
+              onSelect={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                setActiveVersion(versionId);
+              }}
+              renderActions={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                const version = availableVersions.find((item) => item.id === versionId);
+                if (!version) return null;
+                if (version.installed) {
+                  const isActive = version.id === activeVersionId;
+                  return (
+                    <button
+                      type="button"
+                      className={styles.versionActionButton}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeVersion(versionId);
+                      }}
+                      disabled={isActive}
+                      aria-label={t("home.versionRemove")}
+                    >
+                      {t("home.versionRemove")}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    type="button"
+                    className={styles.versionActionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      installVersion(versionId);
+                    }}
+                    disabled={isVersionInstalling}
+                    aria-label={t("home.versionInstall")}
+                  >
+                    {t("home.versionInstall")}
+                  </button>
+                );
+              }}
+              emptyLabel={
+                versionsLoadingAvailable
+                  ? t("home.versionLoading")
+                  : t("home.versionEmpty")
+              }
+            />
+          </div>
+
           <Button
             variant="primary"
             size="lg"
             onClick={launch}
             disabled={!canLaunch || isLaunching}
-            className={styles.playButton}
+            className={`${styles.playButton} ${styles.playButtonDock}`}
           >
-            {isLaunching ? t("home.launching") : t("home.playButton")}
+            {isLaunching ? (
+              t("home.launching")
+            ) : (
+              <span
+                className={styles.playIconOnly}
+                aria-label={t("home.playButton")}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <polygon points="8,5 19,12 8,19" />
+                </svg>
+              </span>
+            )}
           </Button>
         </div>
-      </div>
-
-      <div className={styles.dock}>
-        <DockSelect
-          label={t("home.accountLabel")}
-          value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
-          icon={<UserIcon className={styles.iconSvg} />}
-          options={playerOptions}
-          onSelect={setSelectedPlayerId}
-          renderActions={(id) => (
-            <>
-              <button
-                type="button"
-                className={styles.actionButton}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openEditPlayerModal(id);
-                }}
-                aria-label={t("home.editAccount")}
-              >
-                <EditIcon className={styles.actionIcon} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.actionButton} ${styles.actionDanger}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openDeleteConfirm(id);
-                }}
-                aria-label={t("home.deleteAccount")}
-              >
-                <TrashIcon className={styles.actionIcon} />
-              </button>
-            </>
-          )}
-          onCreate={openPlayerModal}
-          createLabel={t("home.createAccount")}
-          emptyLabel={t("home.emptyAccounts")}
-        />
-        <DockSelect
-          label={t("home.gameProfileLabel")}
-          value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
-          icon={<GameProfileIcon className={styles.iconSvg} />}
-          options={gameOptions}
-          onSelect={setSelectedGameId}
-          onCreate={openGameModal}
-          createLabel={t("home.createGameProfile")}
-          emptyLabel={t("home.emptyGameProfiles")}
-        />
-        {showVersionBranchSelector && (
-          <DockSelect
-            label={t("home.branchLabel")}
-            value={branchValue}
-            icon={<GameProfileIcon className={styles.iconSvg} />}
-            options={branchOptions}
-            onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
-            emptyLabel={t("home.branchEmpty")}
-          />
-        )}
-        <DockSelect
-          label={t("home.versionLabel")}
-          value={versionValue}
-          icon={<GameProfileIcon className={styles.iconSvg} />}
-          options={versionOptions}
-          onSelect={(compositeId) => {
-            const [, versionId] = compositeId.split(":", 2);
-            setActiveVersion(versionId);
-          }}
-          renderActions={(compositeId) => {
-            const [, versionId] = compositeId.split(":", 2);
-            const version = availableVersions.find((item) => item.id === versionId);
-            if (!version) return null;
-            if (version.installed) {
-              const isActive = version.id === activeVersionId;
-              return (
-                <button
-                  type="button"
-                  className={styles.versionActionButton}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeVersion(versionId);
-                  }}
-                  disabled={isActive}
-                  aria-label={t("home.versionRemove")}
-                >
-                  {t("home.versionRemove")}
-                </button>
-              );
-            }
-            return (
-              <button
-                type="button"
-                className={styles.versionActionButton}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  installVersion(versionId);
-                }}
-                disabled={isVersionInstalling}
-                aria-label={t("home.versionInstall")}
-              >
-                {t("home.versionInstall")}
-              </button>
-            );
-          }}
-          emptyLabel={versionsLoadingAvailable ? t("home.versionLoading") : t("home.versionEmpty")}
-        />
-      </div>
+      )}
 
       <Modal
         isOpen={isVersionInstalling}

@@ -84,13 +84,18 @@ const ProfilesPage = () => {
         </div>
       ) : (
         <div className={styles.grid}>
-          {playerProfiles.map((profile) => (
-            <PlayerProfileCard
+          {playerProfiles.map((profile, index) => (
+            <div
               key={profile.id}
-              profile={profile}
-              onUpdate={updatePlayerProfile}
-              onRemove={removePlayerProfile}
-            />
+              className="listItemEnter"
+              style={{ animationDelay: `${Math.min(index, 7) * 40}ms` }}
+            >
+              <PlayerProfileCard
+                profile={profile}
+                onUpdate={updatePlayerProfile}
+                onRemove={removePlayerProfile}
+              />
+            </div>
           ))}
         </div>
       )}

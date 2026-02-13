@@ -43,8 +43,13 @@ const LogsPage = () => {
         ) : logs.length === 0 ? (
           <div className={styles.empty}>No logs available</div>
         ) : (
-          logs.map((log) => (
-            <div key={log.id} className={styles.logRow} data-level={log.level}>
+          logs.map((log, index) => (
+            <div
+              key={log.id}
+              className={`${styles.logRow} listItemEnter`}
+              style={{ animationDelay: `${Math.min(index, 7) * 40}ms` }}
+              data-level={log.level}
+            >
               <div className={styles.logMeta}>
                 <span className={styles.logTime}>{log.timestamp}</span>
                 <span className={styles.logLevel}>{log.level}</span>

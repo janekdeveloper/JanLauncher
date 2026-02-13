@@ -61,8 +61,24 @@ select {
   background: var(--color-bg-panel);
   border-radius: 999px;
   border: 2px solid var(--color-bg);
+  transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-strong);
+}
+
+@keyframes listItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.listItemEnter {
+  animation: listItemEnter 250ms ease-out forwards;
 }

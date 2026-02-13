@@ -1,0 +1,125 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.root {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 120px;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-glass-border);
+  background: rgba(22 30 44 / 0.7);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  text-align: left;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: rgba(134 212 255 / 0.35);
+  background: rgba(30 42 62 / 0.85);
+}
+
+.trigger:focus {
+  outline: none;
+  border-color: rgba(134 212 255 / 0.5);
+  box-shadow: 0 0 0 2px rgba(134 212 255 / 0.15);
+}
+
+.trigger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.triggerText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-muted);
+  transition: transform var(--transition-fast);
+}
+
+.rootOpen .chevron {
+  transform: rotate(180deg);
+}
+
+.list {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--color-glass-border);
+  background: var(--color-glass-panel);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: var(--shadow-glass), 0 12px 28px rgba(5 10 20 / 0.45);
+  padding: 4px;
+  min-width: 100%;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option:hover {
+  background: rgba(134 212 255 / 0.12);
+  color: var(--color-text);
+}
+
+.optionSelected {
+  background: rgba(134 212 255 / 0.18);
+  color: var(--color-primary);
+}
+
+.optionSelected:hover {
+  background: rgba(134 212 255 / 0.22);
+}

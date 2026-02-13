@@ -126,6 +126,13 @@ export const translations = {
       yesterday: "Вчера",
       daysAgo: "{{days}} дн. назад",
       weeksAgo: "{{weeks}} нед. назад",
+      filter: {
+        category: "Категория",
+        version: "Версия игры",
+        allCategories: "Все категории",
+        allVersions: "Все версии"
+      },
+      resetFilters: "Сбросить фильтры",
       filters: {
         mostPopular: "Самые популярные",
         leastPopular: "Наименее популярные",
@@ -164,7 +171,11 @@ export const translations = {
       openGameDir: "Папка игры",
       openConfigDir: "Папка конфигурации",
       openUserDataDir: "Папка профиля",
-      showVersionBranchSelector: "Показывать выбор ветки версий"
+      showVersionBranchSelector: "Показывать выбор ветки версий",
+      sidebarPositionLabel: "Расположение боковой панели",
+      sidebarPositionLeft: "Слева",
+      sidebarPositionTop: "Сверху",
+      showLogsNav: "Показывать раздел логов в боковой панели"
     },
     logs: {
       title: "Логи",
@@ -306,6 +317,13 @@ export const translations = {
       yesterday: "Yesterday",
       daysAgo: "{{days}} days ago",
       weeksAgo: "{{weeks}} weeks ago",
+      filter: {
+        category: "Category",
+        version: "Game version",
+        allCategories: "All categories",
+        allVersions: "All versions"
+      },
+      resetFilters: "Reset filters",
       filters: {
         mostPopular: "Most popular",
         leastPopular: "Least popular",
@@ -344,7 +362,11 @@ export const translations = {
       openGameDir: "Game folder",
       openConfigDir: "Config folder",
       openUserDataDir: "Profile folder",
-      showVersionBranchSelector: "Show version branch selector"
+      showVersionBranchSelector: "Show version branch selector",
+      sidebarPositionLabel: "Sidebar position",
+      sidebarPositionLeft: "Left",
+      sidebarPositionTop: "Top",
+      showLogsNav: "Show logs section in sidebar"
     },
     logs: {
       title: "Logs",
@@ -486,6 +508,13 @@ export const translations = {
       yesterday: "Вчора",
       daysAgo: "{{days}} дн. тому",
       weeksAgo: "{{weeks}} тиж. тому",
+      filter: {
+        category: "Категорія",
+        version: "Версія гри",
+        allCategories: "Усі категорії",
+        allVersions: "Усі версії"
+      },
+      resetFilters: "Скинути фільтри",
       filters: {
         mostPopular: "Найпопулярніші",
         leastPopular: "Найменш популярні",
@@ -524,7 +553,11 @@ export const translations = {
       openGameDir: "Папка гри",
       openConfigDir: "Папка конфігурації",
       openUserDataDir: "Папка профілю",
-      showVersionBranchSelector: "Показувати вибір гілки версій"
+      showVersionBranchSelector: "Показувати вибір гілки версій",
+      sidebarPositionLabel: "Розташування бічної панелі",
+      sidebarPositionLeft: "Зліва",
+      sidebarPositionTop: "Зверху",
+      showLogsNav: "Показувати розділ логів у боковій панелі"
     },
     logs: {
       title: "Логи",
@@ -666,6 +699,13 @@ export const translations = {
       yesterday: "Wczoraj",
       daysAgo: "{{days}} dni temu",
       weeksAgo: "{{weeks}} tyg. temu",
+      filter: {
+        category: "Kategoria",
+        version: "Wersja gry",
+        allCategories: "Wszystkie kategorie",
+        allVersions: "Wszystkie wersje"
+      },
+      resetFilters: "Resetuj filtry",
       filters: {
         mostPopular: "Najpopularniejsze",
         leastPopular: "Najmniej popularne",
@@ -704,7 +744,11 @@ export const translations = {
       openGameDir: "Folder gry",
       openConfigDir: "Folder konfiguracji",
       openUserDataDir: "Folder profilu",
-      showVersionBranchSelector: "Pokaż wybór gałęzi wersji"
+      showVersionBranchSelector: "Pokaż wybór gałęzi wersji",
+      sidebarPositionLabel: "Pozycja paska bocznego",
+      sidebarPositionLeft: "Po lewej",
+      sidebarPositionTop: "U góry",
+      showLogsNav: "Pokaż sekcję logów w pasku bocznym"
     },
     logs: {
       title: "Logi",
@@ -846,6 +890,13 @@ export const translations = {
       yesterday: "Учора",
       daysAgo: "{{days}} дн. таму",
       weeksAgo: "{{weeks}} тыд. таму",
+      filter: {
+        category: "Катэгорыя",
+        version: "Версія гульні",
+        allCategories: "Усе катэгорыі",
+        allVersions: "Усе версіі"
+      },
+      resetFilters: "Скінуць фільтры",
       filters: {
         mostPopular: "Самыя папулярныя",
         leastPopular: "Найменш папулярныя",
@@ -884,7 +935,11 @@ export const translations = {
       openGameDir: "Папка гульні",
       openConfigDir: "Папка канфігурацыі",
       openUserDataDir: "Папка профілю",
-      showVersionBranchSelector: "Паказваць выбар галіны версій"
+      showVersionBranchSelector: "Паказваць выбар галіны версій",
+      sidebarPositionLabel: "Размяшчэнне бакавой панэлі",
+      sidebarPositionLeft: "Злева",
+      sidebarPositionTop: "Зверху",
+      showLogsNav: "Паказваць раздзел логаў у бакавой панэлі"
     },
     logs: {
       title: "Логі",

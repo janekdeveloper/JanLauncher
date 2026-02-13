@@ -9,7 +9,9 @@ import type { GameProfile, Mod } from "../../shared/types";
 
 const CURSEFORGE_API_BASE_URL = "https://api.curseforge.com/v1";
 const CURSEFORGE_GAME_ID = 70216;
+const CURSEFORGE_MODS_CLASS_ID = 9137;
 const DOWNLOAD_TIMEOUT_MS = 5 * 60 * 1000;
+const API_REQUEST_TIMEOUT_MS = 30 * 1000;
 
 const getCurseForgeApiKey = (): string => {
   return process.env.CURSEFORGE_API_KEY || "";
@@ -51,6 +53,14 @@ export type CurseForgeSearchResult = {
   };
 };
 
+export type CurseForgeCategory = {
+  id: number;
+  gameId: number;
+  name: string;
+  slug: string;
+  iconUrl?: string;
+};
+
 /**
  * Manages mod installation, removal, and synchronization.
  * 
@@ -58,13 +68,55 @@ export type CurseForgeSearchResult = {
  */
 export class ModManager {
   /**
+   * Builds search params for CurseForge mods/search. Single place for API parameter formation.
+   */
+  private static buildSearchParams(
+    query: string,
+    pageIndex: number,
+    pageSize: number,
+    sortField?: "downloads" | "dateCreated" | "dateModified" | "name",
+    sortOrder: "asc" | "desc" = "desc",
+    categoryId?: number | null,
+    gameVersion?: string | null
+  ): Record<string, unknown> {
+    const params: Record<string, unknown> = {
+      gameId: CURSEFORGE_GAME_ID,
+      classId: CURSEFORGE_MODS_CLASS_ID,
+      index: pageIndex * pageSize,
+      pageSize
+    };
+    if (query.trim()) {
+      params.searchFilter = query;
+    }
+    if (sortField) {
+      const sortFieldMap: Record<string, number> = {
+        downloads: 6,
+        dateCreated: 3,
+        dateModified: 3,
+        name: 4
+      };
+      params.sortField = sortFieldMap[sortField] || 6;
+      params.sortOrder = sortOrder;
+    }
+    if (categoryId != null && categoryId > 0) {
+      params.categoryId = categoryId;
+    }
+    if (gameVersion != null && gameVersion.trim()) {
+      params.gameVersion = gameVersion.trim();
+    }
+    return params;
+  }
+
+  /**
    * Searches for mods on CurseForge.
-   * 
+   *
    * @param query - Search query
    * @param pageIndex - Page index (defaults to 0)
    * @param pageSize - Page size (defaults to 20)
    * @param sortField - Sort field (downloads, dateCreated, dateModified, name)
    * @param sortOrder - Sort order (asc or desc, defaults to desc)
+   * @param categoryId - Optional category filter
+   * @param gameVersion - Optional game version filter
    * @returns CurseForge search results
    */
   static async searchMods(
@@ -72,37 +124,20 @@ export class ModManager {
     pageIndex = 0,
     pageSize = 20,
     sortField?: "downloads" | "dateCreated" | "dateModified" | "name",
-    sortOrder: "asc" | "desc" = "desc"
+    sortOrder: "asc" | "desc" = "desc",
+    categoryId?: number | null,
+    gameVersion?: string | null
   ): Promise<CurseForgeSearchResult> {
     const apiKey = getCurseForgeApiKey();
     if (!apiKey) {
       throw new Error("CURSEFORGE_API_KEY environment variable is not set");
     }
-    
+
     try {
-      Logger.info("ModManager", `Searching mods: "${query}" (page ${pageIndex}, sort: ${sortField || "default"} ${sortOrder})`);
-      
+      Logger.info("ModManager", `Searching mods: "${query}" (page ${pageIndex}, sort: ${sortField || "default"} ${sortOrder}, categoryId: ${categoryId ?? "all"}, gameVersion: ${gameVersion ?? "all"})`);
+
       const url = `${CURSEFORGE_API_BASE_URL}/mods/search`;
-      const params: Record<string, unknown> = {
-        gameId: CURSEFORGE_GAME_ID,
-        index: pageIndex * pageSize,
-        pageSize
-      };
-
-      if (query.trim()) {
-        params.searchFilter = query;
-      }
-
-      if (sortField) {
-        const sortFieldMap: Record<string, number> = {
-          downloads: 6,
-          dateCreated: 3,
-          dateModified: 3,
-          name: 4
-        };
-        params.sortField = sortFieldMap[sortField] || 6;
-        params.sortOrder = sortOrder;
-      }
+      const params = ModManager.buildSearchParams(query, pageIndex, pageSize, sortField, sortOrder, categoryId, gameVersion);
 
       const response = await axios.get<CurseForgeSearchResult>(url, {
         headers: { "x-api-key": apiKey },
@@ -113,6 +148,57 @@ export class ModManager {
       return response.data;
     } catch (error) {
       Logger.error("ModManager", "Failed to search mods", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets mod categories for the game from CurseForge API.
+   */
+  static async getCategories(): Promise<CurseForgeCategory[]> {
+    const apiKey = getCurseForgeApiKey();
+    if (!apiKey) {
+      throw new Error("CURSEFORGE_API_KEY environment variable is not set");
+    }
+    try {
+      const url = `${CURSEFORGE_API_BASE_URL}/categories`;
+      const response = await axios.get<{ data: CurseForgeCategory[] }>(url, {
+        headers: { "x-api-key": apiKey },
+        params: { gameId: CURSEFORGE_GAME_ID, classId: CURSEFORGE_MODS_CLASS_ID },
+        timeout: API_REQUEST_TIMEOUT_MS
+      });
+      return response.data?.data ?? [];
+    } catch (error) {
+      Logger.error("ModManager", "Failed to get categories", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets available game versions from CurseForge API.
+   */
+  static async getGameVersions(): Promise<string[]> {
+    const apiKey = getCurseForgeApiKey();
+    if (!apiKey) {
+      throw new Error("CURSEFORGE_API_KEY environment variable is not set");
+    }
+    try {
+      const url = `${CURSEFORGE_API_BASE_URL}/games/${CURSEFORGE_GAME_ID}/versions`;
+      const response = await axios.get<{ data: Array<{ versions: string[] }> }>(url, {
+        headers: { "x-api-key": apiKey },
+        timeout: API_REQUEST_TIMEOUT_MS
+      });
+      const data = response.data?.data;
+      if (!Array.isArray(data)) return [];
+      const versions: string[] = [];
+      for (const item of data) {
+        if (Array.isArray(item.versions)) {
+          versions.push(...item.versions);
+        }
+      }
+      return versions;
+    } catch (error) {
+      Logger.error("ModManager", "Failed to get game versions", error);
       throw error;
     }
   }
@@ -415,26 +501,59 @@ export class ModManager {
       throw new Error("CURSEFORGE_API_KEY environment variable is not set");
     }
 
+    // Try getting downloadUrl from file details endpoint (as used in other launchers)
     const url = `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}`;
-    const response = await axios.get(url, {
-      headers: { "x-api-key": apiKey },
-      params: { gameId: CURSEFORGE_GAME_ID },
-      timeout: DOWNLOAD_TIMEOUT_MS
-    });
+    try {
+      const response = await axios.get(url, {
+        headers: { "x-api-key": apiKey },
+        params: { gameId: CURSEFORGE_GAME_ID },
+        timeout: DOWNLOAD_TIMEOUT_MS
+      });
 
-    const downloadUrl = response.data?.data?.downloadUrl;
-    if (!downloadUrl || typeof downloadUrl !== "string") {
-      throw new Error("CurseForge response missing downloadUrl");
+      Logger.debug("ModManager", `File details response structure: ${JSON.stringify(Object.keys(response.data?.data || {}))}`);
+
+      // Try different possible locations for downloadUrl
+      const fileData = response.data?.data;
+      let downloadUrl = fileData?.downloadUrl;
+
+      if (!downloadUrl && fileData) {
+        // Log the full response structure for debugging
+        Logger.debug("ModManager", `Full file data keys: ${JSON.stringify(Object.keys(fileData))}`);
+        Logger.debug("ModManager", `File data sample: ${JSON.stringify(fileData, null, 2).substring(0, 500)}`);
+      }
+
+      if (downloadUrl && typeof downloadUrl === "string") {
+        return downloadUrl;
+      }
+
+      // If downloadUrl is not in the response, try using the download endpoint directly
+      Logger.info("ModManager", "downloadUrl not found in file details, using direct download endpoint");
+      return `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}/download`;
+    } catch (error: any) {
+      Logger.error("ModManager", `Failed to get file details: ${error.message}`);
+      
+      // Fallback: use direct download endpoint
+      Logger.info("ModManager", "Falling back to direct download endpoint");
+      return `${CURSEFORGE_API_BASE_URL}/mods/${modInfo.modId}/files/${modInfo.fileId}/download`;
     }
-
-    return downloadUrl;
   }
 
   private static async downloadToFile(url: string, targetPath: string): Promise<void> {
     const tempPath = `${targetPath}.download`;
     this.removeFileIfExists(tempPath);
     try {
+      const headers: Record<string, string> = {};
+      
+      // If URL is a CurseForge API endpoint, add API key
+      if (url.includes("api.curseforge.com")) {
+        const apiKey = getCurseForgeApiKey();
+        if (apiKey) {
+          headers["x-api-key"] = apiKey;
+        }
+      }
+      
       const response = await axios.get(url, {
+        headers,
         responseType: "stream",
         timeout: DOWNLOAD_TIMEOUT_MS
       });

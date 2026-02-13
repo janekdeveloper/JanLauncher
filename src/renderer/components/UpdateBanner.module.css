@@ -25,6 +25,17 @@
   }
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -75,6 +86,10 @@
   background: linear-gradient(135deg, rgba(255, 122, 134, 0.2) 0%, rgba(238, 98, 113, 0.15) 100%);
   box-shadow: 0 4px 20px rgba(255, 122, 134, 0.25), 0 0 0 1px rgba(255, 122, 134, 0.3) inset;
   border-bottom-color: rgba(255, 122, 134, 0.35);
+}
+
+.bannerClosing {
+  animation: slideUp 250ms var(--ease-out-emphasized) forwards !important;
 }
 
 .content {

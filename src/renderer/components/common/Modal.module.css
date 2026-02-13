@@ -1,3 +1,43 @@
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalBackdropOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -7,6 +47,14 @@
   justify-content: center;
   padding: 24px;
   z-index: 999;
+}
+
+.backdropEnter {
+  animation: modalBackdropIn 220ms var(--ease-out-emphasized) forwards;
+}
+
+.backdropClosing {
+  animation: modalBackdropOut 220ms var(--ease-out-emphasized) forwards;
 }
 
 .backdrop.blocking {
@@ -22,6 +70,14 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 60px rgba(5, 10, 20, 0.45);
   overflow: hidden;
+}
+
+.modalEnter {
+  animation: modalIn 220ms var(--ease-out-emphasized) forwards;
+}
+
+.modalClosing {
+  animation: modalOut 220ms var(--ease-out-emphasized) forwards;
 }
 
 .header {
