@@ -9,7 +9,7 @@ import styles from "./MainLayout.module.css";
 const MainLayout = () => {
   const { t } = useI18n();
   const location = useLocation();
-  const [sidebarPosition, setSidebarPosition] = useState<"left" | "top">("left");
+  const [sidebarPosition, setSidebarPosition] = useState<"left" | "top">("top");
 
   useEffect(() => {
     let isMounted = true;
@@ -18,7 +18,7 @@ const MainLayout = () => {
       .get()
       .then((data) => {
         if (!isMounted) return;
-        setSidebarPosition(data.sidebarPosition === "top" ? "top" : "left");
+        setSidebarPosition(data.sidebarPosition === "left" ? "left" : "top");
       })
       .catch(() => {
         if (!isMounted) return;
@@ -34,7 +34,7 @@ const MainLayout = () => {
         )
       ) {
         setSidebarPosition(
-          customEvent.detail?.sidebarPosition === "top" ? "top" : "left"
+          customEvent.detail?.sidebarPosition === "left" ? "left" : "top"
         );
       }
     };

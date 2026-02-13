@@ -289,6 +289,7 @@ button.navItemTop {
 .sidebarTop .socialButtonsHorizontal {
   flex: 1;
   justify-content: flex-end;
+  margin-right: 56px; /* 48px button + 8px gap: keep Telegram in place, Discord to its left */
 }
 
 .socialButton {

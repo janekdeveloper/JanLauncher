@@ -22,7 +22,7 @@ const InterfaceTab = () => {
                 type="radio"
                 name="sidebar-position"
                 value="left"
-                checked={(settings.sidebarPosition ?? "left") === "left"}
+                checked={(settings.sidebarPosition ?? "top") === "left"}
                 onChange={() => updateSettings({ sidebarPosition: "left" })}
                 className={styles.checkboxInput}
               />
@@ -36,7 +36,7 @@ const InterfaceTab = () => {
                 type="radio"
                 name="sidebar-position"
                 value="top"
-                checked={settings.sidebarPosition === "top"}
+                checked={(settings.sidebarPosition ?? "top") === "top"}
                 onChange={() => updateSettings({ sidebarPosition: "top" })}
                 className={styles.checkboxInput}
               />

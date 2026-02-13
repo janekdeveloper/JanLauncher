@@ -47,7 +47,7 @@ const DEFAULT_SETTINGS: Settings = {
   launcherLanguage: undefined,
   enableRussianLocalization: false,
   showVersionBranchSelector: false,
-  sidebarPosition: "left",
+  sidebarPosition: "top",
   showLogsNav: false,
   themeId: "classic",
   hasCompletedOnboarding: false
@@ -182,7 +182,7 @@ export class ConfigStore {
 
     if (!("sidebarPosition" in this.settings)) {
       (this.settings as Settings & { sidebarPosition?: "left" | "top" }).sidebarPosition =
-        "left";
+        "top";
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -375,7 +375,7 @@ export class ConfigStore {
       sidebarPosition:
         next.sidebarPosition === "left" || next.sidebarPosition === "top"
           ? next.sidebarPosition
-          : fallback.sidebarPosition ?? "left",
+          : fallback.sidebarPosition ?? "top",
       showLogsNav: isBoolean(next.showLogsNav)
         ? next.showLogsNav
         : fallback.showLogsNav ?? false,

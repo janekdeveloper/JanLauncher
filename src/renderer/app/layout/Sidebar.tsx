@@ -280,28 +280,57 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
             .filter(Boolean)
             .join(" ")}
         >
-          <button
-            type="button"
-            onClick={() => api.news.openUrl(TELEGRAM_URL)}
-            className={styles.socialButton}
-            aria-label="Telegram"
-            title="Telegram"
-            onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
-            onMouseLeave={handleMouseLeave}
-          >
-            <TelegramIcon className={styles.socialIcon} />
-          </button>
-          <button
-            type="button"
-            onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
-            className={styles.socialButton}
-            aria-label="Discord"
-            title="Discord"
-            onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
-            onMouseLeave={handleMouseLeave}
-          >
-            <DiscordIcon className={styles.socialIcon} />
-          </button>
+          {position === "top" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
+                className={styles.socialButton}
+                aria-label="Discord"
+                title="Discord"
+                onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <DiscordIcon className={styles.socialIcon} />
+              </button>
+              <button
+                type="button"
+                onClick={() => api.news.openUrl(TELEGRAM_URL)}
+                className={styles.socialButton}
+                aria-label="Telegram"
+                title="Telegram"
+                onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <TelegramIcon className={styles.socialIcon} />
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => api.news.openUrl(TELEGRAM_URL)}
+                className={styles.socialButton}
+                aria-label="Telegram"
+                title="Telegram"
+                onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <TelegramIcon className={styles.socialIcon} />
+              </button>
+              <button
+                type="button"
+                onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
+                className={styles.socialButton}
+                aria-label="Discord"
+                title="Discord"
+                onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <DiscordIcon className={styles.socialIcon} />
+              </button>
+            </>
+          )}
         </div>
       </aside>
       {tooltip && (
