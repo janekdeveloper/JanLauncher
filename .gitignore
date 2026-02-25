@@ -146,3 +146,4 @@ build-all.sh
 merge-linux-updates.sh
 docs/API_ARCHITECTURE.md
 src/main/api/README.md
+vitest.config.ts
