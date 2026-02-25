@@ -9,6 +9,7 @@ import UpdateBanner from "../components/UpdateBanner";
 import CommunityModal from "../components/modals/CommunityModal";
 import OnboardingLayout from "../onboarding/OnboardingLayout";
 import { api } from "../services/api";
+import { AudioService } from "../services/AudioService";
 import { useI18n } from "../i18n";
 import styles from "./App.module.css";
 
@@ -35,6 +36,11 @@ const App = () => {
       .get()
       .then(async (settings) => {
         if (cancelled) return;
+        const volume = settings.backgroundMusicVolume ?? 0.3;
+        AudioService.init(volume);
+        if (volume > 0) {
+          AudioService.play();
+        }
         if (settings.hasCompletedOnboarding === true) {
           setOnboardingStatus("completed");
           return;
@@ -59,6 +65,16 @@ const App = () => {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = api.settings.onUpdated((patch) => {
+      if ("backgroundMusicVolume" in patch) {
+        const v = patch.backgroundMusicVolume ?? 0;
+        AudioService.setVolume(v);
+      }
+    });
+    return unsubscribe;
   }, []);
 
   const handleOnboardingComplete = () => {

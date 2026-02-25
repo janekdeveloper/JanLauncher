@@ -65,6 +65,8 @@ export type Mod = {
   curseForgeId?: number;
   curseForgeFileId?: number;
   missing?: boolean;
+  /** Icon/logo URL (e.g. from CurseForge) for display in the UI */
+  iconUrl?: string;
 };
 
 export type GameProfile = {
@@ -79,7 +81,7 @@ export type GameProfile = {
   versionId?: string | null;
 };
 
-import type { ThemeId } from "./theme";
+import type { ThemeId, ColorScheme } from "./theme";
 
 export type Settings = {
   installedGameVersion?: string | null;
@@ -89,8 +91,11 @@ export type Settings = {
   sidebarPosition?: "left" | "top";
   showLogsNav?: boolean;
   themeId?: ThemeId;
+  colorScheme?: ColorScheme;
   /** Set to true after user completes first-run onboarding. Never reset. */
   hasCompletedOnboarding?: boolean;
+  /** Background music volume 0–1. 0 = off. */
+  backgroundMusicVolume?: number;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";
@@ -150,3 +155,21 @@ export type NewsArticle = {
   imageUrl: string;
   date?: string;
 };
+
+export interface FeaturedServer {
+  name: string;
+  description: string;
+  ip: string;
+  port: number;
+  type: "main" | "page";
+  advertiseUrl?: string;
+}
+
+export interface FeaturedServersResponse {
+  servers: FeaturedServer[];
+}
+
+export interface ServerLaunchOptions {
+  ip: string;
+  port: number;
+}

@@ -1,0 +1,215 @@
+.page {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  min-height: 0;
+}
+
+.mainCard {
+  width: 100%;
+  max-width: 720px;
+  padding: 40px 44px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-glass),
+    0 24px 56px rgba(5 10 20 / 0.35);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.logoWrap {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  box-shadow: 0 12px 32px var(--color-primary-glow),
+    0 0 0 1px var(--color-glass-border),
+    inset 0 1px 0 var(--color-surface-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoLetter {
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 2px 12px rgba(0 0 0 / 0.35),
+    0 0 24px var(--color-primary-glow);
+  line-height: 1;
+  letter-spacing: -2px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.heroText {
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+.version,
+.platform,
+.status {
+  font-variant-numeric: tabular-nums;
+}
+
+.sep {
+  opacity: 0.5;
+}
+
+.tagline {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.divider {
+  margin: 36px 0;
+  border: none;
+  border-top: 1px solid var(--color-glass-border);
+}
+
+.section {
+  margin-bottom: 8px;
+}
+
+.section:last-of-type {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.teamCard {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-fast) var(--ease-out-emphasized),
+    box-shadow var(--transition-fast) var(--ease-out-emphasized),
+    transform var(--transition-fast) var(--ease-out-emphasized);
+}
+
+button.teamCard {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--color-glass-border);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.teamCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px var(--color-primary-glow),
+    var(--shadow-subtle);
+  transform: translateY(-2px);
+}
+
+.teamAvatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-glass-border);
+}
+
+.teamInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teamName {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.teamRole {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--color-glass-panel);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast) var(--ease-out-emphasized),
+    border-color var(--transition-fast) var(--ease-out-emphasized),
+    color var(--transition-fast) var(--ease-out-emphasized),
+    box-shadow var(--transition-fast) var(--ease-out-emphasized),
+    transform var(--transition-fast) var(--ease-out-emphasized);
+}
+
+.linkButton:hover {
+  background: var(--color-surface-overlay);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  transform: translateY(-1px);
+}
+
+.linkIcon {
+  width: 22px;
+  height: 22px;
+}

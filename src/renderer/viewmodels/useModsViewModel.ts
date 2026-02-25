@@ -71,17 +71,29 @@ export const useModsViewModel = () => {
       return;
     }
     let cancelled = false;
-    const loadInstalled = async () => {
+    const run = async () => {
       setIsLoadingInstalled(true);
       try {
         const mods = await api.mods.loadInstalled(selectedGame.id, language);
-        if (!cancelled) setInstalledMods(mods);
+        if (cancelled) return;
+        setInstalledMods(mods);
+        const needsEnrich = mods.some((m) => typeof m.curseForgeId === "number" && !m.iconUrl);
+        if (needsEnrich) {
+          try {
+            await api.mods.enrichProfileModIcons(selectedGame.id);
+            if (cancelled) return;
+            const updated = await api.mods.loadInstalled(selectedGame.id, language);
+            if (!cancelled) setInstalledMods(updated);
+          } catch {
+            // keep current mods on enrich failure
+          }
+        }
       } catch {
       } finally {
         if (!cancelled) setIsLoadingInstalled(false);
       }
     };
-    loadInstalled();
+    run();
     return () => {
       cancelled = true;
     };

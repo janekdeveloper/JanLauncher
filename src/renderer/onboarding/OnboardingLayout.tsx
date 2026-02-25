@@ -4,11 +4,12 @@ import StepLanguage from "./StepLanguage";
 import StepAccount from "./StepAccount";
 import StepGameProfile from "./StepGameProfile";
 import StepCommunity from "./StepCommunity";
+import StepMonitoring from "./StepMonitoring";
 import StepFinish from "./StepFinish";
 import { useI18n } from "../i18n";
 import styles from "./OnboardingLayout.module.css";
 
-export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5 | 6;
 
 type OnboardingLayoutProps = {
   onComplete: () => void;
@@ -26,11 +27,12 @@ const OnboardingLayout = ({ onComplete }: OnboardingLayoutProps) => {
     { step: 2, labelKey: "onboarding.stepAccount" },
     { step: 3, labelKey: "onboarding.stepGameProfile" },
     { step: 4, labelKey: "onboarding.stepCommunity" },
-    { step: 5, labelKey: "onboarding.stepFinish" }
+    { step: 5, labelKey: "onboarding.stepMonitoring" },
+    { step: 6, labelKey: "onboarding.stepFinish" }
   ];
 
   const goNext = useCallback(() => {
-    if (step < 5) {
+    if (step < 6) {
       setStep((s) => (s + 1) as OnboardingStep);
     } else {
       onComplete();
@@ -48,7 +50,8 @@ const OnboardingLayout = ({ onComplete }: OnboardingLayoutProps) => {
     (step === 2 && step2Ready) ||
     (step === 3 && step3Ready) ||
     step === 4 ||
-    step === 5;
+    step === 5 ||
+    step === 6;
 
   return (
     <div className={styles.root}>
@@ -84,6 +87,9 @@ const OnboardingLayout = ({ onComplete }: OnboardingLayoutProps) => {
           <StepCommunity />
         )}
         {step === 5 && (
+          <StepMonitoring />
+        )}
+        {step === 6 && (
           <StepFinish onComplete={onComplete} />
         )}
       </main>
@@ -95,7 +101,7 @@ const OnboardingLayout = ({ onComplete }: OnboardingLayoutProps) => {
           </Button>
         )}
         <div className={styles.footerSpacer} />
-        {step < 5 && (
+        {step < 6 && (
           <Button
             variant="primary"
             onClick={goNext}

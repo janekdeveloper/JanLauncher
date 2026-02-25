@@ -2,6 +2,7 @@ import { ipcMain, shell } from "electron";
 import { Logger } from "../core/Logger";
 import { ModManager, type CurseForgeCategory, type CurseForgeMod, type CurseForgeSearchResult } from "../services/ModManager";
 import { ModDescriptionTranslator } from "../services/ModDescriptionTranslator";
+import { GameProfileManager } from "../services/GameProfileManager";
 import type { Language } from "../core/translation";
 import type { Mod } from "../../shared/types";
 
@@ -173,6 +174,7 @@ export const registerModsHandlers = (): void => {
           throw new Error("No file ID available for mod");
         }
 
+        const logoUrl = modDetails.logo?.thumbnailUrl ?? modDetails.logo?.url;
         return await ModManager.downloadMod({
           gameProfileId: options.gameProfileId,
           modInfo: {
@@ -181,7 +183,8 @@ export const registerModsHandlers = (): void => {
             name: modDetails.name,
             version: modDetails.latestFilesIndexes[0]?.gameVersion ?? "unknown",
             summary: modDetails.summary,
-            author: modDetails.authors[0]?.name
+            author: modDetails.authors[0]?.name,
+            iconUrl: logoUrl
           }
         });
       } catch (error) {
@@ -287,4 +290,46 @@ export const registerModsHandlers = (): void => {
       throw error;
     }
   });
+
+  /**
+   * Fetches missing icon URLs from CurseForge for installed mods and updates the profile.
+   * Used for mods installed before iconUrl was stored.
+   */
+  ipcMain.handle(
+    "mods:enrichProfileModIcons",
+    async (_event, gameProfileId: string): Promise<void> => {
+      if (!gameProfileId || typeof gameProfileId !== "string") {
+        throw new Error("Invalid gameProfileId");
+      }
+      const manager = new GameProfileManager();
+      const profile = manager.getProfile(gameProfileId);
+      const modsNeedingIcon = profile.mods.filter(
+        (m): m is Mod & { curseForgeId: number } =>
+          typeof m.curseForgeId === "number" && !m.iconUrl
+      );
+      if (modsNeedingIcon.length === 0) return;
+
+      Logger.info("IPC", `Enriching ${modsNeedingIcon.length} mod icon(s) for profile ${gameProfileId}`);
+      const updatedMods = [...profile.mods];
+      let changed = false;
+      for (const mod of modsNeedingIcon) {
+        try {
+          const details = await ModManager.getModDetails(mod.curseForgeId);
+          const iconUrl = details.logo?.thumbnailUrl ?? details.logo?.url;
+          if (iconUrl) {
+            const idx = updatedMods.findIndex((m) => m.id === mod.id);
+            if (idx !== -1) {
+              updatedMods[idx] = { ...updatedMods[idx], iconUrl };
+              changed = true;
+            }
+          }
+        } catch (err) {
+          Logger.warn("IPC", `Failed to fetch icon for mod ${mod.curseForgeId}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+      if (changed) {
+        manager.update(gameProfileId, { mods: updatedMods });
+      }
+    }
+  );
 };

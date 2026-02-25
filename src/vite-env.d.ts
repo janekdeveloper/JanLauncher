@@ -13,7 +13,9 @@ import type {
   GameVersionBranch,
   GameVersionInfo,
   ActiveGameVersion,
-  InstalledGameVersion
+  InstalledGameVersion,
+  FeaturedServersResponse,
+  ServerLaunchOptions
 } from "./shared/types";
 import type {
   AuthProviderInfo,
@@ -27,6 +29,9 @@ declare global {
   interface Window {
     api?: {
       openExternal(url: string): Promise<void>;
+      app: {
+        getAppInfo(): Promise<{ version: string; platform: string }>;
+      };
       window: {
         openSettings(): Promise<void>;
       };
@@ -79,6 +84,7 @@ declare global {
         toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
         uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
         openUrl(url: string): Promise<void>;
+        enrichProfileModIcons(gameProfileId: string): Promise<void>;
       };
       versions: {
         getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
@@ -138,6 +144,14 @@ declare global {
          * Returns total physical memory in megabytes.
          */
         getTotalMemoryMB(): Promise<number>;
+      };
+      servers: {
+        getFeatured(): Promise<FeaturedServersResponse>;
+        launch(options: ServerLaunchOptions): Promise<void>;
+        copyAddress(ip: string, port: number): Promise<void>;
+        openAdvertise(url: string): Promise<void>;
+        openAdvertiseContact(type: "telegram" | "discord"): Promise<void>;
+        open(ip: string, port: number, playerProfileId: string, gameProfileId: string): Promise<void>;
       };
     };
   }

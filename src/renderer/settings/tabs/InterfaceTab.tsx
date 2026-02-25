@@ -1,10 +1,14 @@
 import { useI18n } from "../../i18n";
 import { useSettingsContext } from "../SettingsContext";
+import { useTheme } from "../../theme";
+import { COLOR_SCHEMES } from "../../../shared/theme";
+import { MoonIcon, SunIcon } from "../../components/icons";
 import styles from "../settingsContent.module.css";
 
 const InterfaceTab = () => {
   const { t } = useI18n();
   const { settings, updateSettings } = useSettingsContext();
+  const { colorScheme, setColorScheme } = useTheme();
 
   if (!settings) return null;
 
@@ -14,6 +18,38 @@ const InterfaceTab = () => {
       <p className={styles.subtitle}>{t("settings.interfaceTabHint")}</p>
 
       <div className={styles.grid}>
+        <div className={styles.card}>
+          <p className={styles.label}>{t("settings.colorSchemeLabel")}</p>
+          <div
+            className={styles.colorSchemePill}
+            role="group"
+            aria-label={t("settings.colorSchemeLabel")}
+          >
+            <span
+              className={styles.colorSchemePillThumb}
+              aria-hidden="true"
+              data-scheme={colorScheme}
+            />
+            {COLOR_SCHEMES.map((scheme) => (
+              <button
+                key={scheme}
+                type="button"
+                className={styles.colorSchemePillOption}
+                onClick={() => setColorScheme(scheme)}
+                aria-pressed={colorScheme === scheme}
+                data-scheme={scheme}
+              >
+                <span className={styles.colorSchemePillIcon}>
+                  {scheme === "dark" ? <MoonIcon /> : <SunIcon />}
+                </span>
+                <span className={styles.colorSchemePillLabel}>
+                  {scheme === "dark" ? t("settings.colorSchemeDark") : t("settings.colorSchemeLight")}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.card}>
           <p className={styles.label}>{t("settings.sidebarPositionLabel")}</p>
           <div className={styles.checkboxWrapper}>

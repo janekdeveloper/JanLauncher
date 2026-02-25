@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import Button from "../components/common/Button";
@@ -16,9 +16,11 @@ import { useDropdown } from "../hooks/useDropdown";
 import { useI18n } from "../i18n";
 import { useHomeViewModel } from "../viewmodels/useHomeViewModel";
 import { api } from "../services/api";
-import type { AuthDomain, GameVersionBranch } from "../../shared/types";
+import type { AuthDomain, GameVersionBranch, FeaturedServer } from "../../shared/types";
 import type { AuthProviderInfo, AuthProviderId } from "../../main/core/auth/auth.types";
 import { DISCORD_INVITE_URL } from "../constants/links";
+import { ServerList } from "../components/ServerList";
+import ServerModal from "../components/modals/ServerModal";
 import styles from "./HomePage.module.css";
 
 type AccountStatus = "valid" | "refreshing" | "invalid";
@@ -201,9 +203,37 @@ const HomePage = () => {
     removeVersion
   } = useHomeViewModel();
 
+  // Server catalog state
+  const [servers, setServers] = useState<FeaturedServer[]>([]);
+  const [serversLoading, setServersLoading] = useState(true);
+  const [serversError, setServersError] = useState<string | null>(null);
+  const [selectedServer, setSelectedServer] = useState<FeaturedServer | null>(null);
+  const location = useLocation();
+
   useEffect(() => {
     refreshPlayerProfiles();
   }, [location.pathname, location.hash, refreshPlayerProfiles]);
+
+  // Fetch servers on component mount
+  useEffect(() => {
+    const loadServers = async () => {
+      try {
+        setServersLoading(true);
+        setServersError(null);
+        const response = await window.api?.servers.getFeatured();
+        if (response) {
+          const mainServers = response.servers.filter(s => s.type === "main");
+          setServers(mainServers);
+        }
+      } catch (err) {
+        setServersError("Failed to load servers");
+      } finally {
+        setServersLoading(false);
+      }
+    };
+
+    loadServers();
+  }, []);
 
   const getProviderLabel = (provider?: AuthProviderInfo | null): string => {
     if (!provider) return "";
@@ -299,17 +329,24 @@ const HomePage = () => {
 
   return (
     <section className={styles.page}>
-      <div className={styles.center}>
-        <div className={styles.playCard}>
-          <p className={styles.playSubtitle}>{t("home.playSubtitle")}</p>
-          <h2 className={styles.playTitle}>{t("home.playTitle")}</h2>
-          <p className={styles.playHint}>
-            {t("home.playHint")}
-          </p>
+      {/* Server Catalog Section - At Top */}
+      <div className={styles.serverSection}>
+        <div className={styles.serverSectionHeader}>
+          <h2 className={styles.serverSectionTitle}>{t("servers.homeTitle")}</h2>
+          <p className={styles.serverSectionSubtitle}>{t("servers.homeSubtitle")}</p>
         </div>
+        {serversLoading ? (
+          <div className={styles.serverLoading}>Loading servers...</div>
+        ) : serversError ? (
+          <div className={styles.serverError}>{serversError}</div>
+        ) : (
+          <ServerList servers={servers} onServerClick={setSelectedServer} />
+        )}
       </div>
 
-      {showVersionBranchSelector ? (
+      {/* Control Panel - Fixed at Bottom */}
+      <div className={styles.controlPanelFixed}>
+        {showVersionBranchSelector ? (
         <>
           <div className={styles.playButtonCenter}>
             {selectedPlayerId && isAccountValid === false && (
@@ -622,6 +659,7 @@ const HomePage = () => {
           </Button>
         </div>
       )}
+      </div>
 
       <Modal
         isOpen={loginModalState !== "idle"}
@@ -962,6 +1000,14 @@ const HomePage = () => {
           })}
         </p>
       </Modal>
+
+      {selectedServer && (
+        <ServerModal
+          server={selectedServer}
+          isOpen={selectedServer !== null}
+          onClose={() => setSelectedServer(null)}
+        />
+      )}
     </section>
   );
 };

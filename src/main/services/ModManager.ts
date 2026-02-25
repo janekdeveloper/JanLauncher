@@ -27,6 +27,8 @@ type ModInfo = {
   summary?: string;
   author?: string;
   apiKey?: string;
+  /** Logo/icon URL for UI display */
+  iconUrl?: string;
 };
 
 export type CurseForgeMod = {
@@ -41,6 +43,10 @@ export type CurseForgeMod = {
   }>;
   dateModified: string;
   downloadCount: number;
+  logo?: {
+    thumbnailUrl?: string;
+    url?: string;
+  };
 };
 
 export type CurseForgeSearchResult = {
@@ -309,7 +315,8 @@ export class ModManager {
         dateInstalled: new Date().toISOString(),
         curseForgeId: modInfo.modId,
         curseForgeFileId: modInfo.fileId,
-        missing: false
+        missing: false,
+        iconUrl: modInfo.iconUrl
       };
 
       const profile = this.getProfile(gameProfileId);

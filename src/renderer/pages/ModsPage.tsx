@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Virtuoso } from "react-virtuoso";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
@@ -7,32 +7,87 @@ import { ExternalLinkIcon, DownloadIcon, CalendarIcon, PackageIcon, CheckCircleI
 import { useI18n } from "../i18n";
 import { useModsViewModel } from "../viewmodels/useModsViewModel";
 import { useLauncherStore } from "../store/launcherStore";
+import { api } from "../services/api";
 import type { Mod } from "../../shared/types";
 import styles from "./ModsPage.module.css";
 
 type InstalledModItemProps = {
   mod: Mod;
+  index: number;
   togglingModId: string | null;
   uninstallingModId: string | null;
+  installingModId: number | null;
+  isSelected: boolean;
   onToggle: (modId: string) => Promise<void>;
   onUninstall: (modId: string) => Promise<void>;
+  onReinstall: (mod: Mod) => Promise<void>;
+  onSelect: (modId: string, options?: { shiftKey: boolean; index: number }) => void;
+  formatDate: (dateString?: string) => string | null;
+  formatFileSize: (bytes: number) => string;
   t: (key: string) => string;
   styles: typeof import("./ModsPage.module.css");
 };
 
 const InstalledModItem = ({
   mod,
+  index,
   togglingModId,
   uninstallingModId,
+  installingModId,
+  isSelected,
   onToggle,
   onUninstall,
+  onReinstall,
+  onSelect,
+  formatDate,
+  formatFileSize,
   t,
   styles: s
 }: InstalledModItemProps) => {
   const toggling = togglingModId === mod.id;
   const uninstalling = uninstallingModId === mod.id;
+  const reinstalling = mod.curseForgeId != null && installingModId === mod.curseForgeId;
   return (
-    <div className={s.modItem}>
+    <div
+      role="button"
+      tabIndex={0}
+      className={`${s.modItem} ${isSelected ? s.modItemSelected : ""}`}
+      onMouseDown={(e) => {
+        if (e.shiftKey) e.preventDefault();
+      }}
+      onClick={(e) => onSelect(mod.id, { shiftKey: e.shiftKey, index })}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(mod.id, { shiftKey: e.shiftKey, index });
+        }
+      }}
+      aria-pressed={isSelected}
+      aria-label={mod.name}
+    >
+      <div className={s.modItemIconWrap}>
+        {mod.iconUrl ? (
+          <img
+            src={mod.iconUrl}
+            alt=""
+            className={s.modItemIconImg}
+            loading="lazy"
+            decoding="async"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+              const fallback = target.nextElementSibling;
+              if (fallback) (fallback as HTMLElement).style.display = "flex";
+            }}
+          />
+        ) : null}
+        <span
+          className={s.modItemIconLetter}
+          style={mod.iconUrl ? { display: "none" } : undefined}
+        >
+          {mod.name.charAt(0).toUpperCase()}
+        </span>
+      </div>
       <div className={s.modItemContent}>
         <div className={s.modItemHeader}>
           <h4 className={s.modName}>{mod.name}</h4>
@@ -52,17 +107,21 @@ const InstalledModItem = ({
             <span>{t("mods.author")}: {mod.author}</span>
           )}
           {mod.version && <span>{t("mods.version")}: {mod.version}</span>}
+          <span>{formatFileSize(mod.fileSize)}</span>
+          {formatDate(mod.dateInstalled) && (
+            <span>{formatDate(mod.dateInstalled)}</span>
+          )}
           {mod.missing && (
             <span className={s.modMissing}>{t("mods.missing")}</span>
           )}
         </div>
       </div>
-      <div className={s.modItemActions}>
+      <div className={s.modItemActions} onClick={(e) => e.stopPropagation()}>
         <Button
           variant={mod.enabled ? "secondary" : "primary"}
           size="sm"
           onClick={() => onToggle(mod.id)}
-          disabled={toggling || uninstalling}
+          disabled={toggling || uninstalling || reinstalling}
         >
           {toggling
             ? t("mods.toggling")
@@ -70,11 +129,21 @@ const InstalledModItem = ({
             ? t("mods.disable")
             : t("mods.enable")}
         </Button>
+        {mod.curseForgeId != null && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onReinstall(mod)}
+            disabled={toggling || uninstalling || reinstalling}
+          >
+            {reinstalling ? t("mods.reinstalling") : t("mods.reinstall")}
+          </Button>
+        )}
         <Button
           variant="danger"
           size="sm"
           onClick={() => onUninstall(mod.id)}
-          disabled={toggling || uninstalling}
+          disabled={toggling || uninstalling || reinstalling}
         >
           {uninstalling ? t("mods.uninstalling") : t("mods.uninstall")}
         </Button>
@@ -123,9 +192,137 @@ const ModsPage = () => {
 
   const [activeTab, setActiveTab] = useState<"search" | "installed">("search");
   const [installedScrollParent, setInstalledScrollParent] = useState<HTMLDivElement | null>(null);
+  const [selectedModIds, setSelectedModIds] = useState<Set<string>>(new Set());
+  const lastClickedIndexRef = useRef<number | null>(null);
   const installedCatalogRef = useCallback((el: HTMLDivElement | null) => {
     setInstalledScrollParent(el);
   }, []);
+
+  const handleSelectMod = useCallback(
+    (modId: string, options?: { shiftKey: boolean; index: number }) => {
+      const shiftKey = options?.shiftKey ?? false;
+      const index = options?.index ?? 0;
+      if (shiftKey && options?.index !== undefined) {
+        const anchor = lastClickedIndexRef.current ?? index;
+        const start = Math.min(anchor, index);
+        const end = Math.max(anchor, index);
+        const idsInRange = installedMods
+          .slice(start, end + 1)
+          .map((m) => m.id);
+        setSelectedModIds(new Set(idsInRange));
+      } else {
+        lastClickedIndexRef.current = index;
+        setSelectedModIds((prev) => {
+          const next = new Set(prev);
+          if (next.has(modId)) next.delete(modId);
+          else next.add(modId);
+          return next;
+        });
+      }
+    },
+    [installedMods]
+  );
+
+  const selectAllMods = useCallback(() => {
+    setSelectedModIds(new Set(installedMods.map((m) => m.id)));
+  }, [installedMods]);
+
+  const clearModSelection = useCallback(() => {
+    setSelectedModIds(new Set());
+  }, []);
+
+  const selectedMods = installedMods.filter((m) => selectedModIds.has(m.id));
+  const selectedEnabledCount = selectedMods.filter((m) => m.enabled).length;
+  const selectedDisabledCount = selectedMods.length - selectedEnabledCount;
+
+  const handleEnableSelected = useCallback(async () => {
+    for (const mod of selectedMods) {
+      if (!mod.enabled) {
+        try {
+          await toggleMod(mod.id);
+        } catch {
+          //
+        }
+      }
+    }
+  }, [selectedMods, toggleMod]);
+
+  const handleDisableSelected = useCallback(async () => {
+    for (const mod of selectedMods) {
+      if (mod.enabled) {
+        try {
+          await toggleMod(mod.id);
+        } catch {
+          //
+        }
+      }
+    }
+  }, [selectedMods, toggleMod]);
+
+  const handleUninstallSelected = useCallback(async () => {
+    const n = selectedModIds.size;
+    if (n === 0) return;
+    if (!confirm(t("mods.confirmUninstallSelected", { count: n }))) return;
+    const ids = Array.from(selectedModIds);
+    for (const id of ids) {
+      try {
+        await uninstallMod(id);
+      } catch {
+        //
+      }
+    }
+    clearModSelection();
+  }, [selectedModIds, uninstallMod, t, clearModSelection]);
+
+  const handleReinstall = useCallback(
+    async (mod: Mod) => {
+      if (mod.curseForgeId == null) return;
+      try {
+        await installMod(mod.curseForgeId, mod.curseForgeFileId);
+      } catch {
+        //
+      }
+    },
+    [installMod]
+  );
+
+  const handleReinstallSelected = useCallback(async () => {
+    for (const mod of selectedMods) {
+      if (mod.curseForgeId != null) {
+        try {
+          await installMod(mod.curseForgeId, mod.curseForgeFileId);
+        } catch {
+          //
+        }
+      }
+    }
+  }, [selectedMods, installMod]);
+
+  const selectedReinstallableCount = selectedMods.filter((m) => m.curseForgeId != null).length;
+
+  useEffect(() => {
+    if (activeTab !== "installed" || installedMods.length === 0) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isSelectAll = (e.ctrlKey || e.metaKey) && (e.key === "a" || e.key === "A" || e.code === "KeyA");
+      if (!isSelectAll) return;
+      const target = e.target as HTMLElement;
+      if (target?.closest("input") || target?.closest("textarea") || target?.closest("[contenteditable=true]")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      selectAllMods();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [activeTab, installedMods.length, selectAllMods]);
+
+  useEffect(() => {
+    if (activeTab === "installed") {
+      const id = requestAnimationFrame(() => {
+        installedCatalogRef.current?.focus({ preventScroll: true });
+      });
+      return () => cancelAnimationFrame(id);
+    }
+  }, [activeTab]);
 
   const handleInstall = async (modId: number) => {
     try {
@@ -177,6 +374,12 @@ const ModsPage = () => {
     return count.toString();
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${bytes} B`;
+  };
+
   return (
     <section className={styles.page}>
       <div className={styles.header}>
@@ -184,8 +387,21 @@ const ModsPage = () => {
           <h2 className={styles.title}>{t("mods.title")}</h2>
           <p className={styles.subtitle}>{t("mods.subtitle")}</p>
         </div>
-        <div className={styles.profileSelector}>
-          <Select<string>
+        <div className={styles.headerActions}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => selectedGameId && api.paths.openUserDataDir(selectedGameId)}
+            disabled={!selectedGameId}
+            className={styles.openModsFolderButton}
+            title={t("mods.openModsFolder")}
+            aria-label={t("mods.openModsFolder")}
+          >
+            <FolderIcon className={styles.openModsFolderIcon} aria-hidden />
+            <span className={styles.openModsFolderText}>{t("mods.openModsFolder")}</span>
+          </Button>
+          <div className={styles.profileSelector}>
+            <Select<string>
             id="mods-game-profile"
             value={selectedGameId || null}
             onChange={(id) => {
@@ -206,6 +422,7 @@ const ModsPage = () => {
             className={styles.profileSelect}
             maxListHeight={200}
           />
+          </div>
         </div>
       </div>
 
@@ -487,7 +704,18 @@ const ModsPage = () => {
           </div>
         </>
       ) : (
-        <div ref={installedCatalogRef} className={styles.catalog}>
+        <div
+          ref={installedCatalogRef}
+          className={`${styles.catalog} ${styles.catalogInstalledList}`}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === "a" || e.key === "A" || e.nativeEvent?.code === "KeyA")) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (installedMods.length > 0) selectAllMods();
+            }
+          }}
+        >
           {isLoadingInstalled ? (
             <div className={styles.loading}>{t("mods.loading")}</div>
           ) : installedMods.length === 0 ? (
@@ -495,25 +723,92 @@ const ModsPage = () => {
               <h4>{t("mods.noInstalledMods")}</h4>
               <p>{t("mods.noInstalledModsHint")}</p>
             </div>
-          ) : installedScrollParent ? (
-            <Virtuoso
-              customScrollParent={installedScrollParent}
-              data={installedMods}
-              itemContent={(index, mod) => (
-                <div className={styles.modItemWrapper}>
-                  <InstalledModItem
-                    mod={mod}
-                    togglingModId={togglingModId}
-                    uninstallingModId={uninstallingModId}
-                    onToggle={handleToggle}
-                    onUninstall={handleUninstall}
-                    t={t}
-                    styles={styles}
-                  />
+          ) : (
+            <>
+              {selectedModIds.size > 0 && (
+                <div className={styles.installedToolbar}>
+                  <span className={styles.installedToolbarCount}>
+                    {t("mods.selectedCount", { count: selectedModIds.size })}
+                  </span>
+                  <div className={styles.installedToolbarActions}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleEnableSelected}
+                      disabled={selectedDisabledCount === 0}
+                      title={t("mods.enableSelected")}
+                    >
+                      {t("mods.enableSelected")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleDisableSelected}
+                      disabled={selectedEnabledCount === 0}
+                      title={t("mods.disableSelected")}
+                    >
+                      {t("mods.disableSelected")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleReinstallSelected}
+                      disabled={selectedReinstallableCount === 0}
+                      title={t("mods.reinstallSelected")}
+                    >
+                      {t("mods.reinstallSelected")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={handleUninstallSelected}
+                      title={t("mods.uninstallSelected")}
+                    >
+                      {t("mods.uninstallSelected")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearModSelection}
+                    >
+                      {t("mods.clearSelection")}
+                    </Button>
+                  </div>
                 </div>
               )}
-            />
-          ) : null}
+              {installedScrollParent ? (
+                <Virtuoso
+                  customScrollParent={installedScrollParent}
+                  data={installedMods}
+                  itemContent={(index, mod) => (
+                    <div className={styles.modItemWrapper}>
+                      <InstalledModItem
+                        mod={mod}
+                        index={index}
+                        togglingModId={togglingModId}
+                        uninstallingModId={uninstallingModId}
+                        installingModId={installingModId}
+                        isSelected={selectedModIds.has(mod.id)}
+                        onToggle={handleToggle}
+                        onUninstall={handleUninstall}
+                        onReinstall={handleReinstall}
+                        onSelect={handleSelectMod}
+                        formatDate={formatDate}
+                        formatFileSize={formatFileSize}
+                        t={t}
+                        styles={styles}
+                      />
+                    </div>
+                  )}
+                />
+              ) : null}
+            </>
+          )}
         </div>
       )}
     </section>

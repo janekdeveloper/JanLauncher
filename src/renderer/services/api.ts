@@ -28,6 +28,10 @@ if (!window.api) {
 const apiInstance = window.api;
 
 export const api = {
+  app: {
+    getAppInfo: (): Promise<{ version: string; platform: string }> =>
+      apiInstance.app.getAppInfo()
+  },
   window: {
     openSettings: (): Promise<void> => apiInstance.window.openSettings()
   },
@@ -121,7 +125,9 @@ export const api = {
       gameProfileId: string;
       modId: string;
     }): Promise<void> => apiInstance.mods.uninstall(options),
-    openUrl: (url: string): Promise<void> => apiInstance.mods.openUrl(url)
+    openUrl: (url: string): Promise<void> => apiInstance.mods.openUrl(url),
+    enrichProfileModIcons: (gameProfileId: string): Promise<void> =>
+      apiInstance.mods.enrichProfileModIcons(gameProfileId)
   },
   versions: {
     getAvailable: (branch: GameVersionBranch): Promise<GameVersionInfo[]> =>

@@ -12,7 +12,9 @@ import type {
   GameVersionBranch,
   GameVersionInfo,
   ActiveGameVersion,
-  InstalledGameVersion
+  InstalledGameVersion,
+  FeaturedServersResponse,
+  ServerLaunchOptions
 } from "../shared/types";
 import type {
   AuthProviderInfo,
@@ -24,6 +26,9 @@ import type {
 
 export interface PreloadApi {
   openExternal(url: string): Promise<void>;
+  app: {
+    getAppInfo(): Promise<{ version: string; platform: string }>;
+  };
   window: {
     openSettings(): Promise<void>;
   };
@@ -79,6 +84,7 @@ export interface PreloadApi {
     toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
     uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
     openUrl(url: string): Promise<void>;
+    enrichProfileModIcons(gameProfileId: string): Promise<void>;
   };
   versions: {
     getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
@@ -139,10 +145,21 @@ export interface PreloadApi {
      */
     getTotalMemoryMB(): Promise<number>;
   };
+  servers: {
+    getFeatured(): Promise<FeaturedServersResponse>;
+    launch(options: ServerLaunchOptions): Promise<void>;
+    copyAddress(ip: string, port: number): Promise<void>;
+    openAdvertise(url: string): Promise<void>;
+    openAdvertiseContact(type: "telegram" | "discord"): Promise<void>;
+    open(ip: string, port: number, playerProfileId: string, gameProfileId: string): Promise<void>;
+  };
 }
 
 const api: PreloadApi = {
   openExternal: (url) => ipcRenderer.invoke("external:open", url),
+  app: {
+    getAppInfo: () => ipcRenderer.invoke("app:getAppInfo")
+  },
   window: {
     openSettings: () => ipcRenderer.invoke("window:openSettings")
   },
@@ -244,7 +261,8 @@ const api: PreloadApi = {
     install: (options) => ipcRenderer.invoke("mods:install", options),
     toggle: (options) => ipcRenderer.invoke("mods:toggle", options),
     uninstall: (options) => ipcRenderer.invoke("mods:uninstall", options),
-    openUrl: (url) => ipcRenderer.invoke("mods:openUrl", url)
+    openUrl: (url) => ipcRenderer.invoke("mods:openUrl", url),
+    enrichProfileModIcons: (gameProfileId) => ipcRenderer.invoke("mods:enrichProfileModIcons", gameProfileId)
   },
   versions: {
     getAvailable: (branch) => ipcRenderer.invoke("versions:getAvailable", branch),
@@ -358,6 +376,14 @@ const api: PreloadApi = {
   },
   system: {
     getTotalMemoryMB: () => ipcRenderer.invoke("system:getTotalMemory")
+  },
+  servers: {
+    getFeatured: () => ipcRenderer.invoke("servers:getFeatured"),
+    launch: (options) => ipcRenderer.invoke("servers:launch", options),
+    copyAddress: (ip, port) => ipcRenderer.invoke("servers:copyAddress", ip, port),
+    openAdvertise: (url) => ipcRenderer.invoke("servers:openAdvertise", url),
+    openAdvertiseContact: (type) => ipcRenderer.invoke("servers:openAdvertiseContact", type),
+    open: (ip, port, playerProfileId, gameProfileId) => ipcRenderer.invoke("servers:open", ip, port, playerProfileId, gameProfileId)
   }
 };
 

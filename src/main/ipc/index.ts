@@ -11,9 +11,11 @@ import { registerAuthHandlers } from "./auth.ipc";
 import { registerTranslationHandlers } from "./translation.ipc";
 import { registerPathsHandlers } from "./paths.ipc";
 import { registerExternalHandlers } from "./external.ipc";
+import { registerAppHandlers } from "./app.ipc";
 import { registerUpdateHandlers } from "../updater/updateIpc";
 import { registerVersionsHandlers } from "./versions.ipc";
 import { registerSystemHandlers } from "./system.ipc";
+import { registerServersHandlers } from "./servers.ipc";
 import { Logger } from "../core/Logger";
 
 /**
@@ -34,8 +36,10 @@ export const registerIpcHandlers = (): void => {
   registerTranslationHandlers();
   registerPathsHandlers();
   registerExternalHandlers();
+  registerAppHandlers();
   registerVersionsHandlers();
   registerSystemHandlers();
+  registerServersHandlers();
   registerUpdateHandlers();
   Logger.info("IPC", "IPC handlers registered");
 };

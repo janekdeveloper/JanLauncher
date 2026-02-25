@@ -507,6 +507,113 @@
   color: var(--color-text);
 }
 
+.colorSchemeRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.colorSchemeButton {
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.colorSchemeButton:hover {
+  border-color: var(--color-primary);
+  background: var(--color-glass-highlight);
+}
+
+.colorSchemeButtonActive {
+  border-color: var(--color-primary);
+  background: var(--color-glass-panel);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+}
+
+/* Pill-style light/dark switcher with sliding thumb */
+.colorSchemePill {
+  display: flex;
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-inset);
+}
+
+.colorSchemePillThumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: var(--color-glass-panel);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-subtle);
+  pointer-events: none;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.colorSchemePillThumb[data-scheme="light"] {
+  transform: translateX(100%);
+}
+
+.colorSchemePillOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: color 200ms ease;
+}
+
+.colorSchemePillOption:hover {
+  color: var(--color-text);
+}
+
+.colorSchemePillOption[aria-pressed="true"] {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.colorSchemePillIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colorSchemePillIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.colorSchemePillOption[aria-pressed="true"] .colorSchemePillIcon {
+  color: var(--color-primary);
+}
+
+.colorSchemePillLabel {
+  white-space: nowrap;
+}
+
 .foldersGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

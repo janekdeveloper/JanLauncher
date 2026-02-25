@@ -17,11 +17,43 @@ export const translations = {
       home: "Главная",
       mods: "Моды",
       news: "Новости",
+      catalog: "Каталог",
       settings: "Настройки",
-      logs: "Логи"
+      logs: "Логи",
+      about: "О программе"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "Ищешь где поиграть?",
+      homeSubtitle: "Выбирай сервер из списка и запускай игру!",
+      catalogTitle: "Каталог серверов",
+      catalogSubtitle: "Полный список доступных серверов",
+      advertiseButton: "Рекламировать сервер",
+      advertiseTelegram: "Telegram (менеджер по рекламе)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Купить рекламу",
+      chooseContactMethod: "Выберите удобный способ связи с менеджером по рекламе",
+      launchGame: "Запустить игру",
+      launching: "Запуск...",
+      copyAddress: "Скопировать адрес",
+      copied: "Скопировано!",
+      copyFailed: "Ошибка",
+      viewDetails: "Подробнее",
+      launchError: "Не удалось запустить игру",
+      selectProfilesError: "Пожалуйста, выберите профиль игрока и игры"
+    },
+    about: {
+      tagline: "Современный кроссплатформенный лаунчер, созданный специально для Hytale. Он обеспечивает плавный и интуитивный опыт управления игрой, профилями, модами и многим другим.",
+      statusActive: "Активен",
+      sectionTeam: "Команда",
+      sectionLinks: "Ссылки",
+      roleLeadDeveloper: "Ведущий разработчик",
+      roleMusicComposer: "Композитор",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -151,7 +183,17 @@ export const translations = {
         leastPopular: "Наименее популярные",
         newest: "Самые новые",
         oldest: "Самые старые"
-      }
+      },
+      openModsFolder: "Папка модов",
+      selectedCount: "Выбрано: {{count}}",
+      clearSelection: "Снять выделение",
+      enableSelected: "Включить выбранные",
+      disableSelected: "Выключить выбранные",
+      uninstallSelected: "Удалить выбранные",
+      confirmUninstallSelected: "Удалить выбранные моды ({{count}})? Это действие нельзя отменить.",
+      reinstall: "Переустановить",
+      reinstalling: "Переустановка…",
+      reinstallSelected: "Переустановить выбранные"
     },
     news: {
       title: "Новости Hytale",
@@ -179,12 +221,17 @@ export const translations = {
       languageLabel: "Язык интерфейса",
       languageHint: "Изменение языка применяется сразу.",
       enableRussianLocalization: "Включить русскую локализацию игры",
+      backgroundMusicVolume: "Громкость фоновой музыки",
+      backgroundMusicVolumeOff: "Выкл",
       clearCache: "Очистить кеш переводов",
       foldersTitle: "Папки",
       openGameDir: "Папка игры",
       openConfigDir: "Папка конфигурации",
       openUserDataDir: "Папка профиля",
       showVersionBranchSelector: "Показывать выбор ветки версий",
+      colorSchemeLabel: "Оформление",
+      colorSchemeDark: "Тёмная",
+      colorSchemeLight: "Светлая",
       sidebarPositionLabel: "Расположение боковой панели",
       sidebarPositionLeft: "Слева",
       sidebarPositionTop: "Сверху",
@@ -214,7 +261,9 @@ export const translations = {
       modsTabDescription: "Управление модами выполняется в главном окне в разделе «Моды».",
       authTabHint: "Управление аккаунтами.",
       authTabDescription: "Добавление и привязка аккаунтов выполняется в главном окне в разделе «Профили».",
-      advancedTabHint: "Дополнительные действия."
+      advancedTabHint: "Дополнительные действия.",
+      restartOnboarding: "Перезапустить обучение",
+      restartOnboardingHint: "Показать приветственный экран заново"
     },
     logs: {
       title: "Логи",
@@ -264,7 +313,17 @@ export const translations = {
       communitySubtitle: "Подпишитесь на обновления, получайте поддержку и поставьте звезду на GitHub.",
       joinDiscord: "Перейти в Discord",
       openTelegram: "Перейти в Telegram",
-      starOnGitHub: "Поставить звезду на GitHub"
+      starOnGitHub: "Поставить звезду на GitHub",
+      stepMonitoring: "Каталог серверов",
+      monitoringTitle: "Каталог серверов Hytale",
+      monitoringSubtitle: "Находите и подключайтесь к серверам прямо из лаунчера.",
+      monitoringServers: "Список серверов",
+      monitoringServersDesc: "Просматривайте актуальный список доступных серверов с описанием, онлайном и режимами игры.",
+      monitoringQuickLaunch: "Быстрый запуск",
+      monitoringQuickLaunchDesc: "Подключайтесь к любому серверу одним кликом — лаунчер автоматически запустит игру с нужными настройками.",
+      monitoringAdvertise: "Реклама сервера",
+      monitoringAdvertiseDesc: "Владельцы серверов могут разместить свой проект в каталоге и привлечь новых игроков.",
+      monitoringNote: "Каталог серверов доступен на главной странице и в отдельном разделе лаунчера."
     }
   },
   en: {
@@ -285,11 +344,43 @@ export const translations = {
       home: "Home",
       mods: "Mods",
       news: "News",
+      catalog: "Catalog",
       settings: "Settings",
-      logs: "Logs"
+      logs: "Logs",
+      about: "About"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "Looking for a place to play?",
+      homeSubtitle: "Choose a server from the list and launch the game!",
+      catalogTitle: "Server Catalog",
+      catalogSubtitle: "Complete list of available servers",
+      advertiseButton: "Advertise your server",
+      advertiseTelegram: "Telegram (advertising manager)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Buy Advertising",
+      chooseContactMethod: "Choose a convenient way to contact the advertising manager",
+      launchGame: "Launch Game",
+      launching: "Launching...",
+      copyAddress: "Copy Address",
+      copied: "Copied!",
+      copyFailed: "Failed",
+      viewDetails: "View Details",
+      launchError: "Failed to launch game",
+      selectProfilesError: "Please select player and game profiles first"
+    },
+    about: {
+      tagline: "A modern cross-platform launcher built specifically for Hytale. It delivers a smooth, intuitive experience for managing the game, profiles, mods, and more.",
+      statusActive: "Active",
+      sectionTeam: "Team",
+      sectionLinks: "Links",
+      roleLeadDeveloper: "Lead Developer",
+      roleMusicComposer: "Music Composer",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -419,7 +510,17 @@ export const translations = {
         leastPopular: "Least popular",
         newest: "Newest",
         oldest: "Oldest"
-      }
+      },
+      openModsFolder: "Mods folder",
+      selectedCount: "Selected: {{count}}",
+      clearSelection: "Clear selection",
+      enableSelected: "Enable selected",
+      disableSelected: "Disable selected",
+      uninstallSelected: "Uninstall selected",
+      confirmUninstallSelected: "Uninstall selected mods ({{count}})? This cannot be undone.",
+      reinstall: "Reinstall",
+      reinstalling: "Reinstalling...",
+      reinstallSelected: "Reinstall selected"
     },
     news: {
       title: "Hytale News",
@@ -447,12 +548,17 @@ export const translations = {
       languageLabel: "Language",
       languageHint: "Language changes apply instantly.",
       enableRussianLocalization: "Enable Russian fan localization",
+      backgroundMusicVolume: "Background music volume",
+      backgroundMusicVolumeOff: "Off",
       clearCache: "Clear translation cache",
       foldersTitle: "Folders",
       openGameDir: "Game folder",
       openConfigDir: "Config folder",
       openUserDataDir: "Profile folder",
       showVersionBranchSelector: "Show version branch selector",
+      colorSchemeLabel: "Appearance",
+      colorSchemeDark: "Dark",
+      colorSchemeLight: "Light",
       sidebarPositionLabel: "Sidebar position",
       sidebarPositionLeft: "Left",
       sidebarPositionTop: "Top",
@@ -482,7 +588,9 @@ export const translations = {
       modsTabDescription: "Manage mods in the main window under Mods.",
       authTabHint: "Account management.",
       authTabDescription: "Add and link accounts in the main window under Profiles.",
-      advancedTabHint: "Additional actions."
+      advancedTabHint: "Additional actions.",
+      restartOnboarding: "Restart onboarding",
+      restartOnboardingHint: "Show the welcome screen again"
     },
     logs: {
       title: "Logs",
@@ -532,7 +640,17 @@ export const translations = {
       communitySubtitle: "Stay updated, get support, and star us on GitHub.",
       joinDiscord: "Join Discord",
       openTelegram: "Open Telegram",
-      starOnGitHub: "Star on GitHub"
+      starOnGitHub: "Star on GitHub",
+      stepMonitoring: "Server Catalog",
+      monitoringTitle: "Hytale Server Catalog",
+      monitoringSubtitle: "Find and connect to servers directly from the launcher.",
+      monitoringServers: "Server List",
+      monitoringServersDesc: "Browse the current list of available servers with descriptions, player counts, and game modes.",
+      monitoringQuickLaunch: "Quick Launch",
+      monitoringQuickLaunchDesc: "Connect to any server with one click — the launcher will automatically start the game with the right settings.",
+      monitoringAdvertise: "Server Advertising",
+      monitoringAdvertiseDesc: "Server owners can list their project in the catalog and attract new players.",
+      monitoringNote: "The server catalog is available on the home page and in a dedicated launcher section."
     }
   },
   uk: {
@@ -553,11 +671,43 @@ export const translations = {
       home: "Головна",
       mods: "Моди",
       news: "Новини",
+      catalog: "Каталог",
       settings: "Налаштування",
-      logs: "Логи"
+      logs: "Логи",
+      about: "Про програму"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "Шукаєш де пограти?",
+      homeSubtitle: "Обирай сервер зі списку та запускай гру!",
+      catalogTitle: "Каталог серверів",
+      catalogSubtitle: "Повний список доступних серверів",
+      advertiseButton: "Рекламувати сервер",
+      advertiseTelegram: "Telegram (менеджер з реклами)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Купити рекламу",
+      chooseContactMethod: "Оберіть зручний спосіб зв'язку з менеджером з реклами",
+      launchGame: "Запустити гру",
+      launching: "Запуск...",
+      copyAddress: "Скопіювати адресу",
+      copied: "Скопійовано!",
+      copyFailed: "Помилка",
+      viewDetails: "Детальніше",
+      launchError: "Не вдалося запустити гру",
+      selectProfilesError: "Будь ласка, оберіть профіль гравця та гри"
+    },
+    about: {
+      tagline: "Сучасний кроссплатформенний лаунчер, створений спеціально для Hytale. Забезпечує плавний та інтуїтивний досвід керування грою, профілями, модами та багатьма іншими.",
+      statusActive: "Активний",
+      sectionTeam: "Команда",
+      sectionLinks: "Посилання",
+      roleLeadDeveloper: "Ведучий розробник",
+      roleMusicComposer: "Композитор",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -687,7 +837,17 @@ export const translations = {
         leastPopular: "Найменш популярні",
         newest: "Найновіші",
         oldest: "Найстаріші"
-      }
+      },
+      openModsFolder: "Папка модів",
+      selectedCount: "Обрано: {{count}}",
+      clearSelection: "Зняти виділення",
+      enableSelected: "Увімкнути вибрані",
+      disableSelected: "Вимкнути вибрані",
+      uninstallSelected: "Видалити вибрані",
+      confirmUninstallSelected: "Видалити вибрані моди ({{count}})? Цю дію не можна скасувати.",
+      reinstall: "Перевстановити",
+      reinstalling: "Перевстановлення…",
+      reinstallSelected: "Перевстановити вибрані"
     },
     news: {
       title: "Новини Hytale",
@@ -715,12 +875,17 @@ export const translations = {
       languageLabel: "Мова інтерфейсу",
       languageHint: "Зміна мови застосовується одразу.",
       enableRussianLocalization: "Увімкнути російську локалізацію гри",
+      backgroundMusicVolume: "Гучність фонової музики",
+      backgroundMusicVolumeOff: "Вимк",
       clearCache: "Очистити кеш перекладів",
       foldersTitle: "Папки",
       openGameDir: "Папка гри",
       openConfigDir: "Папка конфігурації",
       openUserDataDir: "Папка профілю",
       showVersionBranchSelector: "Показувати вибір гілки версій",
+      colorSchemeLabel: "Оформлення",
+      colorSchemeDark: "Темна",
+      colorSchemeLight: "Світла",
       sidebarPositionLabel: "Розташування бічної панелі",
       sidebarPositionLeft: "Зліва",
       sidebarPositionTop: "Зверху",
@@ -750,7 +915,9 @@ export const translations = {
       modsTabDescription: "Керування модами виконується в головному вікні в розділі «Моди».",
       authTabHint: "Керування обліковими записами.",
       authTabDescription: "Додавання та прив'язка облікових записів виконується в головному вікні в розділі «Профілі».",
-      advancedTabHint: "Додаткові дії."
+      advancedTabHint: "Додаткові дії.",
+      restartOnboarding: "Перезапустити навчання",
+      restartOnboardingHint: "Показати привітальний екран знову"
     },
     logs: {
       title: "Логи",
@@ -800,7 +967,17 @@ export const translations = {
       communitySubtitle: "Будьте в курсі оновлень, отримуйте підтримку та поставте зірку на GitHub.",
       joinDiscord: "Перейти в Discord",
       openTelegram: "Перейти в Telegram",
-      starOnGitHub: "Поставити зірку на GitHub"
+      starOnGitHub: "Поставити зірку на GitHub",
+      stepMonitoring: "Каталог серверів",
+      monitoringTitle: "Каталог серверів Hytale",
+      monitoringSubtitle: "Знаходьте та підключайтеся до серверів прямо з лаунчера.",
+      monitoringServers: "Список серверів",
+      monitoringServersDesc: "Переглядайте актуальний список доступних серверів з описом, онлайном та режимами гри.",
+      monitoringQuickLaunch: "Швидкий запуск",
+      monitoringQuickLaunchDesc: "Підключайтеся до будь-якого сервера одним кліком — лаунчер автоматично запустить гру з потрібними налаштуваннями.",
+      monitoringAdvertise: "Реклама сервера",
+      monitoringAdvertiseDesc: "Власники серверів можуть розмістити свій проєкт у каталозі та залучити нових гравців.",
+      monitoringNote: "Каталог серверів доступний на головній сторінці та в окремому розділі лаунчера."
     }
   },
   pl: {
@@ -821,11 +998,43 @@ export const translations = {
       home: "Start",
       mods: "Mody",
       news: "Aktualności",
+      catalog: "Katalog",
       settings: "Ustawienia",
-      logs: "Logi"
+      logs: "Logi",
+      about: "O programie"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "Szukasz gdzie zagrać?",
+      homeSubtitle: "Wybierz serwer z listy i uruchom grę!",
+      catalogTitle: "Katalog serwerów",
+      catalogSubtitle: "Pełna lista dostępnych serwerów",
+      advertiseButton: "Reklamuj swój serwer",
+      advertiseTelegram: "Telegram (menedżer reklamy)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Kup reklamę",
+      chooseContactMethod: "Wybierz wygodny sposób kontaktu z menedżerem reklamy",
+      launchGame: "Uruchom grę",
+      launching: "Uruchamianie...",
+      copyAddress: "Kopiuj adres",
+      copied: "Skopiowano!",
+      copyFailed: "Błąd",
+      viewDetails: "Zobacz szczegóły",
+      launchError: "Nie udało się uruchomić gry",
+      selectProfilesError: "Proszę wybrać profil gracza i gry"
+    },
+    about: {
+      tagline: "Nowoczesny, wieloplatformowy launcher stworzony specjalnie dla Hytale. Zapewnia płynne i intuicyjne zarządzanie grą, profilami, modami i nie tylko.",
+      statusActive: "Aktywny",
+      sectionTeam: "Zespół",
+      sectionLinks: "Linki",
+      roleLeadDeveloper: "Główny programista",
+      roleMusicComposer: "Kompozytor",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -955,7 +1164,17 @@ export const translations = {
         leastPopular: "Najmniej popularne",
         newest: "Najnowsze",
         oldest: "Najstarsze"
-      }
+      },
+      openModsFolder: "Folder modów",
+      selectedCount: "Wybrano: {{count}}",
+      clearSelection: "Wyczyść zaznaczenie",
+      enableSelected: "Włącz zaznaczone",
+      disableSelected: "Wyłącz zaznaczone",
+      uninstallSelected: "Odinstaluj zaznaczone",
+      confirmUninstallSelected: "Odinstalować zaznaczone mody ({{count}})? Tej operacji nie można cofnąć.",
+      reinstall: "Reinstaluj",
+      reinstalling: "Reinstalowanie...",
+      reinstallSelected: "Reinstaluj zaznaczone"
     },
     news: {
       title: "Aktualności Hytale",
@@ -983,12 +1202,17 @@ export const translations = {
       languageLabel: "Język interfejsu",
       languageHint: "Zmiana języka jest natychmiastowa.",
       enableRussianLocalization: "Włącz rosyjską lokalizację gry",
+      backgroundMusicVolume: "Głośność muzyki w tle",
+      backgroundMusicVolumeOff: "Wyłącz",
       clearCache: "Wyczyść cache tłumaczeń",
       foldersTitle: "Foldery",
       openGameDir: "Folder gry",
       openConfigDir: "Folder konfiguracji",
       openUserDataDir: "Folder profilu",
       showVersionBranchSelector: "Pokaż wybór gałęzi wersji",
+      colorSchemeLabel: "Wygląd",
+      colorSchemeDark: "Ciemny",
+      colorSchemeLight: "Jasny",
       sidebarPositionLabel: "Pozycja paska bocznego",
       sidebarPositionLeft: "Po lewej",
       sidebarPositionTop: "U góry",
@@ -1018,7 +1242,9 @@ export const translations = {
       modsTabDescription: "Zarządzaj modami w głównym oknie w sekcji Mody.",
       authTabHint: "Zarządzanie kontami.",
       authTabDescription: "Dodawanie i powiązywanie kont w głównym oknie w sekcji Profile.",
-      advancedTabHint: "Dodatkowe działania."
+      advancedTabHint: "Dodatkowe działania.",
+      restartOnboarding: "Uruchom ponownie wprowadzenie",
+      restartOnboardingHint: "Pokaż ekran powitalny ponownie"
     },
     logs: {
       title: "Logi",
@@ -1068,7 +1294,17 @@ export const translations = {
       communitySubtitle: "Bądź na bieżąco, uzyskuj wsparcie i oznacz nas gwiazdką na GitHubie.",
       joinDiscord: "Dołącz do Discord",
       openTelegram: "Otwórz Telegram",
-      starOnGitHub: "Oznacz gwiazdką na GitHub"
+      starOnGitHub: "Oznacz gwiazdką na GitHub",
+      stepMonitoring: "Katalog serwerów",
+      monitoringTitle: "Katalog serwerów Hytale",
+      monitoringSubtitle: "Znajdź i połącz się z serwerami bezpośrednio z launchera.",
+      monitoringServers: "Lista serwerów",
+      monitoringServersDesc: "Przeglądaj aktualną listę dostępnych serwerów z opisami, liczbą graczy i trybami gry.",
+      monitoringQuickLaunch: "Szybkie uruchomienie",
+      monitoringQuickLaunchDesc: "Połącz się z dowolnym serwerem jednym kliknięciem — launcher automatycznie uruchomi grę z odpowiednimi ustawieniami.",
+      monitoringAdvertise: "Reklama serwera",
+      monitoringAdvertiseDesc: "Właściciele serwerów mogą umieścić swój projekt w katalogu i przyciągnąć nowych graczy.",
+      monitoringNote: "Katalog serwerów jest dostępny na stronie głównej i w dedykowanej sekcji launchera."
     }
   },
   be: {
@@ -1089,11 +1325,43 @@ export const translations = {
       home: "Галоўная",
       mods: "Моды",
       news: "Навіны",
+      catalog: "Каталог",
       settings: "Налады",
-      logs: "Логі"
+      logs: "Логі",
+      about: "А праграме"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "Шукаеш дзе пагуляць?",
+      homeSubtitle: "Выбірай сервер са спісу і запускай гульню!",
+      catalogTitle: "Каталог сервераў",
+      catalogSubtitle: "Поўны спіс даступных сервераў",
+      advertiseButton: "Рэкламаваць сервер",
+      advertiseTelegram: "Telegram (менеджар па рэкламе)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Купіць рэкламу",
+      chooseContactMethod: "Выберыце зручны спосаб сувязі з менеджарам па рэкламе",
+      launchGame: "Запусціць гульню",
+      launching: "Запуск...",
+      copyAddress: "Скапіяваць адрас",
+      copied: "Скапіявана!",
+      copyFailed: "Памылка",
+      viewDetails: "Падрабязней",
+      launchError: "Не атрымалася запусціць гульню",
+      selectProfilesError: "Калі ласка, выберыце профіль гульца і гульні"
+    },
+    about: {
+      tagline: "Сучасны кроссплатформенны лаўнчар, створаны спецыяльна для Hytale. Забяспечвае плаўны і інтуітыўны досвед кіравання гульнёй, профілямі, модамі і многім іншым.",
+      statusActive: "Актыўны",
+      sectionTeam: "Каманда",
+      sectionLinks: "Спасылкі",
+      roleLeadDeveloper: "Кіраўнік распрацоўкі",
+      roleMusicComposer: "Кампазітар",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -1223,7 +1491,17 @@ export const translations = {
         leastPopular: "Найменш папулярныя",
         newest: "Самыя новыя",
         oldest: "Самыя старыя"
-      }
+      },
+      openModsFolder: "Папка модаў",
+      selectedCount: "Выбрана: {{count}}",
+      clearSelection: "Зняць вылучэнне",
+      enableSelected: "Уключыць абраныя",
+      disableSelected: "Выключыць абраныя",
+      uninstallSelected: "Выдаліць абраныя",
+      confirmUninstallSelected: "Выдаліць абраныя моды ({{count}})? Гэтае дзеянне нельга адмяніць.",
+      reinstall: "Пераўсталяваць",
+      reinstalling: "Пераўстаноўка…",
+      reinstallSelected: "Пераўсталяваць абраныя"
     },
     news: {
       title: "Навіны Hytale",
@@ -1251,12 +1529,17 @@ export const translations = {
       languageLabel: "Мова інтэрфейсу",
       languageHint: "Змена мовы ўжываецца адразу.",
       enableRussianLocalization: "Уключыць расійскую лакалізацыю гульні",
+      backgroundMusicVolume: "Гучнасць фонавай музыкі",
+      backgroundMusicVolumeOff: "Выкл",
       clearCache: "Ачысціць кеш перакладаў",
       foldersTitle: "Папкі",
       openGameDir: "Папка гульні",
       openConfigDir: "Папка канфігурацыі",
       openUserDataDir: "Папка профілю",
       showVersionBranchSelector: "Паказваць выбар галіны версій",
+      colorSchemeLabel: "Афармленне",
+      colorSchemeDark: "Цёмная",
+      colorSchemeLight: "Светлая",
       sidebarPositionLabel: "Размяшчэнне бакавой панэлі",
       sidebarPositionLeft: "Злева",
       sidebarPositionTop: "Зверху",
@@ -1286,7 +1569,9 @@ export const translations = {
       modsTabDescription: "Кіраванне модамі выконваецца ў галоўным акне ў раздзеле «Моды».",
       authTabHint: "Кіраванне акаўнтамі.",
       authTabDescription: "Даданне і прывязка акаўнтаў выконваецца ў галоўным акне ў раздзеле «Профілі».",
-      advancedTabHint: "Дадатковыя дзеянні."
+      advancedTabHint: "Дадатковыя дзеянні.",
+      restartOnboarding: "Перазапусціць навучанне",
+      restartOnboardingHint: "Паказаць прывітальны экран зноў"
     },
     logs: {
       title: "Логі",
@@ -1336,7 +1621,17 @@ export const translations = {
       communitySubtitle: "Будзьце ў курсе абнаўленняў, атрымлівайце падтрымку і пастаўце зорку на GitHub.",
       joinDiscord: "Перайсці ў Discord",
       openTelegram: "Перайсці ў Telegram",
-      starOnGitHub: "Паставіць зорку на GitHub"
+      starOnGitHub: "Паставіць зорку на GitHub",
+      stepMonitoring: "Каталог сервераў",
+      monitoringTitle: "Каталог сервераў Hytale",
+      monitoringSubtitle: "Знаходзьце і падключайцеся да сервераў проста з лаўнчара.",
+      monitoringServers: "Спіс сервераў",
+      monitoringServersDesc: "Праглядайце актуальны спіс даступных сервераў з апісаннем, онлайнам і рэжымамі гульні.",
+      monitoringQuickLaunch: "Хуткі запуск",
+      monitoringQuickLaunchDesc: "Падключайцеся да любога сервера адным клікам — лаўнчар аўтаматычна запусціць гульню з патрэбнымі наладамі.",
+      monitoringAdvertise: "Рэклама сервера",
+      monitoringAdvertiseDesc: "Уладальнікі сервераў могуць размясціць свой праект у каталогу і прыцягнуць новых гульцоў.",
+      monitoringNote: "Каталог сервераў даступны на галоўнай старонцы і ў асобным раздзеле лаўнчара."
     }
   },
   es: {
@@ -1357,11 +1652,43 @@ export const translations = {
       home: "Inicio",
       mods: "Mods",
       news: "Noticias",
+      catalog: "Catálogo",
       settings: "Configuración",
-      logs: "Registros"
+      logs: "Registros",
+      about: "Acerca de"
     },
     layout: {
       subtitle: "Hytale Launcher"
+    },
+    servers: {
+      homeTitle: "¿Buscas dónde jugar?",
+      homeSubtitle: "¡Elige un servidor de la lista y lanza el juego!",
+      catalogTitle: "Catálogo de servidores",
+      catalogSubtitle: "Lista completa de servidores disponibles",
+      advertiseButton: "Anuncia tu servidor",
+      advertiseTelegram: "Telegram (gerente de publicidad)",
+      advertiseDiscord: "Discord",
+      buyAdvertising: "Comprar publicidad",
+      chooseContactMethod: "Elige una forma conveniente de contactar al gerente de publicidad",
+      launchGame: "Lanzar juego",
+      launching: "Lanzando...",
+      copyAddress: "Copiar dirección",
+      copied: "¡Copiado!",
+      copyFailed: "Error",
+      viewDetails: "Ver detalles",
+      launchError: "No se pudo lanzar el juego",
+      selectProfilesError: "Por favor, selecciona los perfiles de jugador y juego primero"
+    },
+    about: {
+      tagline: "Un launcher moderno y multiplataforma creado específicamente para Hytale. Ofrece una experiencia fluida e intuitiva para gestionar el juego, perfiles, mods y mucho más.",
+      statusActive: "Activo",
+      sectionTeam: "Equipo",
+      sectionLinks: "Enlaces",
+      roleLeadDeveloper: "Desarrollador principal",
+      roleMusicComposer: "Compositor musical",
+      platformWindows: "Windows",
+      platformMacOS: "macOS",
+      platformLinux: "Linux"
     },
     home: {
       playSubtitle: "Hytale Launcher",
@@ -1491,7 +1818,17 @@ export const translations = {
         leastPopular: "Menos populares",
         newest: "Más nuevos",
         oldest: "Más antiguos"
-      }
+      },
+      openModsFolder: "Carpeta de mods",
+      selectedCount: "Seleccionados: {{count}}",
+      clearSelection: "Quitar selección",
+      enableSelected: "Activar seleccionados",
+      disableSelected: "Desactivar seleccionados",
+      uninstallSelected: "Desinstalar seleccionados",
+      confirmUninstallSelected: "¿Desinstalar los mods seleccionados ({{count}})? Esta acción no se puede deshacer.",
+      reinstall: "Reinstalar",
+      reinstalling: "Reinstalando...",
+      reinstallSelected: "Reinstalar seleccionados"
     },
     news: {
       title: "Noticias de Hytale",
@@ -1519,12 +1856,17 @@ export const translations = {
       languageLabel: "Idioma",
       languageHint: "Los cambios de idioma se aplican al instante.",
       enableRussianLocalization: "Habilitar localización rusa del juego",
+      backgroundMusicVolume: "Volumen de música de fondo",
+      backgroundMusicVolumeOff: "Apagado",
       clearCache: "Limpiar caché de traducciones",
       foldersTitle: "Carpetas",
       openGameDir: "Carpeta del juego",
       openConfigDir: "Carpeta de configuración",
       openUserDataDir: "Carpeta de perfil",
       showVersionBranchSelector: "Mostrar selector de rama de versión",
+      colorSchemeLabel: "Apariencia",
+      colorSchemeDark: "Oscuro",
+      colorSchemeLight: "Claro",
       sidebarPositionLabel: "Posición de la barra lateral",
       sidebarPositionLeft: "Izquierda",
       sidebarPositionTop: "Arriba",
@@ -1554,7 +1896,9 @@ export const translations = {
       modsTabDescription: "Gestione los mods en la ventana principal en la sección Mods.",
       authTabHint: "Gestión de cuentas.",
       authTabDescription: "Añada y vincule cuentas en la ventana principal en la sección Perfiles.",
-      advancedTabHint: "Acciones adicionales."
+      advancedTabHint: "Acciones adicionales.",
+      restartOnboarding: "Reiniciar introducción",
+      restartOnboardingHint: "Mostrar la pantalla de bienvenida nuevamente"
     },
     logs: {
       title: "Registros",
@@ -1604,7 +1948,17 @@ export const translations = {
       communitySubtitle: "Mantente al día, obtén soporte y dale una estrella al proyecto en GitHub.",
       joinDiscord: "Unirse a Discord",
       openTelegram: "Abrir Telegram",
-      starOnGitHub: "Dar una estrella en GitHub"
+      starOnGitHub: "Dar una estrella en GitHub",
+      stepMonitoring: "Catálogo de servidores",
+      monitoringTitle: "Catálogo de servidores Hytale",
+      monitoringSubtitle: "Encuentra y conéctate a servidores directamente desde el launcher.",
+      monitoringServers: "Lista de servidores",
+      monitoringServersDesc: "Explora la lista actual de servidores disponibles con descripciones, número de jugadores y modos de juego.",
+      monitoringQuickLaunch: "Inicio rápido",
+      monitoringQuickLaunchDesc: "Conéctate a cualquier servidor con un clic: el launcher iniciará automáticamente el juego con la configuración correcta.",
+      monitoringAdvertise: "Publicidad de servidor",
+      monitoringAdvertiseDesc: "Los propietarios de servidores pueden listar su proyecto en el catálogo y atraer nuevos jugadores.",
+      monitoringNote: "El catálogo de servidores está disponible en la página principal y en una sección dedicada del launcher."
     }
   }
 };

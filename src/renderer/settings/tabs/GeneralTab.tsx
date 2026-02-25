@@ -180,6 +180,37 @@ const GeneralTab = () => {
         </div>
 
         <div className={styles.card}>
+          <p className={styles.label}>{t("settings.backgroundMusicVolume")}</p>
+          <div className={styles.memorySliderWrapper}>
+            <input
+              className={styles.range}
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={Math.round((settings.backgroundMusicVolume ?? 0.3) * 100)}
+              onChange={(e) =>
+                updateSettings({
+                  backgroundMusicVolume: Number(e.target.value) / 100
+                })
+              }
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round((settings.backgroundMusicVolume ?? 0.3) * 100)}
+              aria-valuetext={
+                settings.backgroundMusicVolume === 0
+                  ? t("settings.backgroundMusicVolumeOff")
+                  : undefined
+              }
+            />
+            <div className={styles.memoryLabels}>
+              <span>{t("settings.backgroundMusicVolumeOff")}</span>
+              <span>{Math.round((settings.backgroundMusicVolume ?? 0.3) * 100)}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.card}>
           <p className={styles.label}>{t("settings.foldersTitle")}</p>
           <div className={styles.foldersGrid}>
             <button

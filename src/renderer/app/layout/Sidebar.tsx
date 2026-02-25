@@ -1,13 +1,15 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import {
   HomeIcon,
   LogsIcon,
   ModsIcon,
   NewsIcon,
+  LayoutIcon,
   SettingsIcon,
   TelegramIcon,
-  DiscordIcon
+  DiscordIcon,
+  InfoCircleIcon
 } from "../../components/icons";
 import { useI18n } from "../../i18n";
 import { api } from "../../services/api";
@@ -34,6 +36,7 @@ type TooltipState = {
 const Sidebar = ({ position = "left" }: SidebarProps) => {
   const { t } = useI18n();
   const location = useLocation();
+  const navigate = useNavigate();
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const navRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
   const navContainerRef = useRef<HTMLElement>(null);
@@ -103,6 +106,7 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
     { to: "/", label: t("nav.home"), end: true, icon: HomeIcon },
     { to: "/mods", label: t("nav.mods"), icon: ModsIcon },
     { to: "/news", label: t("nav.news"), icon: NewsIcon },
+    { to: "/catalog", label: t("nav.catalog"), icon: LayoutIcon },
     { action: "openSettings", label: t("nav.settings"), icon: SettingsIcon },
     { to: "/logs", label: t("nav.logs"), icon: LogsIcon }
   ];
@@ -282,52 +286,74 @@ const Sidebar = ({ position = "left" }: SidebarProps) => {
         >
           {position === "top" ? (
             <>
+              <div className={styles.socialGroup}>
+                <button
+                  type="button"
+                  onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
+                  className={styles.socialButton}
+                  aria-label="Discord"
+                  title="Discord"
+                  onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <DiscordIcon className={styles.socialIcon} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => api.news.openUrl(TELEGRAM_URL)}
+                  className={styles.socialButton}
+                  aria-label="Telegram"
+                  title="Telegram"
+                  onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <TelegramIcon className={styles.socialIcon} />
+                </button>
+              </div>
               <button
                 type="button"
-                onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
-                className={styles.socialButton}
-                aria-label="Discord"
-                title="Discord"
-                onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
-                onMouseLeave={handleMouseLeave}
+                onClick={() => navigate("/about")}
+                className={styles.aboutIconButton}
+                aria-label={t("nav.about")}
+                title={t("nav.about")}
               >
-                <DiscordIcon className={styles.socialIcon} />
-              </button>
-              <button
-                type="button"
-                onClick={() => api.news.openUrl(TELEGRAM_URL)}
-                className={styles.socialButton}
-                aria-label="Telegram"
-                title="Telegram"
-                onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
-                onMouseLeave={handleMouseLeave}
-              >
-                <TelegramIcon className={styles.socialIcon} />
+                <InfoCircleIcon className={styles.aboutIcon} />
               </button>
             </>
           ) : (
             <>
+              <div className={styles.socialGroup}>
+                <button
+                  type="button"
+                  onClick={() => api.news.openUrl(TELEGRAM_URL)}
+                  className={styles.socialButton}
+                  aria-label="Telegram"
+                  title="Telegram"
+                  onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <TelegramIcon className={styles.socialIcon} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
+                  className={styles.socialButton}
+                  aria-label="Discord"
+                  title="Discord"
+                  onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <DiscordIcon className={styles.socialIcon} />
+                </button>
+              </div>
               <button
                 type="button"
-                onClick={() => api.news.openUrl(TELEGRAM_URL)}
-                className={styles.socialButton}
-                aria-label="Telegram"
-                title="Telegram"
-                onMouseEnter={(e) => handleMouseEnter({ label: "Telegram" }, e.currentTarget)}
-                onMouseLeave={handleMouseLeave}
+                onClick={() => navigate("/about")}
+                className={styles.aboutIconButton}
+                aria-label={t("nav.about")}
+                title={t("nav.about")}
               >
-                <TelegramIcon className={styles.socialIcon} />
-              </button>
-              <button
-                type="button"
-                onClick={() => api.news.openUrl(DISCORD_INVITE_URL)}
-                className={styles.socialButton}
-                aria-label="Discord"
-                title="Discord"
-                onMouseEnter={(e) => handleMouseEnter({ label: "Discord" }, e.currentTarget)}
-                onMouseLeave={handleMouseLeave}
-              >
-                <DiscordIcon className={styles.socialIcon} />
+                <InfoCircleIcon className={styles.aboutIcon} />
               </button>
             </>
           )}

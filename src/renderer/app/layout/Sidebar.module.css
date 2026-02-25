@@ -165,11 +165,6 @@
   border-radius: 18px;
 }
 
-.sidebarTop .nav {
-  flex: 2;
-  justify-content: center;
-}
-
 .navItem {
   height: 48px;
   border-radius: 14px;
@@ -275,6 +270,12 @@ button.navItemTop {
 .socialButtons {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.socialGroup {
+  display: flex;
+  gap: 8px;
 }
 
 .socialButtonsVertical {
@@ -282,14 +283,43 @@ button.navItemTop {
   margin-top: auto;
 }
 
+.socialButtonsVertical .socialGroup {
+  flex-direction: column;
+}
+
+.socialButtonsVertical .aboutIconButton {
+  margin-top: 16px;
+  margin-bottom: -14px; /* прижать к нижнему краю сайдбара */
+}
+
+.socialButtonsHorizontal .aboutIconButton {
+  margin-left: 16px;
+}
+
 .socialButtonsHorizontal {
   flex-direction: row;
 }
 
 .sidebarTop .socialButtonsHorizontal {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   justify-content: flex-end;
-  margin-right: 56px; /* 48px button + 8px gap: keep Telegram in place, Discord to its left */
+}
+
+.sidebarTop .socialButtonsHorizontal .aboutIconButton {
+  margin-right: -12px; /* прижать иконку About к правому краю сайдбара */
+}
+
+.sidebarTop .brand {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.sidebarTop .nav {
+  flex: 2 1 0;
+  min-width: 0;
+  justify-content: center;
 }
 
 .socialButton {
@@ -322,6 +352,29 @@ button.navItemTop {
 }
 
 .socialIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.aboutIconButton {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast) var(--ease-out-emphasized),
+    opacity var(--transition-fast) var(--ease-out-emphasized);
+}
+
+.aboutIconButton:hover {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+.aboutIcon {
   width: 22px;
   height: 22px;
 }

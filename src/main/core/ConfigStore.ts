@@ -13,7 +13,7 @@ import type {
   Mod,
   GameVersionBranch
 } from "../../shared/types";
-import { isThemeId } from "../../shared/theme";
+import { isThemeId, isColorScheme } from "../../shared/theme";
 
 const getDefaultJavaPath = (): string => {
   try {
@@ -50,7 +50,9 @@ const DEFAULT_SETTINGS: Settings = {
   sidebarPosition: "top",
   showLogsNav: false,
   themeId: "classic",
-  hasCompletedOnboarding: false
+  colorScheme: "dark",
+  hasCompletedOnboarding: false,
+  backgroundMusicVolume: 0.3
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -69,6 +71,16 @@ const isNullableString = (value: unknown): value is string | null =>
 const isGameVersionBranch = (value: unknown): value is GameVersionBranch =>
   value === "release" || value === "pre-release" || value === "beta" || value === "alpha";
 
+const isVolumeValue = (value: unknown): boolean => {
+  if (value === undefined) return true;
+  if (isNumber(value)) return value >= 0 && value <= 1;
+  if (typeof value === "string") {
+    const n = parseFloat(value);
+    return Number.isFinite(n) && n >= 0 && n <= 1;
+  }
+  return false;
+};
+
 const isSettings = (value: unknown): value is Settings =>
   isRecord(value) &&
   (value.installedGameVersion === undefined ||
@@ -83,7 +95,9 @@ const isSettings = (value: unknown): value is Settings =>
     value.sidebarPosition === "top") &&
   (value.showLogsNav === undefined || isBoolean(value.showLogsNav)) &&
   (value.themeId === undefined || (typeof value.themeId === "string" && value.themeId.length > 0)) &&
-  (value.hasCompletedOnboarding === undefined || isBoolean(value.hasCompletedOnboarding));
+  (value.colorScheme === undefined || isColorScheme(value.colorScheme)) &&
+  (value.hasCompletedOnboarding === undefined || isBoolean(value.hasCompletedOnboarding)) &&
+  isVolumeValue(value.backgroundMusicVolume);
 
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
@@ -122,7 +136,8 @@ const isMod = (value: unknown): value is Mod =>
   (value.author === undefined || isString(value.author)) &&
   (value.curseForgeId === undefined || isNumber(value.curseForgeId)) &&
   (value.curseForgeFileId === undefined || isNumber(value.curseForgeFileId)) &&
-  (value.missing === undefined || isBoolean(value.missing));
+  (value.missing === undefined || isBoolean(value.missing)) &&
+  (value.iconUrl === undefined || isString(value.iconUrl));
 
 const isGameProfile = (value: unknown): value is GameProfile =>
   isRecord(value) &&
@@ -171,6 +186,11 @@ export class ConfigStore {
 
     if (!("themeId" in this.settings) || !isThemeId(this.settings.themeId)) {
       (this.settings as Settings).themeId = "classic";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("colorScheme" in this.settings) || !isColorScheme(this.settings.colorScheme)) {
+      (this.settings as Settings).colorScheme = "dark";
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -380,9 +400,19 @@ export class ConfigStore {
         ? next.showLogsNav
         : fallback.showLogsNav ?? false,
       themeId: isThemeId(next.themeId) ? next.themeId : fallback.themeId ?? "classic",
+      colorScheme: isColorScheme(next.colorScheme) ? next.colorScheme : fallback.colorScheme ?? "dark",
       hasCompletedOnboarding: isBoolean(next.hasCompletedOnboarding)
         ? next.hasCompletedOnboarding
-        : fallback.hasCompletedOnboarding ?? false
+        : fallback.hasCompletedOnboarding ?? false,
+      backgroundMusicVolume: (() => {
+        const v = next.backgroundMusicVolume;
+        if (isNumber(v) && v >= 0 && v <= 1) return v;
+        if (typeof v === "string") {
+          const n = parseFloat(v);
+          if (Number.isFinite(n) && n >= 0 && n <= 1) return n;
+        }
+        return fallback.backgroundMusicVolume ?? 0.3;
+      })()
     };
   }
 
