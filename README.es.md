@@ -14,9 +14,9 @@
 ---
 
 [![Version](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
-[![Downloads](https://img.shields.io/badge/Downloads-2k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
+[![Downloads](https://img.shields.io/badge/Downloads-5k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPL-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)]()
 
 [![GitHub Releases](https://img.shields.io/badge/Descargar-GitHub%20Releases-brightgreen)](https://github.com/janekdeveloper/JanLauncher/releases)
@@ -32,6 +32,19 @@
 JanLauncher es un launcher moderno y multiplataforma diseñado específicamente para Hytale. Ofrece una experiencia fluida e intuitiva para gestionar tu juego, perfiles, mods y más, todo en un solo lugar.
 
 Ya seas un jugador casual o alguien a quien le gusta personalizar su experiencia de juego, JanLauncher facilita entrar en Hytale de forma rápida y eficiente.
+
+---
+
+## ⚠️ Aviso importante
+
+### Producto no oficial
+**JanLauncher es un launcher no oficial de código abierto para Hytale.** Este proyecto no está afiliado, respaldado, patrocinado ni aprobado por Hypixel Studios, Riot Games o cualquiera de sus afiliados.
+
+### Propiedad intelectual
+"Hytale", "Hypixel Studios" y los logotipos y recursos estrictamente relacionados son marcas comerciales o marcas registradas de Hypixel Studios Inc. Todos los derechos reservados por sus respectivos propietarios. El uso de este software está sujeto a los términos del Acuerdo de Licencia de Usuario Final de Hytale (EULA).
+
+### Archivos del juego y distribución
+JanLauncher actúa únicamente como una herramienta del lado del cliente para facilitar el proceso de descarga e inicio. No aloja, modifica ni distribuye directamente archivos originales del juego.
 
 ---
 

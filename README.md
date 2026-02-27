@@ -14,10 +14,10 @@
 ---
 
 [![Version](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
-[![Downloads](https://img.shields.io/badge/Downloads-2k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
+[![Downloads](https://img.shields.io/badge/Downloads-5k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
 <!-- [![Downloads](https://img.shields.io/github/downloads/janekdeveloper/janlauncher/total?style=for-the-badge&logo=github&label=Downloads&color=207e5c)](https://github.com/janekdeveloper/janlauncher/releases) -->
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPL-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)]()
 
 [![GitHub Releases](https://img.shields.io/badge/Download-GitHub%20Releases-brightgreen)](https://github.com/janekdeveloper/JanLauncher/releases)
@@ -33,6 +33,19 @@
 JanLauncher is a modern, cross-platform launcher designed specifically for Hytale. It provides a smooth and intuitive experience for managing your game, profiles, mods, and more—all in one place.
 
 Whether you're a casual player or someone who loves customizing their game experience, JanLauncher makes it easy to get into Hytale quickly and efficiently.
+
+---
+
+## ⚠️ Important Disclaimer
+
+### Unofficial Product
+**JanLauncher is an unofficial, open-source launcher for Hytale.** This project is not affiliated with, endorsed by, sponsored by, or approved by Hypixel Studios, Riot Games, or any of their affiliates.
+
+### Intellectual Property
+"Hytale", "Hypixel Studios", and strictly related logos and assets are trademarks or registered trademarks of Hypixel Studios Inc. All rights reserved by their respective owners. Usage of this software is subject to the terms of the Hytale End-User License Agreement (EULA).
+
+### Game Files & Distribution
+JanLauncher acts solely as a client-side tool to facilitate the downloading and launching process. It does not host, modify, or distribute original game files directly.
 
 ---
 

@@ -114,8 +114,7 @@ const GeneralTab = () => {
                           onClick={() => {
                             setLanguage(option.value as Language);
                             updateSettings({
-                              launcherLanguage: option.value,
-                              enableRussianLocalization: option.value === "ru"
+                              launcherLanguage: option.value
                             });
                             closeLanguage();
                           }}
