@@ -18,7 +18,7 @@
 }
 
 .button:not(:disabled):active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.98);
 }
 
 .primary {

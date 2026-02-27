@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import Button from "../components/common/Button";
@@ -16,16 +16,21 @@ import { useDropdown } from "../hooks/useDropdown";
 import { useI18n } from "../i18n";
 import { useHomeViewModel } from "../viewmodels/useHomeViewModel";
 import { api } from "../services/api";
-import type { AuthDomain, GameVersionBranch } from "../../shared/types";
-import type { AuthProviderInfo } from "../../main/core/auth/auth.types";
+import type { AuthDomain, GameVersionBranch, FeaturedServer } from "../../shared/types";
+import type { AuthProviderInfo, AuthProviderId } from "../../main/core/auth/auth.types";
 import { DISCORD_INVITE_URL } from "../constants/links";
+import { ServerList } from "../components/ServerList";
+import ServerModal from "../components/modals/ServerModal";
 import styles from "./HomePage.module.css";
+
+type AccountStatus = "valid" | "refreshing" | "invalid";
 
 type DockOption = {
   id: string;
   label: string;
   meta?: string;
   invalid?: boolean;
+  status?: AccountStatus;
 };
 
 type DockSelectProps = {
@@ -85,14 +90,22 @@ const DockSelect = ({
                     close();
                   }}
                 >
-                  <span className={`${styles.dropdownItemLabel} ${option.invalid ? styles.dropdownItemLabelInvalid : ""}`}>
-                    {option.label}
-                  </span>
-                  {option.meta ? (
-                    <span className={`${styles.dropdownItemMeta} ${option.invalid ? styles.dropdownItemMetaInvalid : ""}`}>
-                      {option.meta}
-                    </span>
+                  {option.status ? (
+                    <span
+                      className={`${styles.accountStatusIndicator} ${styles[`accountStatus${option.status.charAt(0).toUpperCase() + option.status.slice(1)}`]}`}
+                      aria-hidden
+                    />
                   ) : null}
+                  <span className={styles.dropdownItemText}>
+                    <span className={`${styles.dropdownItemLabel} ${option.invalid ? styles.dropdownItemLabelInvalid : ""}`}>
+                      {option.label}
+                    </span>
+                    {option.meta ? (
+                      <span className={`${styles.dropdownItemMeta} ${option.invalid ? styles.dropdownItemMetaInvalid : ""}`}>
+                        {option.meta}
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
                 {renderActions ? (
                   <div className={styles.dropdownItemActions}>
@@ -167,6 +180,11 @@ const HomePage = () => {
     isGameNotInstalled,
     isAccountValid,
     isValidatingAccount,
+    loginModalState,
+    loginError,
+    startLogin,
+    closeLoginModal,
+    getDefaultAuthDomain,
     refreshPlayerProfiles,
     authProviders,
     versionBranch,
@@ -185,9 +203,37 @@ const HomePage = () => {
     removeVersion
   } = useHomeViewModel();
 
+  // Server catalog state
+  const [servers, setServers] = useState<FeaturedServer[]>([]);
+  const [serversLoading, setServersLoading] = useState(true);
+  const [serversError, setServersError] = useState<string | null>(null);
+  const [selectedServer, setSelectedServer] = useState<FeaturedServer | null>(null);
+  const location = useLocation();
+
   useEffect(() => {
     refreshPlayerProfiles();
   }, [location.pathname, location.hash, refreshPlayerProfiles]);
+
+  // Fetch servers on component mount
+  useEffect(() => {
+    const loadServers = async () => {
+      try {
+        setServersLoading(true);
+        setServersError(null);
+        const response = await window.api?.servers.getFeatured();
+        if (response) {
+          const mainServers = response.servers.filter(s => s.type === "main");
+          setServers(mainServers);
+        }
+      } catch (err) {
+        setServersError("Failed to load servers");
+      } finally {
+        setServersLoading(false);
+      }
+    };
+
+    loadServers();
+  }, []);
 
   const getProviderLabel = (provider?: AuthProviderInfo | null): string => {
     if (!provider) return "";
@@ -201,6 +247,12 @@ const HomePage = () => {
     const isSelected = profile.id === selectedPlayerId;
     const isValidating = isSelected ? isValidatingAccount : false;
     const isInvalid = isSelected ? isAccountValid === false : false;
+    const status: AccountStatus =
+      isSelected && isValidating
+        ? "refreshing"
+        : isSelected && isInvalid
+          ? "invalid"
+          : "valid";
 
     let meta = "";
     const provider = authProviders.find((p) => p.id === profile.authDomain);
@@ -227,7 +279,8 @@ const HomePage = () => {
       id: profile.id,
       label: profile.nickname,
       meta,
-      invalid: isInvalid
+      invalid: isInvalid,
+      status
     };
   });
 
@@ -276,130 +329,382 @@ const HomePage = () => {
 
   return (
     <section className={styles.page}>
-      <div className={styles.center}>
-        <div className={styles.playCard}>
-          <p className={styles.playSubtitle}>{t("home.playSubtitle")}</p>
-          <h2 className={styles.playTitle}>{t("home.playTitle")}</h2>
-          <p className={styles.playHint}>
-            {t("home.playHint")}
-          </p>
+      {/* Server Catalog Section - At Top */}
+      <div className={styles.serverSection}>
+        <div className={styles.serverSectionHeader}>
+          <h2 className={styles.serverSectionTitle}>{t("servers.homeTitle")}</h2>
+          <p className={styles.serverSectionSubtitle}>{t("servers.homeSubtitle")}</p>
+        </div>
+        {serversLoading ? (
+          <div className={styles.serverLoading}>Loading servers...</div>
+        ) : serversError ? (
+          <div className={styles.serverError}>{serversError}</div>
+        ) : (
+          <ServerList servers={servers} onServerClick={setSelectedServer} />
+        )}
+      </div>
+
+      {/* Control Panel - Fixed at Bottom */}
+      <div className={styles.controlPanelFixed}>
+        {showVersionBranchSelector ? (
+        <>
+          <div className={styles.playButtonCenter}>
+            {selectedPlayerId && isAccountValid === false && (
+              <div className={styles.invalidAccountBlock}>
+                <p className={styles.invalidAccountWarning}>
+                  {t("home.invalidAccountWarning")}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const profile = selectedPlayer;
+                    if (profile) {
+                      startLogin(
+                        profile.id,
+                        (profile.authDomain ?? getDefaultAuthDomain()) as AuthProviderId,
+                        { uuid: profile.id, username: profile.nickname }
+                      );
+                    }
+                  }}
+                  className={styles.reloginButton}
+                >
+                  {t("home.relogin")}
+                </Button>
+              </div>
+            )}
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={launch}
+              disabled={!canLaunch || isLaunching}
+              className={styles.playButton}
+            >
+              {isLaunching ? (
+                t("home.launching")
+              ) : (
+                <span
+                  className={styles.playIconOnly}
+                  aria-label={t("home.playButton")}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <polygon points="8,5 19,12 8,19" />
+                  </svg>
+                </span>
+              )}
+            </Button>
+          </div>
+          <div className={styles.dockFullWidth}>
+            <DockSelect
+              label={t("home.accountLabel")}
+              value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
+              icon={<UserIcon className={styles.iconSvg} />}
+              options={playerOptions}
+              onSelect={setSelectedPlayerId}
+              renderActions={(id) => (
+                <>
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openEditPlayerModal(id);
+                    }}
+                    aria-label={t("home.editAccount")}
+                  >
+                    <EditIcon className={styles.actionIcon} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.actionDanger}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDeleteConfirm(id);
+                    }}
+                    aria-label={t("home.deleteAccount")}
+                  >
+                    <TrashIcon className={styles.actionIcon} />
+                  </button>
+                </>
+              )}
+              onCreate={openPlayerModal}
+              createLabel={t("home.createAccount")}
+              emptyLabel={t("home.emptyAccounts")}
+            />
+            <DockSelect
+              label={t("home.gameProfileLabel")}
+              value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={gameOptions}
+              onSelect={setSelectedGameId}
+              onCreate={openGameModal}
+              createLabel={t("home.createGameProfile")}
+              emptyLabel={t("home.emptyGameProfiles")}
+            />
+            <DockSelect
+              label={t("home.branchLabel")}
+              value={branchValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={branchOptions}
+              onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
+              emptyLabel={t("home.branchEmpty")}
+            />
+            <DockSelect
+              label={t("home.versionLabel")}
+              value={versionValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={versionOptions}
+              onSelect={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                setActiveVersion(versionId);
+              }}
+              renderActions={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                const version = availableVersions.find((item) => item.id === versionId);
+                if (!version) return null;
+                if (version.installed) {
+                  const isActive = version.id === activeVersionId;
+                  return (
+                    <button
+                      type="button"
+                      className={styles.versionActionButton}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeVersion(versionId);
+                      }}
+                      disabled={isActive}
+                      aria-label={t("home.versionRemove")}
+                    >
+                      {t("home.versionRemove")}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    type="button"
+                    className={styles.versionActionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      installVersion(versionId);
+                    }}
+                    disabled={isVersionInstalling}
+                    aria-label={t("home.versionInstall")}
+                  >
+                    {t("home.versionInstall")}
+                  </button>
+                );
+              }}
+              emptyLabel={
+                versionsLoadingAvailable
+                  ? t("home.versionLoading")
+                  : t("home.versionEmpty")
+              }
+            />
+          </div>
+        </>
+      ) : (
+        <div className={styles.dockRow}>
+          <div className={styles.dock}>
+            <DockSelect
+              label={t("home.accountLabel")}
+              value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
+              icon={<UserIcon className={styles.iconSvg} />}
+              options={playerOptions}
+              onSelect={setSelectedPlayerId}
+              renderActions={(id) => (
+                <>
+                  <button
+                    type="button"
+                    className={styles.actionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openEditPlayerModal(id);
+                    }}
+                    aria-label={t("home.editAccount")}
+                  >
+                    <EditIcon className={styles.actionIcon} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.actionButton} ${styles.actionDanger}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDeleteConfirm(id);
+                    }}
+                    aria-label={t("home.deleteAccount")}
+                  >
+                    <TrashIcon className={styles.actionIcon} />
+                  </button>
+                </>
+              )}
+              onCreate={openPlayerModal}
+              createLabel={t("home.createAccount")}
+              emptyLabel={t("home.emptyAccounts")}
+            />
+            <DockSelect
+              label={t("home.gameProfileLabel")}
+              value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={gameOptions}
+              onSelect={setSelectedGameId}
+              onCreate={openGameModal}
+              createLabel={t("home.createGameProfile")}
+              emptyLabel={t("home.emptyGameProfiles")}
+            />
+            <DockSelect
+              label={t("home.versionLabel")}
+              value={versionValue}
+              icon={<GameProfileIcon className={styles.iconSvg} />}
+              options={versionOptions}
+              onSelect={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                setActiveVersion(versionId);
+              }}
+              renderActions={(compositeId) => {
+                const [, versionId] = compositeId.split(":", 2);
+                const version = availableVersions.find((item) => item.id === versionId);
+                if (!version) return null;
+                if (version.installed) {
+                  const isActive = version.id === activeVersionId;
+                  return (
+                    <button
+                      type="button"
+                      className={styles.versionActionButton}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeVersion(versionId);
+                      }}
+                      disabled={isActive}
+                      aria-label={t("home.versionRemove")}
+                    >
+                      {t("home.versionRemove")}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    type="button"
+                    className={styles.versionActionButton}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      installVersion(versionId);
+                    }}
+                    disabled={isVersionInstalling}
+                    aria-label={t("home.versionInstall")}
+                  >
+                    {t("home.versionInstall")}
+                  </button>
+                );
+              }}
+              emptyLabel={
+                versionsLoadingAvailable
+                  ? t("home.versionLoading")
+                  : t("home.versionEmpty")
+              }
+            />
+          </div>
+
+          {selectedPlayerId && isAccountValid === false && (
+            <div className={styles.invalidAccountBlock}>
+              <p className={styles.invalidAccountWarning}>
+                {t("home.invalidAccountWarning")}
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const profile = selectedPlayer;
+                  if (profile) {
+                    startLogin(
+                      profile.id,
+                      (profile.authDomain ?? getDefaultAuthDomain()) as AuthProviderId,
+                      { uuid: profile.id, username: profile.nickname }
+                    );
+                  }
+                }}
+                className={styles.reloginButton}
+              >
+                {t("home.relogin")}
+              </Button>
+            </div>
+          )}
+
           <Button
             variant="primary"
             size="lg"
             onClick={launch}
             disabled={!canLaunch || isLaunching}
-            className={styles.playButton}
+            className={`${styles.playButton} ${styles.playButtonDock}`}
           >
-            {isLaunching ? t("home.launching") : t("home.playButton")}
+            {isLaunching ? (
+              t("home.launching")
+            ) : (
+              <span
+                className={styles.playIconOnly}
+                aria-label={t("home.playButton")}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <polygon points="8,5 19,12 8,19" />
+                </svg>
+              </span>
+            )}
           </Button>
         </div>
+      )}
       </div>
 
-      <div className={styles.dock}>
-        <DockSelect
-          label={t("home.accountLabel")}
-          value={selectedPlayer?.nickname ?? t("home.accountPlaceholder")}
-          icon={<UserIcon className={styles.iconSvg} />}
-          options={playerOptions}
-          onSelect={setSelectedPlayerId}
-          renderActions={(id) => (
-            <>
-              <button
-                type="button"
-                className={styles.actionButton}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openEditPlayerModal(id);
-                }}
-                aria-label={t("home.editAccount")}
-              >
-                <EditIcon className={styles.actionIcon} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.actionButton} ${styles.actionDanger}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openDeleteConfirm(id);
-                }}
-                aria-label={t("home.deleteAccount")}
-              >
-                <TrashIcon className={styles.actionIcon} />
-              </button>
-            </>
-          )}
-          onCreate={openPlayerModal}
-          createLabel={t("home.createAccount")}
-          emptyLabel={t("home.emptyAccounts")}
-        />
-        <DockSelect
-          label={t("home.gameProfileLabel")}
-          value={selectedGame?.name ?? t("home.gameProfilePlaceholder")}
-          icon={<GameProfileIcon className={styles.iconSvg} />}
-          options={gameOptions}
-          onSelect={setSelectedGameId}
-          onCreate={openGameModal}
-          createLabel={t("home.createGameProfile")}
-          emptyLabel={t("home.emptyGameProfiles")}
-        />
-        {showVersionBranchSelector && (
-          <DockSelect
-            label={t("home.branchLabel")}
-            value={branchValue}
-            icon={<GameProfileIcon className={styles.iconSvg} />}
-            options={branchOptions}
-            onSelect={(id) => setActiveBranch(id as GameVersionBranch)}
-            emptyLabel={t("home.branchEmpty")}
-          />
+      <Modal
+        isOpen={loginModalState !== "idle"}
+        title={
+          loginModalState === "waiting"
+            ? t("home.loginOpeningBrowser")
+            : loginModalState === "success"
+              ? t("home.loginSuccess")
+              : loginModalState === "error"
+                ? t("home.loginError")
+                : ""
+        }
+        onClose={
+          loginModalState === "waiting" || loginModalState === "error"
+            ? closeLoginModal
+            : undefined
+        }
+        footer={
+          loginModalState === "waiting" ? (
+            <div className={styles.modalFooter}>
+              <Button variant="ghost" onClick={closeLoginModal}>
+                {t("home.loginCancel")}
+              </Button>
+            </div>
+          ) : loginModalState === "error" ? (
+            <div className={styles.modalFooter}>
+              <Button variant="primary" onClick={closeLoginModal}>
+                {t("common.close")}
+              </Button>
+            </div>
+          ) : undefined
+        }
+      >
+        {loginModalState === "waiting" && (
+          <p className={styles.loginModalMessage}>
+            {t("home.loginOpeningBrowser")}
+          </p>
         )}
-        <DockSelect
-          label={t("home.versionLabel")}
-          value={versionValue}
-          icon={<GameProfileIcon className={styles.iconSvg} />}
-          options={versionOptions}
-          onSelect={(compositeId) => {
-            const [, versionId] = compositeId.split(":", 2);
-            setActiveVersion(versionId);
-          }}
-          renderActions={(compositeId) => {
-            const [, versionId] = compositeId.split(":", 2);
-            const version = availableVersions.find((item) => item.id === versionId);
-            if (!version) return null;
-            if (version.installed) {
-              const isActive = version.id === activeVersionId;
-              return (
-                <button
-                  type="button"
-                  className={styles.versionActionButton}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeVersion(versionId);
-                  }}
-                  disabled={isActive}
-                  aria-label={t("home.versionRemove")}
-                >
-                  {t("home.versionRemove")}
-                </button>
-              );
-            }
-            return (
-              <button
-                type="button"
-                className={styles.versionActionButton}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  installVersion(versionId);
-                }}
-                disabled={isVersionInstalling}
-                aria-label={t("home.versionInstall")}
-              >
-                {t("home.versionInstall")}
-              </button>
-            );
-          }}
-          emptyLabel={versionsLoadingAvailable ? t("home.versionLoading") : t("home.versionEmpty")}
-        />
-      </div>
+        {loginModalState === "success" && (
+          <p className={styles.loginModalMessage}>{t("home.loginSuccess")}</p>
+        )}
+        {loginModalState === "error" && loginError && (
+          <p className={styles.errorMessage}>{loginError}</p>
+        )}
+      </Modal>
 
       <Modal
         isOpen={isVersionInstalling}
@@ -460,67 +765,84 @@ const HomePage = () => {
                 const isSelected = authDomainDraft === provider.id;
                 const isDisabled = !provider.isAvailable;
                 
+                const isHytale = provider.id === "hytale.com";
                 const isOfficialProvider = provider.kind === "official";
-                
+
                 return (
-            <button
+                  <button
                     key={provider.id}
-              type="button"
-              className={`${styles.authSystemOption} ${
+                    type="button"
+                    className={`${styles.authSystemOption} ${
                       isSelected ? styles.authSystemOptionActive : ""
                     } ${isDisabled ? styles.authSystemOptionDisabled : ""}`}
                     onClick={() => setAuthDomainDraft(provider.id as AuthDomain)}
                     disabled={isDisabled}
-            >
-              <div className={styles.authSystemOptionContent}>
-                <div className={styles.authSystemOptionIcon}>
-                        {isOfficialProvider ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
                   >
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
+                    <div className={styles.authSystemOptionContent}>
+                      <div className={styles.authSystemOptionIcon}>
+                        {isHytale ? (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          </svg>
+                        ) : isOfficialProvider ? (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                          </svg>
                         ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                    <line x1="7" y1="8" x2="17" y2="8" />
-                    <line x1="7" y1="12" x2="17" y2="12" />
-                  </svg>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                            <line x1="7" y1="8" x2="17" y2="8" />
+                            <line x1="7" y1="12" x2="17" y2="12" />
+                          </svg>
                         )}
-                </div>
-                <div className={styles.authSystemOptionText}>
-                  <span className={styles.authSystemOptionName}>
-                    {getProviderLabel(provider)}
-                  </span>
-                  <span className={styles.authSystemOptionDomain}>{provider.authDomain}</span>
-                  {provider.hintKey && !isDisabled && (
-                    <span className={styles.authSystemOptionHint}>
-                      {t(provider.hintKey)}
-                    </span>
-                  )}
-                  {isDisabled && (
-                    <span className={styles.authSystemOptionHint}>
-                      {t("home.authSystemUnavailable")}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </button>
+                      </div>
+                      <div className={styles.authSystemOptionText}>
+                        <span className={styles.authSystemOptionName}>
+                          {getProviderLabel(provider)}
+                        </span>
+                        <span className={styles.authSystemOptionDomain}>{provider.authDomain}</span>
+                        {provider.descriptionKey && (
+                          <span className={styles.authSystemOptionDescription}>
+                            {t(provider.descriptionKey)}
+                          </span>
+                        )}
+                        {provider.hintKey && !isDisabled && (
+                          <span className={styles.authSystemOptionHint}>
+                            {t(provider.hintKey)}
+                          </span>
+                        )}
+                        {isDisabled && (
+                          <span className={styles.authSystemOptionHint}>
+                            {t("home.authSystemUnavailable")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
                 );
               })
             ) : (
@@ -678,6 +1000,14 @@ const HomePage = () => {
           })}
         </p>
       </Modal>
+
+      {selectedServer && (
+        <ServerModal
+          server={selectedServer}
+          isOpen={selectedServer !== null}
+          onClose={() => setSelectedServer(null)}
+        />
+      )}
     </section>
   );
 };

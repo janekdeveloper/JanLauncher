@@ -9,8 +9,23 @@ import type {
   AuthProviderInfo,
   AuthProviderId,
   LoginParams,
-  AccountValidationResult
+  AccountValidationResult,
+  AuthSession
 } from "../core/auth/auth.types";
+
+/** Strip sensitive fields before sending session to renderer. */
+function sanitizeSessionForRenderer(session: AuthSession | null): AuthSession | null {
+  if (!session) return null;
+  const { refreshToken: _r, ...rest } = session;
+  return rest as AuthSession;
+}
+
+function sanitizeValidationResult(result: AccountValidationResult): AccountValidationResult {
+  if (result.session) {
+    return { ...result, session: sanitizeSessionForRenderer(result.session) ?? undefined };
+  }
+  return result;
+}
 
 export const registerAuthHandlers = (): void => {
   ipcMain.handle("auth:getProviders", async (): Promise<AuthProviderInfo[]> => {
@@ -72,7 +87,8 @@ export const registerAuthHandlers = (): void => {
 
     Logger.debug("IPC", `auth:getSession ${profileId}`);
     try {
-      return await AuthManager.getSession(profileId);
+      const session = await AuthManager.getSession(profileId);
+      return sanitizeSessionForRenderer(session);
     } catch (error) {
       Logger.error("IPC", "auth:getSession failed", error);
       throw error;
@@ -86,7 +102,8 @@ export const registerAuthHandlers = (): void => {
 
     Logger.debug("IPC", `auth:refreshSession ${profileId}`);
     try {
-      return await AuthManager.refreshSession(profileId);
+      const session = await AuthManager.refreshSession(profileId);
+      return sanitizeSessionForRenderer(session);
     } catch (error) {
       Logger.error("IPC", "auth:refreshSession failed", error);
       throw error;
@@ -102,7 +119,8 @@ export const registerAuthHandlers = (): void => {
 
       Logger.debug("IPC", `auth:validateAccount ${profileId}`);
       try {
-        return await AccountValidator.validateAccount(profileId);
+        const result = await AccountValidator.validateAccount(profileId);
+        return sanitizeValidationResult(result);
       } catch (error) {
         Logger.error("IPC", "auth:validateAccount failed", error);
         throw error;
@@ -119,7 +137,8 @@ export const registerAuthHandlers = (): void => {
 
       Logger.debug("IPC", `auth:getAccountState ${profileId}`);
       try {
-        return await AccountValidator.getAccountState(profileId);
+        const result = await AccountValidator.getAccountState(profileId);
+        return sanitizeValidationResult(result);
       } catch (error) {
         Logger.error("IPC", "auth:getAccountState failed", error);
         throw error;
@@ -136,7 +155,8 @@ export const registerAuthHandlers = (): void => {
 
       Logger.debug("IPC", `auth:handleAuthError ${profileId}`);
       try {
-        return await AccountValidator.handleAuthError(profileId, error);
+        const result = await AccountValidator.handleAuthError(profileId, error);
+        return sanitizeValidationResult(result);
       } catch (err) {
         Logger.error("IPC", "auth:handleAuthError failed", err);
         throw err;

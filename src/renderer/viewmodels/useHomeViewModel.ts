@@ -10,10 +10,14 @@ import type {
 } from "../../shared/types";
 import type {
   AuthProviderInfo,
+  AuthProviderId,
   AuthSession,
-  AccountValidationResult
+  AccountValidationResult,
+  LoginParams
 } from "../../main/core/auth/auth.types";
 import { AccountState } from "../../main/core/auth/auth.types";
+
+export type LoginModalState = "idle" | "waiting" | "success" | "error";
 
 export const useHomeViewModel = () => {
   const {
@@ -64,8 +68,15 @@ export const useHomeViewModel = () => {
   } | null>(null);
   const [isVersionInstalling, setIsVersionInstalling] = useState(false);
   const [showVersionBranchSelector, setShowVersionBranchSelector] = useState(false);
+  const [loginModalState, setLoginModalState] = useState<LoginModalState>("idle");
+  const [loginError, setLoginError] = useState<string | null>(null);
   const isValidatingRef = useRef(false);
+  const selectedPlayerIdRef = useRef<string | null>(null);
+  const playerProfilesRef = useRef<PlayerProfile[]>([]);
   const isEditingPlayer = Boolean(editingPlayerId);
+
+  selectedPlayerIdRef.current = selectedPlayerId;
+  playerProfilesRef.current = playerProfiles;
 
   const canLaunch = Boolean(
     selectedPlayerId &&
@@ -134,6 +145,54 @@ export const useHomeViewModel = () => {
       setErrorMessage(message);
       setErrorModalOpen(true);
       setIsLaunching(false);
+      const profileId = selectedPlayerIdRef.current;
+      if (profileId) {
+        const profiles = playerProfilesRef.current;
+        api.auth.handleAuthError(profileId, new Error(message)).then((result) => {
+          const profile = profiles.find((p) => p.id === profileId);
+          if (profile && result.session) {
+            syncPlayerProfile({
+              ...profile,
+              authDomain: result.session.providerId as AuthDomain,
+              authTokens: {
+                identityToken: result.session.identityToken,
+                sessionToken: result.session.sessionToken,
+                ...(result.session.expiresAt != null && { expiresAt: result.session.expiresAt }),
+                ...(result.session.uuid && { authUuid: result.session.uuid }),
+                ...(result.session.username && { authUsername: result.session.username })
+              },
+              authInvalid: !result.canLaunch
+            });
+          }
+          return api.auth.validateAccount(profileId);
+        }).then((validation) => {
+          const profile = playerProfilesRef.current.find((p) => p.id === profileId);
+          if (!profile) return;
+          const isValid = validation.state === AccountState.VALID && validation.canLaunch;
+          setIsAccountValid(isValid);
+          if (validation.session) {
+            const s = validation.session;
+            syncPlayerProfile({
+              ...profile,
+              authDomain: s.providerId as AuthDomain,
+              authTokens: {
+                identityToken: s.identityToken,
+                sessionToken: s.sessionToken,
+                ...(s.expiresAt != null && { expiresAt: s.expiresAt }),
+                ...(s.uuid && { authUuid: s.uuid }),
+                ...(s.username && { authUsername: s.username })
+              },
+              authInvalid: !isValid
+            });
+          } else {
+            syncPlayerProfile({ ...profile, authInvalid: true });
+          }
+        }).catch(() => {
+          setIsAccountValid(false);
+          const profile = playerProfilesRef.current.find((p) => p.id === profileId);
+          if (profile) syncPlayerProfile({ ...profile, authInvalid: true });
+        });
+      }
     });
 
     return () => {
@@ -141,7 +200,7 @@ export const useHomeViewModel = () => {
       cleanupStderr();
       cleanupError();
     };
-  }, []);
+  }, [syncPlayerProfile]);
 
   useEffect(() => {
     const cleanupProgress = api.gameInstaller.onProgress((progress) => {
@@ -354,12 +413,16 @@ export const useHomeViewModel = () => {
         if (!currentPlayer) return;
 
         if (result.session) {
+          const s = result.session;
           syncPlayerProfile({
             ...currentPlayer,
-            authDomain: result.session.providerId as AuthDomain,
+            authDomain: s.providerId as AuthDomain,
             authTokens: {
-              identityToken: result.session.identityToken,
-              sessionToken: result.session.sessionToken
+              identityToken: s.identityToken,
+              sessionToken: s.sessionToken,
+              ...(s.expiresAt != null && { expiresAt: s.expiresAt }),
+              ...(s.uuid && { authUuid: s.uuid }),
+              ...(s.username && { authUsername: s.username })
             },
             authInvalid: !isValid
           });
@@ -461,6 +524,51 @@ export const useHomeViewModel = () => {
     if (deletingPlayerId) {
       deletePlayerProfile(deletingPlayerId);
       closeDeleteConfirm();
+    }
+  };
+
+  const closeLoginModal = () => {
+    setLoginModalState("idle");
+    setLoginError(null);
+  };
+
+  const startLogin = async (
+    profileId: string,
+    providerId: AuthProviderId,
+    params: LoginParams
+  ) => {
+    setLoginError(null);
+    setLoginModalState("waiting");
+    try {
+      await api.auth.login(profileId, providerId, params);
+      setLoginModalState("success");
+      const result = await api.auth.validateAccount(profileId);
+      const profile = playerProfilesRef.current.find((p) => p.id === profileId);
+      if (profile) {
+        const isValid = result.state === AccountState.VALID && result.canLaunch;
+        if (result.session) {
+          const s = result.session;
+          syncPlayerProfile({
+            ...profile,
+            authDomain: s.providerId as AuthDomain,
+            authTokens: {
+              identityToken: s.identityToken,
+              sessionToken: s.sessionToken,
+              ...(s.expiresAt != null && { expiresAt: s.expiresAt }),
+              ...(s.uuid && { authUuid: s.uuid }),
+              ...(s.username && { authUsername: s.username })
+            },
+            authInvalid: !isValid
+          });
+        }
+        if (profileId === selectedPlayerIdRef.current) {
+          setIsAccountValid(isValid);
+        }
+      }
+      setLoginModalState("idle");
+    } catch (err) {
+      setLoginError(err instanceof Error ? err.message : String(err));
+      setLoginModalState("error");
     }
   };
 
@@ -652,6 +760,11 @@ export const useHomeViewModel = () => {
     isGameNotInstalled,
     isAccountValid,
     isValidatingAccount,
+    loginModalState,
+    loginError,
+    startLogin,
+    closeLoginModal,
+    getDefaultAuthDomain,
     refreshPlayerProfiles,
     authProviders,
     versionBranch,

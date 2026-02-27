@@ -89,7 +89,6 @@ export class DualAuthAgentManager {
           fs.unlinkSync(tmpPath);
         }
       } catch {
-        // ignore cleanup failures
       }
       const message = error instanceof Error ? error.message : String(error);
       Logger.error("DualAuthAgent", `Failed to download agent: ${message}`);

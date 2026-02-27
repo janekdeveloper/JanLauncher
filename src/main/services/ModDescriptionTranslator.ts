@@ -5,6 +5,7 @@ import { Paths } from "../core/Paths";
 import { translationService, type Language } from "../core/translation";
 import { backgroundTranslationQueue } from "../core/translation/BackgroundTranslationQueue";
 import type { Mod, CurseForgeMod } from "../../shared/types";
+import type { CurseForgeCategory } from "./ModManager";
 
 interface ModTranslationCacheEntry {
   originalText: string;
@@ -370,6 +371,153 @@ export class ModDescriptionTranslator {
     return mods.map((mod) => {
       return this.requestBackgroundTranslation(mod, language) as T;
     });
+  }
+
+  private static getCategoryCacheKey(categoryId: number, language: Language): string {
+    return `category-${categoryId}-${language}`;
+  }
+
+  private static getCachedCategoryTranslation(
+    categoryId: number,
+    language: Language,
+    originalName: string
+  ): string | null {
+    this.ensureCache();
+    if (this.cache === null) return null;
+
+    const key = this.getCategoryCacheKey(categoryId, language);
+    const entry = this.cache.translations[key];
+
+    if (entry && entry.originalText === originalName) {
+      Logger.debug(
+        "ModDescriptionTranslator",
+        `Cache hit for category ${categoryId} (${language})`
+      );
+      return entry.translatedText;
+    }
+
+    return null;
+  }
+
+  private static setCachedCategoryTranslation(
+    categoryId: number,
+    language: Language,
+    originalName: string,
+    translatedName: string
+  ): void {
+    this.ensureCache();
+    if (this.cache === null) return;
+
+    const key = this.getCategoryCacheKey(categoryId, language);
+    this.cache.translations[key] = {
+      originalText: originalName,
+      translatedText: translatedName,
+      language,
+      translatedAt: new Date().toISOString()
+    };
+
+    this.saveCache();
+  }
+
+  /**
+   * Translates a single category name.
+   * 
+   * @param category - Category to translate
+   * @param language - Target language
+   * @returns Category with translated name or original if translation not needed/failed
+   */
+  static async translateCategory(
+    category: CurseForgeCategory,
+    language: Language
+  ): Promise<CurseForgeCategory> {
+    if (language === "en") {
+      return category;
+    }
+
+    if (!category.name || category.name.trim().length === 0) {
+      return category;
+    }
+
+    const cached = this.getCachedCategoryTranslation(category.id, language, category.name);
+    if (cached !== null) {
+      return { ...category, name: cached };
+    }
+
+    Logger.debug(
+      "ModDescriptionTranslator",
+      `Translating category ${category.id} "${category.name}" to ${language}`
+    );
+    const translated = await translationService.translateText(category.name, language);
+
+    if (translated && translated !== category.name) {
+      this.setCachedCategoryTranslation(category.id, language, category.name, translated);
+    }
+
+    return { ...category, name: translated || category.name };
+  }
+
+  /**
+   * Translates names for a list of categories.
+   * 
+   * Only translates categories that are not in cache.
+   * 
+   * @param categories - List of categories
+   * @param language - Target language
+   * @returns List of categories with translated names
+   */
+  static async translateCategories(
+    categories: CurseForgeCategory[],
+    language: Language
+  ): Promise<CurseForgeCategory[]> {
+    if (language === "en") {
+      return categories;
+    }
+
+    this.ensureCache();
+
+    const categoriesToTranslate: Array<{ category: CurseForgeCategory; index: number }> = [];
+    const translatedCategories: CurseForgeCategory[] = [];
+
+    for (let i = 0; i < categories.length; i++) {
+      const category = categories[i];
+      
+      if (!category.name || category.name.trim().length === 0) {
+        translatedCategories[i] = category;
+        continue;
+      }
+
+      const cached = this.getCachedCategoryTranslation(category.id, language, category.name);
+      if (cached !== null) {
+        translatedCategories[i] = { ...category, name: cached };
+      } else {
+        categoriesToTranslate.push({ category, index: i });
+      }
+    }
+
+    if (categoriesToTranslate.length > 0) {
+      Logger.info(
+        "ModDescriptionTranslator",
+        `Translating ${categoriesToTranslate.length} category names to ${language}`
+      );
+
+      const translationPromises = categoriesToTranslate.map(async ({ category, index }) => {
+        const translated = await this.translateCategory(category, language);
+        return { category: translated, index };
+      });
+
+      const results = await Promise.all(translationPromises);
+      for (const { category, index } of results) {
+        translatedCategories[index] = category;
+      }
+    }
+
+    for (let i = 0; i < categories.length; i++) {
+      if (!translatedCategories[i]) {
+        translatedCategories[i] = categories[i];
+      }
+    }
+
+    return translatedCategories;
   }
 
   /**

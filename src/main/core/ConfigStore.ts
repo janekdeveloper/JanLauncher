@@ -13,6 +13,7 @@ import type {
   Mod,
   GameVersionBranch
 } from "../../shared/types";
+import { isThemeId, isColorScheme } from "../../shared/theme";
 
 const getDefaultJavaPath = (): string => {
   try {
@@ -42,12 +43,16 @@ const getDefaultJavaPath = (): string => {
 };
 
 const DEFAULT_SETTINGS: Settings = {
-  javaPath: getDefaultJavaPath(),
-  jvmArgs: [],
   installedGameVersion: null,
   launcherLanguage: undefined,
   enableRussianLocalization: false,
-  showVersionBranchSelector: false
+  showVersionBranchSelector: false,
+  sidebarPosition: "top",
+  showLogsNav: false,
+  themeId: "classic",
+  colorScheme: "dark",
+  hasCompletedOnboarding: false,
+  backgroundMusicVolume: 0.3
 };
 
 const DEFAULT_PLAYER_PROFILES: PlayerProfile[] = [];
@@ -66,20 +71,43 @@ const isNullableString = (value: unknown): value is string | null =>
 const isGameVersionBranch = (value: unknown): value is GameVersionBranch =>
   value === "release" || value === "pre-release" || value === "beta" || value === "alpha";
 
+const isVolumeValue = (value: unknown): boolean => {
+  if (value === undefined) return true;
+  if (isNumber(value)) return value >= 0 && value <= 1;
+  if (typeof value === "string") {
+    const n = parseFloat(value);
+    return Number.isFinite(n) && n >= 0 && n <= 1;
+  }
+  return false;
+};
+
 const isSettings = (value: unknown): value is Settings =>
   isRecord(value) &&
-  isNullableString(value.javaPath) &&
-  isStringArray(value.jvmArgs) &&
-  (value.installedGameVersion === undefined || isNullableString(value.installedGameVersion)) &&
+  (value.installedGameVersion === undefined ||
+    isNullableString(value.installedGameVersion)) &&
   (value.launcherLanguage === undefined || isString(value.launcherLanguage)) &&
-  (value.enableRussianLocalization === undefined || isBoolean(value.enableRussianLocalization)) &&
-  (value.showVersionBranchSelector === undefined || isBoolean(value.showVersionBranchSelector));
+  (value.enableRussianLocalization === undefined ||
+    isBoolean(value.enableRussianLocalization)) &&
+  (value.showVersionBranchSelector === undefined ||
+    isBoolean(value.showVersionBranchSelector)) &&
+  (value.sidebarPosition === undefined ||
+    value.sidebarPosition === "left" ||
+    value.sidebarPosition === "top") &&
+  (value.showLogsNav === undefined || isBoolean(value.showLogsNav)) &&
+  (value.themeId === undefined || (typeof value.themeId === "string" && value.themeId.length > 0)) &&
+  (value.colorScheme === undefined || isColorScheme(value.colorScheme)) &&
+  (value.hasCompletedOnboarding === undefined || isBoolean(value.hasCompletedOnboarding)) &&
+  isVolumeValue(value.backgroundMusicVolume);
 
 
 const isAuthTokens = (value: unknown): value is AuthTokens =>
   isRecord(value) &&
   isString(value.identityToken) &&
-  isString(value.sessionToken);
+  isString(value.sessionToken) &&
+  (value.expiresAt === undefined || isNumber(value.expiresAt)) &&
+  (value.authUuid === undefined || isString(value.authUuid)) &&
+  (value.authUsername === undefined || isString(value.authUsername)) &&
+  (value.refreshToken === undefined || isString(value.refreshToken));
 
 const isPlayerProfile = (value: unknown): value is PlayerProfile =>
   isRecord(value) &&
@@ -108,7 +136,8 @@ const isMod = (value: unknown): value is Mod =>
   (value.author === undefined || isString(value.author)) &&
   (value.curseForgeId === undefined || isNumber(value.curseForgeId)) &&
   (value.curseForgeFileId === undefined || isNumber(value.curseForgeFileId)) &&
-  (value.missing === undefined || isBoolean(value.missing));
+  (value.missing === undefined || isBoolean(value.missing)) &&
+  (value.iconUrl === undefined || isString(value.iconUrl));
 
 const isGameProfile = (value: unknown): value is GameProfile =>
   isRecord(value) &&
@@ -155,10 +184,35 @@ export class ConfigStore {
       "settings.json"
     );
 
-    // Ensure new settings fields are present without resetting user configuration.
+    if (!("themeId" in this.settings) || !isThemeId(this.settings.themeId)) {
+      (this.settings as Settings).themeId = "classic";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("colorScheme" in this.settings) || !isColorScheme(this.settings.colorScheme)) {
+      (this.settings as Settings).colorScheme = "dark";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
     if (!("showVersionBranchSelector" in this.settings)) {
       (this.settings as Settings & { showVersionBranchSelector?: boolean }).showVersionBranchSelector =
         false;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("sidebarPosition" in this.settings)) {
+      (this.settings as Settings & { sidebarPosition?: "left" | "top" }).sidebarPosition =
+        "top";
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("showLogsNav" in this.settings)) {
+      (this.settings as Settings & { showLogsNav?: boolean }).showLogsNav = false;
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
+
+    if (!("hasCompletedOnboarding" in this.settings)) {
+      (this.settings as Settings).hasCompletedOnboarding = false;
       this.writeJsonFile(Paths.settingsFile, this.settings);
     }
 
@@ -177,6 +231,27 @@ export class ConfigStore {
         Array.isArray(value) && value.every(isGameProfile),
       "gameProfiles.json"
     );
+
+    const legacySettings = this.settings as Settings & { javaPath?: string | null; jvmArgs?: string[] };
+    let profilesChanged = false;
+    for (const profile of this.gameProfiles) {
+      if (!profile.javaPath || profile.javaPath.trim() === "") {
+        profile.javaPath = legacySettings.javaPath ?? getDefaultJavaPath();
+        profilesChanged = true;
+      }
+      if (!profile.gameOptions.args || profile.gameOptions.args.length === 0) {
+        profile.gameOptions.args = legacySettings.jvmArgs ?? [];
+        profilesChanged = true;
+      }
+    }
+    if (profilesChanged) {
+      this.writeJsonFile(Paths.gameProfilesFile, this.gameProfiles);
+    }
+    if (legacySettings.javaPath !== undefined || legacySettings.jvmArgs !== undefined) {
+      const { javaPath: _j, jvmArgs: _a, ...rest } = legacySettings;
+      this.settings = this.sanitizeSettings(rest as Settings, this.settings);
+      this.writeJsonFile(Paths.settingsFile, this.settings);
+    }
 
     this.initialized = true;
   }
@@ -305,8 +380,6 @@ export class ConfigStore {
     fallback: Settings
   ): Settings {
     return {
-      javaPath: isNullableString(next.javaPath) ? next.javaPath : fallback.javaPath,
-      jvmArgs: isStringArray(next.jvmArgs) ? [...next.jvmArgs] : [...fallback.jvmArgs],
       installedGameVersion: isNullableString(next.installedGameVersion)
         ? next.installedGameVersion
         : fallback.installedGameVersion ?? null,
@@ -318,7 +391,28 @@ export class ConfigStore {
         : fallback.enableRussianLocalization ?? false,
       showVersionBranchSelector: isBoolean(next.showVersionBranchSelector)
         ? next.showVersionBranchSelector
-        : fallback.showVersionBranchSelector ?? false
+        : fallback.showVersionBranchSelector ?? false,
+      sidebarPosition:
+        next.sidebarPosition === "left" || next.sidebarPosition === "top"
+          ? next.sidebarPosition
+          : fallback.sidebarPosition ?? "top",
+      showLogsNav: isBoolean(next.showLogsNav)
+        ? next.showLogsNav
+        : fallback.showLogsNav ?? false,
+      themeId: isThemeId(next.themeId) ? next.themeId : fallback.themeId ?? "classic",
+      colorScheme: isColorScheme(next.colorScheme) ? next.colorScheme : fallback.colorScheme ?? "dark",
+      hasCompletedOnboarding: isBoolean(next.hasCompletedOnboarding)
+        ? next.hasCompletedOnboarding
+        : fallback.hasCompletedOnboarding ?? false,
+      backgroundMusicVolume: (() => {
+        const v = next.backgroundMusicVolume;
+        if (isNumber(v) && v >= 0 && v <= 1) return v;
+        if (typeof v === "string") {
+          const n = parseFloat(v);
+          if (Number.isFinite(n) && n >= 0 && n <= 1) return n;
+        }
+        return fallback.backgroundMusicVolume ?? 0.3;
+      })()
     };
   }
 

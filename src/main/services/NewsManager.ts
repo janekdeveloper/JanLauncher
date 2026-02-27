@@ -214,7 +214,8 @@ export class NewsManager {
           en: [],
           uk: [],
           pl: [],
-          be: []
+          be: [],
+          es: []
         },
         lastFetch: new Date().toISOString()
       };

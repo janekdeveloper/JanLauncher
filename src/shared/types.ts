@@ -1,6 +1,14 @@
 export type AuthTokens = {
   identityToken: string;
   sessionToken: string;
+  /** Unix timestamp (seconds) when the access token expires. Used for auto-refresh. */
+  expiresAt?: number;
+  /** Auth provider user id (e.g. from launcher-data). Used for game launch and display. */
+  authUuid?: string;
+  /** Auth provider display name. Used for game launch and display. */
+  authUsername?: string;
+  /** OAuth refresh token. Stored but never logged or exposed to renderer. */
+  refreshToken?: string;
 };
 
 export type PlayerProfile = {
@@ -57,6 +65,8 @@ export type Mod = {
   curseForgeId?: number;
   curseForgeFileId?: number;
   missing?: boolean;
+  /** Icon/logo URL (e.g. from CurseForge) for display in the UI */
+  iconUrl?: string;
 };
 
 export type GameProfile = {
@@ -71,13 +81,21 @@ export type GameProfile = {
   versionId?: string | null;
 };
 
+import type { ThemeId, ColorScheme } from "./theme";
+
 export type Settings = {
-  javaPath: string | null;
-  jvmArgs: string[];
   installedGameVersion?: string | null;
   launcherLanguage?: string;
   enableRussianLocalization?: boolean;
   showVersionBranchSelector?: boolean;
+  sidebarPosition?: "left" | "top";
+  showLogsNav?: boolean;
+  themeId?: ThemeId;
+  colorScheme?: ColorScheme;
+  /** Set to true after user completes first-run onboarding. Never reset. */
+  hasCompletedOnboarding?: boolean;
+  /** Background music volume 0–1. 0 = off. */
+  backgroundMusicVolume?: number;
 };
 
 export type GameStatus = "idle" | "ready" | "running" | "error";
@@ -122,6 +140,14 @@ export type CurseForgeSearchResult = {
   };
 };
 
+export type CurseForgeCategory = {
+  id: number;
+  gameId: number;
+  name: string;
+  slug: string;
+  iconUrl?: string;
+};
+
 export type NewsArticle = {
   title: string;
   description: string;
@@ -129,3 +155,21 @@ export type NewsArticle = {
   imageUrl: string;
   date?: string;
 };
+
+export interface FeaturedServer {
+  name: string;
+  description: string;
+  ip: string;
+  port: number;
+  type: "main" | "page";
+  advertiseUrl?: string;
+}
+
+export interface FeaturedServersResponse {
+  servers: FeaturedServer[];
+}
+
+export interface ServerLaunchOptions {
+  ip: string;
+  port: number;
+}

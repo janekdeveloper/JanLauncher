@@ -118,7 +118,11 @@ const NewsPage = () => {
         ) : (
           <div className={styles.grid}>
             {articles.map((article, index) => (
-              <article key={index} className={styles.card}>
+              <article
+                key={index}
+                className={`${styles.card} listItemEnter`}
+                style={{ animationDelay: `${Math.min(index, 7) * 40}ms` }}
+              >
                 {article.imageUrl && (
                   <div
                     className={styles.cardImage}

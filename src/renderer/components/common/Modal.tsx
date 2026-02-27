@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "../../i18n";
 import { CloseIcon } from "../icons";
 import styles from "./Modal.module.css";
+
+const MODAL_EXIT_MS = 220;
 
 type ModalProps = {
   isOpen: boolean;
@@ -24,22 +26,52 @@ const Modal = ({
   blocking = false
 }: ModalProps) => {
   const { t } = useI18n();
+  const [isClosing, setIsClosing] = useState(false);
+  const closeRequestedRef = useRef(false);
 
-  if (!isOpen) {
+  useEffect(() => {
+    if (isOpen) {
+      setIsClosing(false);
+      closeRequestedRef.current = false;
+    }
+  }, [isOpen]);
+
+  const handleCloseRequest = () => {
+    if (blocking || isClosing || closeRequestedRef.current) return;
+    closeRequestedRef.current = true;
+    setIsClosing(true);
+  };
+
+  const handleAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || !isClosing) return;
+    if ((e as React.AnimationEvent<HTMLDivElement>).animationName?.includes("BackdropOut")) {
+      onClose();
+      setIsClosing(false);
+    }
+  };
+
+  if (!isOpen && !isClosing) {
     return null;
   }
 
-  const handleBackdropClick = blocking ? undefined : onClose;
-  const handleClose = blocking ? undefined : onClose;
+  const backdropClass = [
+    styles.backdrop,
+    blocking ? styles.blocking : "",
+    isClosing ? styles.backdropClosing : styles.backdropEnter,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const modalClass = isClosing ? styles.modalClosing : styles.modalEnter;
 
   return createPortal(
     <div
-      className={`${styles.backdrop} ${blocking ? styles.blocking : ""}`}
-      onClick={handleBackdropClick}
+      className={backdropClass}
+      onClick={blocking ? undefined : handleCloseRequest}
+      onAnimationEnd={handleAnimationEnd}
       role="presentation"
     >
       <div
-        className={styles.modal}
+        className={`${styles.modal} ${modalClass}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -51,7 +83,7 @@ const Modal = ({
             <button
               type="button"
               className={styles.closeButton}
-              onClick={handleClose}
+              onClick={handleCloseRequest}
               aria-label={closeLabel ?? t("common.close")}
             >
               <CloseIcon className={styles.closeIcon} />

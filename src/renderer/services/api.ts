@@ -1,4 +1,5 @@
 import type {
+  CurseForgeCategory,
   CurseForgeMod,
   CurseForgeSearchResult,
   GameProfile,
@@ -27,10 +28,19 @@ if (!window.api) {
 const apiInstance = window.api;
 
 export const api = {
+  app: {
+    getAppInfo: (): Promise<{ version: string; platform: string }> =>
+      apiInstance.app.getAppInfo()
+  },
+  window: {
+    openSettings: (): Promise<void> => apiInstance.window.openSettings()
+  },
   settings: {
     get: (): Promise<Settings> => apiInstance.settings.get(),
     update: (patch: Partial<Settings>): Promise<void> =>
-      apiInstance.settings.update(patch)
+      apiInstance.settings.update(patch),
+    onUpdated: (callback: (patch: Partial<Settings>) => void): (() => void) =>
+      apiInstance.settings.onUpdated(callback)
   },
   playerProfiles: {
     list: (): Promise<PlayerProfile[]> => apiInstance.playerProfiles.list(),
@@ -90,12 +100,18 @@ export const api = {
       pageSize?: number;
       sortField?: "downloads" | "dateCreated" | "dateModified" | "name";
       sortOrder?: "asc" | "desc";
-      language?: "ru" | "en" | "uk" | "pl" | "be";
+      categoryId?: number | null;
+      gameVersion?: string | null;
+      language?: "ru" | "en" | "uk" | "pl" | "be" | "es";
     }): Promise<CurseForgeSearchResult> => apiInstance.mods.search(options),
-    getDetails: (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeMod> =>
-      (apiInstance.mods.getDetails as (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be") => Promise<CurseForgeMod>)(modId, language),
-    loadInstalled: (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<Mod[]> =>
-      (apiInstance.mods.loadInstalled as (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be") => Promise<Mod[]>)(gameProfileId, language),
+    getDetails: (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeMod> =>
+      (apiInstance.mods.getDetails as (modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<CurseForgeMod>)(modId, language),
+    loadInstalled: (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<Mod[]> =>
+      (apiInstance.mods.loadInstalled as (gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => Promise<Mod[]>)(gameProfileId, language),
+    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]> =>
+      apiInstance.mods.getCategories(language),
+    getGameVersions: (): Promise<string[]> =>
+      apiInstance.mods.getGameVersions(),
     install: (options: {
       gameProfileId: string;
       modId: number;
@@ -109,7 +125,9 @@ export const api = {
       gameProfileId: string;
       modId: string;
     }): Promise<void> => apiInstance.mods.uninstall(options),
-    openUrl: (url: string): Promise<void> => apiInstance.mods.openUrl(url)
+    openUrl: (url: string): Promise<void> => apiInstance.mods.openUrl(url),
+    enrichProfileModIcons: (gameProfileId: string): Promise<void> =>
+      apiInstance.mods.enrichProfileModIcons(gameProfileId)
   },
   versions: {
     getAvailable: (branch: GameVersionBranch): Promise<GameVersionInfo[]> =>
@@ -136,11 +154,11 @@ export const api = {
       apiInstance.versions.onError(callback)
   },
   news: {
-    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null> =>
+    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null> =>
       apiInstance.news.loadCached(language),
-    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]> =>
+    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]> =>
       apiInstance.news.refresh(language),
-    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]> =>
+    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]> =>
       apiInstance.news.fetch(language),
     openUrl: (url: string): Promise<void> => apiInstance.news.openUrl(url)
   },

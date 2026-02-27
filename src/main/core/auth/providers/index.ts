@@ -3,4 +3,4 @@
  */
 export type { IAuthProvider } from "./AuthProvider";
 export { SanasolAuth } from "./SanasolAuth";
-export { HytaleOfficialAuth } from "./HytaleOfficialAuth";
+export { HytaleAuthProvider } from "./HytaleAuthProvider";

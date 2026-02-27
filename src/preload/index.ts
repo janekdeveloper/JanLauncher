@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type {
+  CurseForgeCategory,
   CurseForgeMod,
   CurseForgeSearchResult,
   GameProfile,
@@ -11,7 +12,9 @@ import type {
   GameVersionBranch,
   GameVersionInfo,
   ActiveGameVersion,
-  InstalledGameVersion
+  InstalledGameVersion,
+  FeaturedServersResponse,
+  ServerLaunchOptions
 } from "../shared/types";
 import type {
   AuthProviderInfo,
@@ -22,9 +25,17 @@ import type {
 } from "../main/core/auth/auth.types";
 
 export interface PreloadApi {
+  openExternal(url: string): Promise<void>;
+  app: {
+    getAppInfo(): Promise<{ version: string; platform: string }>;
+  };
+  window: {
+    openSettings(): Promise<void>;
+  };
   settings: {
     get(): Promise<Settings>;
     update(patch: Partial<Settings>): Promise<void>;
+    onUpdated(callback: (patch: Partial<Settings>) => void): () => void;
   };
   playerProfiles: {
     list(): Promise<PlayerProfile[]>;
@@ -61,14 +72,19 @@ export interface PreloadApi {
       pageSize?: number;
       sortField?: "downloads" | "dateCreated" | "dateModified" | "name";
       sortOrder?: "asc" | "desc";
-      language?: "ru" | "en" | "uk" | "pl" | "be";
+      categoryId?: number | null;
+      gameVersion?: string | null;
+      language?: "ru" | "en" | "uk" | "pl" | "be" | "es";
     }): Promise<CurseForgeSearchResult>;
-    getDetails(modId: number, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<CurseForgeMod>;
-    loadInstalled(gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<Mod[]>;
+    getDetails(modId: number, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeMod>;
+    loadInstalled(gameProfileId: string, language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<Mod[]>;
+    getCategories(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]>;
+    getGameVersions(): Promise<string[]>;
     install(options: { gameProfileId: string; modId: number; fileId?: number }): Promise<Mod>;
     toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
     uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
     openUrl(url: string): Promise<void>;
+    enrichProfileModIcons(gameProfileId: string): Promise<void>;
   };
   versions: {
     getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
@@ -82,9 +98,9 @@ export interface PreloadApi {
     onError(callback: (message: string) => void): () => void;
   };
   news: {
-    loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
-    refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
-    fetch(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
+    loadCached(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null>;
+    refresh(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
+    fetch(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
     openUrl(url: string): Promise<void>;
   };
   auth: {
@@ -129,12 +145,32 @@ export interface PreloadApi {
      */
     getTotalMemoryMB(): Promise<number>;
   };
+  servers: {
+    getFeatured(): Promise<FeaturedServersResponse>;
+    launch(options: ServerLaunchOptions): Promise<void>;
+    copyAddress(ip: string, port: number): Promise<void>;
+    openAdvertise(url: string): Promise<void>;
+    openAdvertiseContact(type: "telegram" | "discord"): Promise<void>;
+    open(ip: string, port: number, playerProfileId: string, gameProfileId: string): Promise<void>;
+  };
 }
 
 const api: PreloadApi = {
+  openExternal: (url) => ipcRenderer.invoke("external:open", url),
+  app: {
+    getAppInfo: () => ipcRenderer.invoke("app:getAppInfo")
+  },
+  window: {
+    openSettings: () => ipcRenderer.invoke("window:openSettings")
+  },
   settings: {
     get: () => ipcRenderer.invoke("settings:get"),
-    update: (patch) => ipcRenderer.invoke("settings:update", patch)
+    update: (patch) => ipcRenderer.invoke("settings:update", patch),
+    onUpdated: (callback) => {
+      const handler = (_: unknown, patch: Partial<Settings>) => callback(patch);
+      ipcRenderer.on("settings:updated", handler);
+      return () => ipcRenderer.removeListener("settings:updated", handler);
+    }
   },
   playerProfiles: {
     list: () => ipcRenderer.invoke("playerProfiles:list"),
@@ -220,10 +256,13 @@ const api: PreloadApi = {
     search: (options) => ipcRenderer.invoke("mods:search", options),
     getDetails: (modId, language) => ipcRenderer.invoke("mods:getDetails", modId, language),
     loadInstalled: (gameProfileId, language) => ipcRenderer.invoke("mods:loadInstalled", gameProfileId, language),
+    getCategories: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") => ipcRenderer.invoke("mods:getCategories", language),
+    getGameVersions: () => ipcRenderer.invoke("mods:getGameVersions"),
     install: (options) => ipcRenderer.invoke("mods:install", options),
     toggle: (options) => ipcRenderer.invoke("mods:toggle", options),
     uninstall: (options) => ipcRenderer.invoke("mods:uninstall", options),
-    openUrl: (url) => ipcRenderer.invoke("mods:openUrl", url)
+    openUrl: (url) => ipcRenderer.invoke("mods:openUrl", url),
+    enrichProfileModIcons: (gameProfileId) => ipcRenderer.invoke("mods:enrichProfileModIcons", gameProfileId)
   },
   versions: {
     getAvailable: (branch) => ipcRenderer.invoke("versions:getAvailable", branch),
@@ -253,11 +292,11 @@ const api: PreloadApi = {
     }
   },
   news: {
-    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    loadCached: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:loadCached", language),
-    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    refresh: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:refresh", language),
-    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be") =>
+    fetch: (language?: "ru" | "en" | "uk" | "pl" | "be" | "es") =>
       ipcRenderer.invoke("news:fetch", language),
     openUrl: (url) => ipcRenderer.invoke("news:openUrl", url)
   },
@@ -337,6 +376,14 @@ const api: PreloadApi = {
   },
   system: {
     getTotalMemoryMB: () => ipcRenderer.invoke("system:getTotalMemory")
+  },
+  servers: {
+    getFeatured: () => ipcRenderer.invoke("servers:getFeatured"),
+    launch: (options) => ipcRenderer.invoke("servers:launch", options),
+    copyAddress: (ip, port) => ipcRenderer.invoke("servers:copyAddress", ip, port),
+    openAdvertise: (url) => ipcRenderer.invoke("servers:openAdvertise", url),
+    openAdvertiseContact: (type) => ipcRenderer.invoke("servers:openAdvertiseContact", type),
+    open: (ip, port, playerProfileId, gameProfileId) => ipcRenderer.invoke("servers:open", ip, port, playerProfileId, gameProfileId)
   }
 };
 

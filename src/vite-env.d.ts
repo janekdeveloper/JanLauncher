@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 import type {
+  CurseForgeCategory,
   CurseForgeMod,
   CurseForgeSearchResult,
   GameProfile,
@@ -12,7 +13,9 @@ import type {
   GameVersionBranch,
   GameVersionInfo,
   ActiveGameVersion,
-  InstalledGameVersion
+  InstalledGameVersion,
+  FeaturedServersResponse,
+  ServerLaunchOptions
 } from "./shared/types";
 import type {
   AuthProviderInfo,
@@ -25,9 +28,17 @@ import type {
 declare global {
   interface Window {
     api?: {
+      openExternal(url: string): Promise<void>;
+      app: {
+        getAppInfo(): Promise<{ version: string; platform: string }>;
+      };
+      window: {
+        openSettings(): Promise<void>;
+      };
       settings: {
         get(): Promise<Settings>;
         update(patch: Partial<Settings>): Promise<void>;
+        onUpdated(callback: (patch: Partial<Settings>) => void): () => void;
       };
       playerProfiles: {
         list(): Promise<PlayerProfile[]>;
@@ -67,10 +78,13 @@ declare global {
         }): Promise<CurseForgeSearchResult>;
         getDetails(modId: number): Promise<CurseForgeMod>;
         loadInstalled(gameProfileId: string): Promise<Mod[]>;
+        getCategories(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<CurseForgeCategory[]>;
+        getGameVersions(): Promise<string[]>;
         install(options: { gameProfileId: string; modId: number; fileId?: number }): Promise<Mod>;
         toggle(options: { gameProfileId: string; modId: string }): Promise<void>;
         uninstall(options: { gameProfileId: string; modId: string }): Promise<void>;
         openUrl(url: string): Promise<void>;
+        enrichProfileModIcons(gameProfileId: string): Promise<void>;
       };
       versions: {
         getAvailable(branch: GameVersionBranch): Promise<GameVersionInfo[]>;
@@ -84,9 +98,9 @@ declare global {
         onError(callback: (message: string) => void): () => void;
       };
       news: {
-        loadCached(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[] | null>;
-        refresh(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
-        fetch(language?: "ru" | "en" | "uk" | "pl" | "be"): Promise<NewsArticle[]>;
+        loadCached(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[] | null>;
+        refresh(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
+        fetch(language?: "ru" | "en" | "uk" | "pl" | "be" | "es"): Promise<NewsArticle[]>;
         openUrl(url: string): Promise<void>;
       };
       auth: {
@@ -130,6 +144,14 @@ declare global {
          * Returns total physical memory in megabytes.
          */
         getTotalMemoryMB(): Promise<number>;
+      };
+      servers: {
+        getFeatured(): Promise<FeaturedServersResponse>;
+        launch(options: ServerLaunchOptions): Promise<void>;
+        copyAddress(ip: string, port: number): Promise<void>;
+        openAdvertise(url: string): Promise<void>;
+        openAdvertiseContact(type: "telegram" | "discord"): Promise<void>;
+        open(ip: string, port: number, playerProfileId: string, gameProfileId: string): Promise<void>;
       };
     };
   }

@@ -9,14 +9,15 @@
 [![UA](https://img.shields.io/badge/README-Українська-yellow)](README.uk.md)
 [![BE](https://img.shields.io/badge/README-Беларуская-green)](README.be.md)
 [![PL](https://img.shields.io/badge/README-Polski-purple)](README.pl.md)
+[![ES](https://img.shields.io/badge/README-Español-orange)](README.es.md)
 
 ---
 
-[![Version](https://img.shields.io/badge/Version-1.0.1-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
-[![Downloads](https://img.shields.io/badge/Downloads-2k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/janekdeveloper/JanLauncher/releases)
+[![Downloads](https://img.shields.io/badge/Downloads-5k%2B-207e5c?style=for-the-badge&logo=github)](https://github.com/janekdeveloper/JanLauncher/releases)
 <!-- [![Downloads](https://img.shields.io/github/downloads/janekdeveloper/janlauncher/total?style=for-the-badge&logo=github&label=Downloads&color=207e5c)](https://github.com/janekdeveloper/janlauncher/releases) -->
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPL-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)]()
 
 [![GitHub Releases](https://img.shields.io/badge/Спампаваць-GitHub%20Releases-brightgreen)](https://github.com/janekdeveloper/JanLauncher/releases)
@@ -32,6 +33,19 @@
 JanLauncher — гэта сучасны кроссплатформенны лаунчэр, створаны спецыяльна для Hytale. Ён забяспечвае плаўны і інтуітыўны вопыт кіравання гульнёй, профілямі, модамі і многім іншым — усё ў адным месцы.
 
 Незалежна ад таго, ці вы звычайны гульцоў, ці любіце наладжваць свой гульнявы вопыт, JanLauncher спрашчае хуткі і эфектыўны запуск Hytale.
+
+---
+
+## ⚠️ Важнае паведамленне
+
+### Неафіцыйны прадукт
+**JanLauncher з'яўляецца неафіцыйным лаунчэрам з адкрытым зыходным кодам для Hytale.** Гэты праект не звязаны, не адобраны, не спансуецца і не зацверджаны Hypixel Studios, Riot Games або любымі іх афіліяванымі асобамі.
+
+### Інтэлектуальная ўласнасць
+"Hytale", "Hypixel Studios" і звязаныя з імі лагатыпы і актывы з'яўляюцца гандлёвымі знакамі або зарэгістраванымі гандлёвымі знакамі Hypixel Studios Inc. Усе правы належаць іх адпаведным уладальнікам. Выкарыстанне гэтага праграмнага забеспячэння рэгулюецца ўмовамі Ліцэнзійнай угоды канчатковага карыстальніка Hytale (EULA).
+
+### Файлы гульні і распаўсюджванне
+JanLauncher выступае выключна ў якасці кліенцкага інструмента для палягчэння працэсу загрузкі і запуску. Ён не размяшчае, не змяняе і не распаўсюджвае арыгінальныя файлы гульні непасрэдна.
 
 ---
 

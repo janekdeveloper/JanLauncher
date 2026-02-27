@@ -1,0 +1,152 @@
+.root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+  overflow: auto;
+}
+
+.root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--color-primary-glow), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, var(--color-secondary-glow), transparent 45%),
+    radial-gradient(ellipse 50% 30% at 0% 80%, var(--color-primary-glow), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px 24px;
+  flex-shrink: 0;
+}
+
+.heroInner {
+  max-width: 720px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.stepIndicator {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--color-glass-panel);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-glass);
+  min-width: 0;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  border: 2px solid var(--color-border);
+  transition: all var(--transition-medium) var(--ease-out-emphasized);
+}
+
+.stepItemActive .stepNumber {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px var(--color-primary-glow);
+}
+
+.stepItemDone .stepNumber {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+  border-color: var(--color-secondary);
+}
+
+.stepLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.stepItemActive .stepLabel {
+  color: var(--color-text);
+}
+
+.stepLine {
+  width: 14px;
+  height: 2px;
+  background: var(--color-border);
+  margin-right: 4px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px 32px;
+  animation: contentIn var(--transition-slow) var(--ease-out-emphasized);
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 32px 28px;
+  flex-shrink: 0;
+}
+
+.footerSpacer {
+  flex: 1;
+}
+
+.backButton {
+  min-width: 100px;
+}
+
+.nextButton {
+  min-width: 120px;
+}

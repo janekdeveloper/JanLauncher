@@ -1,3 +1,43 @@
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalBackdropOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -9,19 +49,35 @@
   z-index: 999;
 }
 
+.backdropEnter {
+  animation: modalBackdropIn 220ms var(--ease-out-emphasized) forwards;
+}
+
+.backdropClosing {
+  animation: modalBackdropOut 220ms var(--ease-out-emphasized) forwards;
+}
+
 .backdrop.blocking {
   cursor: not-allowed;
 }
 
 .modal {
   width: min(520px, 90vw);
-  background: linear-gradient(160deg, rgba(20, 25, 40, 0.92), rgba(12, 16, 28, 0.88));
+  background: var(--color-glass-panel);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 60px rgba(5, 10, 20, 0.45);
+  border: 1px solid var(--color-border-overlay);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
+}
+
+.modalEnter {
+  animation: modalIn 220ms var(--ease-out-emphasized) forwards;
+}
+
+.modalClosing {
+  animation: modalOut 220ms var(--ease-out-emphasized) forwards;
 }
 
 .header {
@@ -29,8 +85,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--color-border-overlay);
+  background: var(--color-surface-overlay);
 }
 
 .title {
@@ -43,7 +99,7 @@
   height: 34px;
   border-radius: 10px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--color-surface-overlay);
   display: grid;
   place-items: center;
   color: var(--color-text-muted);
@@ -52,7 +108,7 @@
 }
 
 .closeButton:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: var(--color-border-overlay-strong);
   color: var(--color-text);
   box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
@@ -68,7 +124,7 @@
 
 .footer {
   padding: 16px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--color-border-overlay);
   display: flex;
   justify-content: flex-end;
   gap: 12px;

@@ -8,14 +8,17 @@ html {
   background-color: var(--color-bg);
   background-image: linear-gradient(
       180deg,
-      rgba(21, 28, 38, 0.8) 0%,
-      rgba(21, 28, 38, 0.72) 45%,
-      rgba(21, 28, 38, 0.9) 100%
+      var(--color-bg-gradient-start, rgba(21 28 38 / 0.8)) 0%,
+      var(--color-bg-gradient-mid, rgba(21 28 38 / 0.72)) 45%,
+      var(--color-bg-gradient-end, rgba(21 28 38 / 0.9)) 100%
     ),
     var(--app-bg-image, none);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  transition:
+    background-color 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-image 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
@@ -25,6 +28,9 @@ body {
   background: transparent;
   color: var(--color-text);
   min-height: 100vh;
+  transition:
+    color 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 1100ms cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   position: relative;
@@ -47,6 +53,11 @@ select {
   min-height: 100vh;
   position: relative;
   z-index: 0;
+  transition:
+    color 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-image 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 ::-webkit-scrollbar {
@@ -55,14 +66,33 @@ select {
 
 ::-webkit-scrollbar-track {
   background: var(--color-bg);
+  transition: background 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-bg-panel);
   border-radius: 999px;
   border: 2px solid var(--color-bg);
+  transition:
+    background 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 1100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-strong);
+}
+
+@keyframes listItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.listItemEnter {
+  animation: listItemEnter 250ms ease-out forwards;
 }

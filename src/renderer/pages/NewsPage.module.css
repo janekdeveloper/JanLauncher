@@ -56,7 +56,7 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(5 10 20 / 0.3);
+  box-shadow: var(--shadow-elevated);
   z-index: 5;
 }
 

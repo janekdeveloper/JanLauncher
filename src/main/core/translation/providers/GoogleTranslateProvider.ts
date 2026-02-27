@@ -17,7 +17,8 @@ export class GoogleTranslateProvider implements TranslationProvider {
     en: "en",
     uk: "uk",
     pl: "pl",
-    be: "be"
+    be: "be",
+    es: "es"
   };
 
   /**
@@ -34,8 +35,24 @@ export class GoogleTranslateProvider implements TranslationProvider {
     targetLang: Language
   ): Promise<string | null> {
     try {
+      if (!sourceLang || !targetLang) {
+        Logger.warn(
+          "GoogleTranslateProvider",
+          `Invalid language parameters: sourceLang=${sourceLang}, targetLang=${targetLang}`
+        );
+        return null;
+      }
+
       const sourceCode = GoogleTranslateProvider.LANGUAGE_CODES[sourceLang];
       const targetCode = GoogleTranslateProvider.LANGUAGE_CODES[targetLang];
+
+      if (!sourceCode || !targetCode) {
+        Logger.warn(
+          "GoogleTranslateProvider",
+          `Language code not found: sourceLang=${sourceLang} (${sourceCode}), targetLang=${targetLang} (${targetCode})`
+        );
+        return null;
+      }
 
       if (sourceCode === targetCode) {
         return text;

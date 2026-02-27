@@ -66,10 +66,6 @@ export const useSettingsViewModel = () => {
     };
   }, []);
 
-  const updateJavaPath = (javaPath: string) => {
-    setSettings((prev) => (prev ? { ...prev, javaPath } : prev));
-  };
-
   const updateMemory = (nextMemory: number) => {
     const clamped = Math.min(
       Math.max(nextMemory, MIN_MEMORY_MB),
@@ -89,11 +85,6 @@ export const useSettingsViewModel = () => {
     }
   };
 
-  const updateJvmArgs = (jvmArgs: string) => {
-    const argsArray = jvmArgs.trim() ? jvmArgs.trim().split(/\s+/) : [];
-    setSettings((prev) => (prev ? { ...prev, jvmArgs: argsArray } : prev));
-  };
-
   const updateRussianLocalization = (enabled: boolean) => {
     setSettings((prev) => (prev ? { ...prev, enableRussianLocalization: enabled } : prev));
   };
@@ -101,8 +92,6 @@ export const useSettingsViewModel = () => {
   const updateLauncherLanguage = (language: string) => {
     setSettings((prev) => (prev ? { ...prev, launcherLanguage: language } : prev));
   };
-
-  const jvmArgsString = settings?.jvmArgs.join(" ") || "";
 
   const updateShowVersionBranchSelector = (enabled: boolean) => {
     setSettings((prev) =>
@@ -116,7 +105,46 @@ export const useSettingsViewModel = () => {
         })
       );
     } catch {
-      // No-op in non-browser environments
+    }
+  };
+
+  const updateSidebarPosition = (position: "left" | "top") => {
+    setSettings((prev) =>
+      prev
+        ? {
+            ...prev,
+            sidebarPosition: position
+          }
+        : prev
+    );
+    void api.settings.update({ sidebarPosition: position });
+    try {
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", {
+          detail: { sidebarPosition: position }
+        })
+      );
+    } catch {
+    }
+  };
+
+  const updateShowLogsNav = (enabled: boolean) => {
+    setSettings((prev) =>
+      prev
+        ? {
+            ...prev,
+            showLogsNav: enabled
+          }
+        : prev
+    );
+    void api.settings.update({ showLogsNav: enabled });
+    try {
+      window.dispatchEvent(
+        new CustomEvent("janlauncher:settings-updated", {
+          detail: { showLogsNav: enabled }
+        })
+      );
+    } catch {
     }
   };
 
@@ -132,13 +160,12 @@ export const useSettingsViewModel = () => {
     settings,
     memory,
     memoryLimit,
-    jvmArgsString,
-    updateJavaPath,
     updateMemory,
-    updateJvmArgs,
     updateRussianLocalization,
     updateLauncherLanguage,
     updateShowVersionBranchSelector,
+    updateShowLogsNav,
+    updateSidebarPosition,
     save
   };
 };

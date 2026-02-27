@@ -1,7 +1,7 @@
 /**
  * Supported languages for translation.
  */
-export type Language = "ru" | "en" | "uk" | "pl" | "be";
+export type Language = "ru" | "en" | "uk" | "pl" | "be" | "es";
 
 /**
  * Translation result with metadata.

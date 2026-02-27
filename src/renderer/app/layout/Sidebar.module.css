@@ -1,23 +1,58 @@
 .sidebar {
-  width: 92px;
   display: flex;
-  flex-direction: column;
-  padding: 20px 12px;
+  padding: 14px 12px;
   gap: 20px;
   background: var(--color-glass-panel);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-right: 1px solid var(--color-glass-border);
   box-shadow: var(--shadow-glass);
   position: relative;
   z-index: 100;
   justify-content: space-between;
 }
 
+.sidebarLeft {
+  width: 92px;
+  flex-direction: column;
+  border-right: 1px solid var(--color-glass-border);
+}
+
+.sidebarTop {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid var(--color-glass-border);
+}
+
 .brand {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidebarTop .brand {
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  gap: 2px;
+}
+
+.brandTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+}
+
+.brandSubtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  opacity: 0.9;
 }
 
 .logo {
@@ -29,9 +64,9 @@
     var(--color-primary),
     var(--color-secondary)
   );
-  box-shadow: 0 8px 24px rgba(134, 212, 255, 0.25),
-    0 0 0 1px rgba(134, 212, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px var(--color-primary-glow),
+    0 0 0 1px var(--color-glass-border),
+    inset 0 1px 0 var(--color-surface-highlight);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,7 +85,7 @@
   height: 200%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.15) 0%,
+    var(--color-surface-highlight) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -59,9 +94,9 @@
 
 .logo:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(134, 212, 255, 0.35),
-    0 0 0 1px rgba(134, 212, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px var(--color-primary-glow),
+    0 0 0 1px var(--color-glass-border),
+    inset 0 1px 0 var(--color-surface-highlight-strong);
 }
 
 .logo:hover::before {
@@ -72,8 +107,8 @@
   font-size: 30px;
   font-weight: 800;
   color: white;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(134, 212, 255, 0.3);
+  text-shadow: 0 2px 12px rgba(0 0 0 / 0.4),
+    0 0 20px var(--color-primary-glow);
   line-height: 1;
   letter-spacing: -2px;
   position: relative;
@@ -81,19 +116,53 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.95) 100%
+    #fff 0%,
+    rgba(255 255 255 / 0.95) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(0 0 0 / 0.3));
 }
 
 .nav {
   display: flex;
+  position: relative;
+}
+
+.navVertical {
   flex-direction: column;
   gap: 8px;
+}
+
+.navHorizontal {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.navIndicator {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 14px;
+  background: var(--color-glass-gradient);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow),
+    var(--shadow-subtle);
+  transition: top 220ms var(--ease-out-emphasized),
+    left 220ms var(--ease-out-emphasized),
+    width 220ms var(--ease-out-emphasized),
+    height 220ms var(--ease-out-emphasized);
+}
+
+.navIndicatorVertical {
+  border-radius: 14px;
+}
+
+.navIndicatorHorizontal {
+  border-radius: 18px;
 }
 
 .navItem {
@@ -104,9 +173,31 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 1;
   transition: background var(--transition-fast), color var(--transition-fast),
     border var(--transition-fast), transform var(--transition-fast);
   border: 1px solid transparent;
+}
+
+/* Сброс стилей кнопки, чтобы не отличалась от NavLink */
+button.navItem {
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+button.navItemTop {
+  min-width: 0;
+  padding: 0 20px;
+}
+
+.navItemTop {
+  height: 50px;
+  padding: 0 20px;
+  border-radius: 18px;
 }
 
 .navItem:hover {
@@ -116,17 +207,12 @@
   color: var(--color-text);
   border-color: var(--color-glass-border);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(5 10 20 / 0.2);
+  box-shadow: var(--shadow-subtle);
 }
 
 .navItemActive {
-  background: var(--color-glass-gradient);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border-color: var(--color-primary);
   color: var(--color-text);
-  box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 4px 12px rgba(5 10 20 / 0.25);
+  border-color: transparent;
 }
 
 .navIcon {
@@ -136,7 +222,6 @@
 
 .tooltip {
   position: fixed;
-  transform: translateY(-50%);
   background: var(--color-glass-panel);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -148,10 +233,19 @@
   white-space: nowrap;
   pointer-events: none;
   z-index: 99999;
-  animation: tooltipIn 140ms ease;
 }
 
-@keyframes tooltipIn {
+.tooltipRight {
+  transform: translateY(-50%);
+  animation: tooltipInRight 140ms ease;
+}
+
+.tooltipBottom {
+  transform: translateX(-50%);
+  animation: tooltipInBottom 140ms ease;
+}
+
+@keyframes tooltipInRight {
   from {
     opacity: 0;
     transform: translateY(-50%) translateX(-6px);
@@ -162,11 +256,70 @@
   }
 }
 
+@keyframes tooltipInBottom {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .socialButtons {
   display: flex;
-  flex-direction: column;
   gap: 8px;
+  align-items: center;
+}
+
+.socialGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.socialButtonsVertical {
+  flex-direction: column;
   margin-top: auto;
+}
+
+.socialButtonsVertical .socialGroup {
+  flex-direction: column;
+}
+
+.socialButtonsVertical .aboutIconButton {
+  margin-top: 16px;
+  margin-bottom: -14px; /* прижать к нижнему краю сайдбара */
+}
+
+.socialButtonsHorizontal .aboutIconButton {
+  margin-left: 16px;
+}
+
+.socialButtonsHorizontal {
+  flex-direction: row;
+}
+
+.sidebarTop .socialButtonsHorizontal {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.sidebarTop .socialButtonsHorizontal .aboutIconButton {
+  margin-right: -12px; /* прижать иконку About к правому краю сайдбара */
+}
+
+.sidebarTop .brand {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.sidebarTop .nav {
+  flex: 2 1 0;
+  min-width: 0;
+  justify-content: center;
 }
 
 .socialButton {
@@ -193,12 +346,35 @@
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-glow),
-    0 4px 12px rgba(5 10 20 / 0.25);
+    var(--shadow-subtle);
   transform: translateY(-1px);
   color: var(--color-primary);
 }
 
 .socialIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.aboutIconButton {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast) var(--ease-out-emphasized),
+    opacity var(--transition-fast) var(--ease-out-emphasized);
+}
+
+.aboutIconButton:hover {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+.aboutIcon {
   width: 22px;
   height: 22px;
 }

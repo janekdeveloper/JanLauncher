@@ -13,9 +13,7 @@ import {
   type GameVersionInfo,
   type InstalledVersionRecord
 } from "./VersionManifest";
-import { getApiBaseUrl, getPatchBaseUrl } from "../core/ApiConfig";
-
-const CONSECUTIVE_MISSES_TO_STOP = 5;
+import { getPatchBaseUrl } from "../core/ApiConfig";
 
 type PatchPair = { prev: number; target: number };
 
@@ -41,15 +39,16 @@ export class VersionManager {
     this.ensureBranch(branch);
     VersionStorage.ensureLayout();
 
-    Logger.info("VersionManager", `Fetching available versions for branch ${branch} from JanNet API`);
+    Logger.info("VersionManager", `[PATCH] Fetching available versions for branch ${branch}`);
 
     const os = this.mapOs();
     const arch = this.mapArch();
-    const apiBaseUrl = getApiBaseUrl();
-    const url = `${apiBaseUrl}/launcher/patches/${branch}/versions`;
+    const patchBaseUrl = getPatchBaseUrl();
+    const url = `${patchBaseUrl}/${branch}/versions`;
 
     let items: VersionsResponseItem[] = [];
     try {
+      Logger.debug("VersionManager", `[PATCH] Request: GET ${url} (os=${os}, arch=${arch})`);
       const response = await axios.get<VersionsResponse>(url, {
         timeout: 5000,
         params: {
@@ -62,19 +61,20 @@ export class VersionManager {
         }
       });
       items = response.data?.items ?? [];
+      Logger.debug("VersionManager", `[PATCH] Response: ${response.status} - ${items.length} versions found`);
     } catch (error) {
       Logger.error(
         "VersionManager",
-        `Failed to fetch versions from JanNet API for branch ${branch}`,
+        `[PATCH] Failed to fetch versions for branch ${branch}`,
         error
       );
       items = [];
     }
 
     if (!items.length) {
-      Logger.warn("VersionManager", `No versions found for branch ${branch} from JanNet API`);
+      Logger.warn("VersionManager", `[PATCH] No versions found for branch ${branch}`);
       console.warn(
-        `[VersionManager] No versions found for branch ${branch} from JanNet API (os=${os}, arch=${arch})`
+        `[VersionManager] No versions found for branch ${branch} (os=${os}, arch=${arch})`
       );
       this.pwrCache.set(branch, new Set<string>());
       return [];
@@ -86,16 +86,14 @@ export class VersionManager {
       .sort((a, b) => b - a);
 
     if (!allTargets.length) {
-      Logger.warn("VersionManager", `No valid numeric versions in JanNet response for branch ${branch}`);
+      Logger.warn("VersionManager", `[PATCH] No valid numeric versions in response for branch ${branch}`);
       this.pwrCache.set(branch, new Set<string>());
       return [];
     }
 
-    // Filter out versions that do NOT have a full patch from 0 on the mirror.
     const targets: number[] = [];
     for (const candidate of allTargets) {
       const url = this.buildPatchUrl(branch, 0, candidate);
-      // Only consider versions that have a 0 -> candidate patch file present.
       const exists = await this.headPatch(url);
       if (exists) {
         targets.push(candidate);
@@ -105,13 +103,12 @@ export class VersionManager {
     if (!targets.length) {
       Logger.warn(
         "VersionManager",
-        `No versions with full 0->N patches found for branch ${branch} (filtered from JanNet response)`
+        `[PATCH] No versions with full 0->N patches found for branch ${branch}`
       );
       this.pwrCache.set(branch, new Set<string>());
       return [];
     }
 
-    // Cache only full patches from 0 -> target for now.
     const pwrSet = new Set<string>();
     for (const target of targets) {
       pwrSet.add(this.patchKey(0, target));
@@ -120,12 +117,10 @@ export class VersionManager {
 
     Logger.info(
       "VersionManager",
-      `Discovered ${targets.length} versions for branch ${branch} from JanNet API: ${targets.join(
-        ", "
-      )}`
+      `[PATCH] Discovered ${targets.length} versions for branch ${branch}: ${targets.join(", ")}`
     );
     console.log(
-      `[VersionManager] Versions for branch ${branch} from JanNet API:`,
+      `[VersionManager] Versions for branch ${branch}:`,
       targets
     );
 
@@ -524,8 +519,9 @@ export class VersionManager {
   private static buildPatchUrl(branch: GameVersionBranch, prev: number, target: number): string {
     const os = this.mapOs();
     const arch = this.mapArch();
-    const base = getPatchBaseUrl();
-    return `${base}/${os}/${arch}/${branch}/${prev}/${target}.pwr`;
+    const patchBaseUrl = getPatchBaseUrl();
+    Logger.debug("VersionManager", `[PATCH] Building URL: ${patchBaseUrl}/${os}/${arch}/${branch}/${prev}/${target}.pwr`);
+    return `${patchBaseUrl}/${os}/${arch}/${branch}/${prev}/${target}.pwr`;
   }
 
   private static mapOs(): "windows" | "linux" | "darwin" {
@@ -554,6 +550,7 @@ export class VersionManager {
 
   private static async headPatch(url: string): Promise<boolean> {
     try {
+      Logger.debug("VersionManager", `[PATCH] Checking patch availability: ${url}`);
       const response = await axios.head(url, {
         timeout: 10000,
         headers: {
@@ -601,10 +598,12 @@ export class VersionManager {
     if (fs.existsSync(filePath) && expectedSize) {
       const stat = fs.statSync(filePath);
       if (stat.size === expectedSize) {
+        Logger.debug("VersionManager", `[PATCH] Using cached patch: ${fileName}`);
         return filePath;
       }
       fs.unlinkSync(filePath);
     } else if (fs.existsSync(filePath) && !expectedSize) {
+      Logger.debug("VersionManager", `[PATCH] Using cached patch (no size check): ${fileName}`);
       return filePath;
     }
 
@@ -613,6 +612,7 @@ export class VersionManager {
       fs.unlinkSync(tempPath);
     }
 
+    Logger.info("VersionManager", `[PATCH] Downloading version from ${url}`);
     const response = await axios.get(url, {
       responseType: "stream",
       timeout: 10 * 60 * 1000,
