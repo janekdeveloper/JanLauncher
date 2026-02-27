@@ -142,3 +142,7 @@ vite.config.ts.timestamp-*
 
 build-all.sh
 merge-linux-updates.sh
+docs/
+src/main/api/
+tests/
+vitest.config.ts
